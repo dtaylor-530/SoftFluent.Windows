@@ -9,9 +9,9 @@ namespace SoftFluent.Windows.Utilities
     /// </summary>
     public class DynamicObjectProperty : PropertyDescriptor
     {
-        private Type _type;
-        private bool _isReadOnly;
         private object _defaultValue;
+        private bool _isReadOnly;
+        private Type _type;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DynamicObjectProperty"/> class.
@@ -20,7 +20,7 @@ namespace SoftFluent.Windows.Utilities
         public DynamicObjectProperty(PropertyDescriptor descriptor)
             : base(descriptor)
         {
-            var atts = new List<Attribute>();
+            List<Attribute> atts = new List<Attribute>();
             foreach (Attribute att in descriptor.Attributes)
             {
                 atts.Add(att);
@@ -41,43 +41,13 @@ namespace SoftFluent.Windows.Utilities
         }
 
         /// <summary>
-        /// Constructs the current instance.
+        /// When overridden in a derived class, gets the type of the component this property is bound to.
         /// </summary>
-        /// <param name="name">The property name.</param>
-        /// <param name="type">The property type.</param>
-        /// <param name="attributes">The property custom attributes.</param>
-        protected virtual void Construct(string name, Type type, IEnumerable<Attribute> attributes)
-        {
-            _type = type;
-
-            var ro = Attributes.GetAttribute<ReadOnlyAttribute>();
-            if (ro != null)
-            {
-                _isReadOnly = ro.IsReadOnly;
-            }
-
-            var dv = Attributes.GetAttribute<DefaultValueAttribute>();
-            if (dv != null)
-            {
-                HasDefaultValue = true;
-                _defaultValue = ConversionService.ChangeType(dv.Value, _type);
-            }
-            else
-            {
-                _defaultValue = ConversionService.ChangeType(null, _type);
-            }
-        }
-
-        /// <summary>
-        /// Returns a <see cref="System.String"/> that represents this instance.
-        /// </summary>
+        /// <value></value>
         /// <returns>
-        /// A <see cref="System.String"/> that represents this instance.
+        /// A <see cref="T:System.Type"/> that represents the type of component this property is bound to. When the <see cref="M:System.ComponentModel.PropertyDescriptor.GetValue(System.Object)"/> or <see cref="M:System.ComponentModel.PropertyDescriptor.SetValue(System.Object,System.Object)"/> methods are invoked, the object specified might be an instance of this type.
         /// </returns>
-        public override string ToString()
-        {
-            return Name + " (" + _type.FullName + ")";
-        }
+        public override Type ComponentType => typeof(DynamicObject);
 
         /// <summary>
         /// Gets or sets the default value.
@@ -85,21 +55,9 @@ namespace SoftFluent.Windows.Utilities
         /// <value>The default value.</value>
         public virtual object DefaultValue
         {
-            get
-            {
-                return _defaultValue;
-            }
-            set
-            {
-                _defaultValue = ConversionService.ChangeType(value, _type);
-            }
+            get => _defaultValue;
+            set => _defaultValue = ConversionHelper.ChangeType(value, _type);
         }
-
-        /// <summary>
-        /// Gets or sets the sort order.
-        /// </summary>
-        /// <value>The sort order.</value>
-        public int SortOrder { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance has a default value.
@@ -109,11 +67,28 @@ namespace SoftFluent.Windows.Utilities
         /// </value>
         public virtual bool HasDefaultValue { get; set; }
 
-        private static Attribute[] GetAttributes(IEnumerable<Attribute> attributes)
-        {
-            var list = attributes == null ? new List<Attribute>() : new List<Attribute>(attributes);
-            return list.ToArray();
-        }
+        /// <summary>
+        /// When overridden in a derived class, gets a value indicating whether this property is read-only.
+        /// </summary>
+        /// <value></value>
+        /// <returns>true if the property is read-only; otherwise, false.
+        /// </returns>
+        public override bool IsReadOnly => _isReadOnly;
+
+        /// <summary>
+        /// When overridden in a derived class, gets the type of the property.
+        /// </summary>
+        /// <value></value>
+        /// <returns>
+        /// A <see cref="T:System.Type"/> that represents the type of the property.
+        /// </returns>
+        public override Type PropertyType => _type;
+
+        /// <summary>
+        /// Gets or sets the sort order.
+        /// </summary>
+        /// <value>The sort order.</value>
+        public int SortOrder { get; set; }
 
         /// <summary>
         /// When overridden in a derived class, returns whether resetting an object changes its value.
@@ -128,21 +103,6 @@ namespace SoftFluent.Windows.Utilities
         }
 
         /// <summary>
-        /// When overridden in a derived class, gets the type of the component this property is bound to.
-        /// </summary>
-        /// <value></value>
-        /// <returns>
-        /// A <see cref="T:System.Type"/> that represents the type of component this property is bound to. When the <see cref="M:System.ComponentModel.PropertyDescriptor.GetValue(System.Object)"/> or <see cref="M:System.ComponentModel.PropertyDescriptor.SetValue(System.Object,System.Object)"/> methods are invoked, the object specified might be an instance of this type.
-        /// </returns>
-        public override Type ComponentType
-        {
-            get
-            {
-                return typeof(DynamicObject);
-            }
-        }
-
-        /// <summary>
         /// When overridden in a derived class, gets the current value of the property on a component.
         /// </summary>
         /// <param name="component">The component with the property for which to retrieve the value.</param>
@@ -151,40 +111,13 @@ namespace SoftFluent.Windows.Utilities
         /// </returns>
         public override object GetValue(object component)
         {
-            var obj = component as DynamicObject;
+            DynamicObject obj = component as DynamicObject;
             if (obj != null)
+            {
                 return obj.GetPropertyValue(Name, _defaultValue);
+            }
 
             throw new ArgumentException("Component is not of the DynamicObject type", "component");
-        }
-
-        /// <summary>
-        /// When overridden in a derived class, gets a value indicating whether this property is read-only.
-        /// </summary>
-        /// <value></value>
-        /// <returns>true if the property is read-only; otherwise, false.
-        /// </returns>
-        public override bool IsReadOnly
-        {
-            get
-            {
-                return _isReadOnly;
-            }
-        }
-
-        /// <summary>
-        /// When overridden in a derived class, gets the type of the property.
-        /// </summary>
-        /// <value></value>
-        /// <returns>
-        /// A <see cref="T:System.Type"/> that represents the type of the property.
-        /// </returns>
-        public override Type PropertyType
-        {
-            get
-            {
-                return _type;
-            }
         }
 
         /// <summary>
@@ -206,7 +139,7 @@ namespace SoftFluent.Windows.Utilities
         /// <param name="value">The new value.</param>
         public override void SetValue(object component, object value)
         {
-            var obj = component as DynamicObject;
+            DynamicObject obj = component as DynamicObject;
             if (obj != null)
             {
                 obj.SetPropertyValue(Name, value);
@@ -226,6 +159,51 @@ namespace SoftFluent.Windows.Utilities
         public override bool ShouldSerializeValue(object component)
         {
             return false;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="string"/> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="string"/> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return Name + " (" + _type.FullName + ")";
+        }
+
+        /// <summary>
+        /// Constructs the current instance.
+        /// </summary>
+        /// <param name="name">The property name.</param>
+        /// <param name="type">The property type.</param>
+        /// <param name="attributes">The property custom attributes.</param>
+        protected virtual void Construct(string name, Type type, IEnumerable<Attribute> attributes)
+        {
+            _type = type;
+
+            ReadOnlyAttribute ro = Attributes.GetAttribute<ReadOnlyAttribute>();
+            if (ro != null)
+            {
+                _isReadOnly = ro.IsReadOnly;
+            }
+
+            DefaultValueAttribute dv = Attributes.GetAttribute<DefaultValueAttribute>();
+            if (dv != null)
+            {
+                HasDefaultValue = true;
+                _defaultValue = ConversionHelper.ChangeType(dv.Value, _type);
+            }
+            else
+            {
+                _defaultValue = ConversionHelper.ChangeType(null, _type);
+            }
+        }
+
+        private static Attribute[] GetAttributes(IEnumerable<Attribute> attributes)
+        {
+            List<Attribute> list = attributes == null ? new List<Attribute>() : new List<Attribute>(attributes);
+            return list.ToArray();
         }
     }
 }

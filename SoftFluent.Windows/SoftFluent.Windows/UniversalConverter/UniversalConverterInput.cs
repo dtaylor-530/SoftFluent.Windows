@@ -17,28 +17,12 @@ namespace SoftFluent.Windows
         }
 
         /// <summary>
-        /// Gets or sets the value to test.
+        /// Gets or sets the converted parameter.
         /// </summary>
         /// <value>
-        /// The value to test.
+        /// The parameter.
         /// </value>
-        public virtual object Value { get; set; }
-
-        /// <summary>
-        /// Gets or sets the value to use for general comparison.
-        /// </summary>
-        /// <value>
-        /// The value to test.
-        /// </value>
-        public virtual object ValueToCompare { get; set; }
-
-        /// <summary>
-        /// Gets or sets the minimum value to use for range comparison.
-        /// </summary>
-        /// <value>
-        /// The minimum value.
-        /// </value>
-        public virtual object MinimumValue { get; set; }
+        public virtual object ConverterParameter { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum value to use for range comparison.
@@ -49,20 +33,12 @@ namespace SoftFluent.Windows
         public virtual object MaximumValue { get; set; }
 
         /// <summary>
-        /// Gets or sets the converted parameter.
+        /// Gets or sets the minimum value to use for range comparison.
         /// </summary>
         /// <value>
-        /// The parameter.
+        /// The minimum value.
         /// </value>
-        public virtual object ConverterParameter { get; set; }
-
-        /// <summary>
-        /// Gets or sets the options to use to determine if there is a match.
-        /// </summary>
-        /// <value>
-        /// The options.
-        /// </value>
-        public virtual UniversalConverterOptions Options { get; set; }
+        public virtual object MinimumValue { get; set; }
 
         /// <summary>
         /// Gets or sets the operator to use to determine if there is a match. The default value is Equal.
@@ -71,6 +47,14 @@ namespace SoftFluent.Windows
         /// The operator.
         /// </value>
         public virtual UniversalConverterOperator Operator { get; set; }
+
+        /// <summary>
+        /// Gets or sets the options to use to determine if there is a match.
+        /// </summary>
+        /// <value>
+        /// The options.
+        /// </value>
+        public virtual UniversalConverterOptions Options { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the result must be reversed.
@@ -87,87 +71,39 @@ namespace SoftFluent.Windows
         public virtual StringComparison StringComparison { get; set; }
 
         /// <summary>
+        /// Gets or sets the value to test.
+        /// </summary>
+        /// <value>
+        /// The value to test.
+        /// </value>
+        public virtual object Value { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value to use for general comparison.
+        /// </summary>
+        /// <value>
+        /// The value to test.
+        /// </value>
+        public virtual object ValueToCompare { get; set; }
+
+        /// <summary>
         /// Clones this instance.
         /// </summary>
         /// <returns></returns>
         public virtual UniversalConverterInput Clone()
         {
-            var clone = new UniversalConverterInput();
-            clone.MaximumValue = MaximumValue;
-            clone.MinimumValue = MinimumValue;
-            clone.Operator = Operator;
-            clone.Options = Options;
-            clone.Value = Value;
-            clone.ValueToCompare = ValueToCompare;
-            clone.Reverse = Reverse;
-            clone.StringComparison = StringComparison;
+            UniversalConverterInput clone = new UniversalConverterInput
+            {
+                MaximumValue = MaximumValue,
+                MinimumValue = MinimumValue,
+                Operator = Operator,
+                Options = Options,
+                Value = Value,
+                ValueToCompare = ValueToCompare,
+                Reverse = Reverse,
+                StringComparison = StringComparison
+            };
             return clone;
-        }
-
-        private Type ValueToCompareToType(IFormatProvider provider)
-        {
-            Type type = Value as Type;
-            if (type != null)
-                return type;
-
-            string name = ValueToCompareToString(provider, true);
-            if (string.IsNullOrEmpty(name))
-                return null;
-
-            return TypeResolutionService.ResolveType(name);
-        }
-
-        private string ValueToCompareToString(IFormatProvider provider, bool forceConvert)
-        {
-            if (ValueToCompare == null)
-                return null;
-
-            string v = ValueToCompare as string;
-            if (v == null)
-            {
-                if (forceConvert || (Options & UniversalConverterOptions.Convert) == UniversalConverterOptions.Convert)
-                {
-                    v = ConversionService.ChangeType<string>(ValueToCompare, null, provider);
-                    if (v == null)
-                    {
-                        v = string.Format(provider, "{0}", ValueToCompare);
-                    }
-                }
-            }
-
-            if ((Options & UniversalConverterOptions.Trim) == UniversalConverterOptions.Trim)
-            {
-                if (v != null)
-                {
-                    v = v.Trim();
-                }
-            }
-
-            if ((Options & UniversalConverterOptions.Nullify) == UniversalConverterOptions.Nullify)
-            {
-                if (v != null && v.Length == 0)
-                {
-                    v = null;
-                }
-            }
-            return v;
-        }
-
-        private string ValueToString(IFormatProvider provider)
-        {
-            if (Value == null)
-                return null;
-
-            string v = Value as string;
-            if (v == null)
-            {
-                v = ConversionService.ChangeType<string>(Value, null, provider);
-                if (v == null)
-                {
-                    v = string.Format(provider, "{0}", Value);
-                }
-            }
-            return v;
         }
 
         /// <summary>
@@ -223,8 +159,7 @@ namespace SoftFluent.Windows
 
                     if ((Options & UniversalConverterOptions.Convert) == UniversalConverterOptions.Convert)
                     {
-                        object cvalue;
-                        if (ConversionService.TryChangeType(ValueToCompare, Value.GetType(), provider, out cvalue))
+                        if (ConversionHelper.TryChangeType(ValueToCompare, Value.GetType(), provider, out object cvalue))
                         {
                             if (Value.Equals(cvalue))
                             {
@@ -267,11 +202,15 @@ namespace SoftFluent.Windows
                 case UniversalConverterOperator.Contains:
                     v = ValueToString(provider);
                     if (v == null)
+                    {
                         break;
+                    }
 
                     vtc = ValueToCompareToString(provider, true);
                     if (vtc == null)
+                    {
                         break;
+                    }
 
                     ret = v.IndexOf(vtc, StringComparison) >= 0;
                     break;
@@ -279,11 +218,15 @@ namespace SoftFluent.Windows
                 case UniversalConverterOperator.StartsWith:
                     v = ValueToString(provider);
                     if (v == null)
+                    {
                         break;
+                    }
 
                     vtc = ValueToCompareToString(provider, true);
                     if (vtc == null)
+                    {
                         break;
+                    }
 
                     ret = v.StartsWith(vtc, StringComparison);
                     break;
@@ -291,11 +234,15 @@ namespace SoftFluent.Windows
                 case UniversalConverterOperator.EndsWith:
                     v = ValueToString(provider);
                     if (v == null)
+                    {
                         break;
+                    }
 
                     vtc = ValueToCompareToString(provider, true);
                     if (vtc == null)
+                    {
                         break;
+                    }
 
                     ret = v.EndsWith(vtc, StringComparison);
                     break;
@@ -304,21 +251,25 @@ namespace SoftFluent.Windows
                 case UniversalConverterOperator.LesserThan:
                 case UniversalConverterOperator.GreaterThanOrEqual:
                 case UniversalConverterOperator.GreaterThan:
-                    var cv = Value as IComparable;
+                    IComparable cv = Value as IComparable;
                     if (cv == null || ValueToCompare == null)
+                    {
                         break;
+                    }
 
                     IComparable cvtc;
                     if (!Value.GetType().IsAssignableFrom(ValueToCompare.GetType()))
                     {
-                        cvtc = ConversionService.ChangeType(ValueToCompare, Value.GetType(), provider) as IComparable;
+                        cvtc = ConversionHelper.ChangeType(ValueToCompare, Value.GetType(), provider) as IComparable;
                     }
                     else
                     {
                         cvtc = ValueToCompare as IComparable;
                     }
                     if (cvtc == null)
+                    {
                         break;
+                    }
 
                     int comparison;
                     v = Value as string;
@@ -352,7 +303,9 @@ namespace SoftFluent.Windows
                     clone.ValueToCompare = MinimumValue;
                     clone.Operator = UniversalConverterOperator.GreaterThanOrEqual;
                     if (!clone.Matches(provider))
+                    {
                         break;
+                    }
 
                     clone = Clone();
                     clone.ValueToCompare = MaximumValue;
@@ -364,12 +317,16 @@ namespace SoftFluent.Windows
                 case UniversalConverterOperator.IsOfType:
                     Type tvtc = ValueToCompareToType(provider);
                     if (tvtc == null)
+                    {
                         break;
+                    }
 
                     if (Value == null)
                     {
                         if (tvtc.IsValueType)
+                        {
                             break;
+                        }
 
                         ret = (Options & UniversalConverterOptions.NullMatchesType) == UniversalConverterOptions.NullMatchesType;
                         break;
@@ -387,6 +344,80 @@ namespace SoftFluent.Windows
             }
 
             return Reverse ? !ret : ret;
+        }
+
+        private string ValueToCompareToString(IFormatProvider provider, bool forceConvert)
+        {
+            if (ValueToCompare == null)
+            {
+                return null;
+            }
+
+            string v = ValueToCompare as string;
+            if (v == null)
+            {
+                if (forceConvert || (Options & UniversalConverterOptions.Convert) == UniversalConverterOptions.Convert)
+                {
+                    v = ConversionHelper.ChangeType<string>(ValueToCompare, null, provider);
+                    if (v == null)
+                    {
+                        v = string.Format(provider, "{0}", ValueToCompare);
+                    }
+                }
+            }
+
+            if ((Options & UniversalConverterOptions.Trim) == UniversalConverterOptions.Trim)
+            {
+                if (v != null)
+                {
+                    v = v.Trim();
+                }
+            }
+
+            if ((Options & UniversalConverterOptions.Nullify) == UniversalConverterOptions.Nullify)
+            {
+                if (v != null && v.Length == 0)
+                {
+                    v = null;
+                }
+            }
+            return v;
+        }
+
+        private Type ValueToCompareToType(IFormatProvider provider)
+        {
+            Type type = Value as Type;
+            if (type != null)
+            {
+                return type;
+            }
+
+            string name = ValueToCompareToString(provider, true);
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+
+            return TypeResolutionHelper.ResolveType(name);
+        }
+
+        private string ValueToString(IFormatProvider provider)
+        {
+            if (Value == null)
+            {
+                return null;
+            }
+
+            string v = Value as string;
+            if (v == null)
+            {
+                v = ConversionHelper.ChangeType<string>(Value, null, provider);
+                if (v == null)
+                {
+                    v = string.Format(provider, "{0}", Value);
+                }
+            }
+            return v;
         }
     }
 }

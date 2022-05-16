@@ -1,3 +1,4 @@
+using SoftFluent.Windows.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,12 +10,37 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Data;
 using System.Windows.Markup;
-using SoftFluent.Windows.Utilities;
 
 namespace SoftFluent.Windows
 {
     public class PropertyGridComboBoxExtension : MarkupExtension
     {
+        protected class Converter : IValueConverter
+        {
+            public Converter(PropertyGridComboBoxExtension extension)
+            {
+                Extension = extension;
+            }
+
+            public PropertyGridComboBoxExtension Extension { get; private set; }
+
+            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                PropertyGridProperty property = value as PropertyGridProperty;
+                if (property != null)
+                {
+                    return Extension.BuildItems(property, targetType, parameter, culture);
+                }
+
+                return value;
+            }
+
+            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+            {
+                return value;
+            }
+        }
+
         private readonly Binding _binding;
 
         public PropertyGridComboBoxExtension(Binding binding)
@@ -25,67 +51,33 @@ namespace SoftFluent.Windows
 
         public string DefaultZeroName { get; set; }
 
-        public virtual PropertyGridItem CreateItem()
-        {
-            return ActivatorService.CreateInstance<PropertyGridItem>();
-        }
-
-        public override object ProvideValue(IServiceProvider serviceProvider)
-        {
-            if (_binding == null)
-                throw new InvalidOperationException();
-
-            _binding.Converter = new Converter(this);
-            return _binding.ProvideValue(serviceProvider);
-        }
-
-        private static int IndexOf(string[] names, string name)
-        {
-            for (int i = 0; i < names.Length; i++)
-            {
-                if (names[i] == null)
-                    continue;
-
-                if (string.Compare(names[i], name, StringComparison.OrdinalIgnoreCase) == 0)
-                    return i;
-            }
-            return -1;
-        }
-
-        private static int IndexOf(object[] names, ulong value)
-        {
-            for (int i = 0; i < names.Length; i++)
-            {
-                if (names[i] == null)
-                    continue;
-
-                ulong ul;
-                if (!ulong.TryParse(string.Format("{0}", names[i]), out ul))
-                    continue;
-
-                if (ul == value)
-                    return i;
-            }
-            return -1;
-        }
-
         public static object EnumToObject(PropertyGridProperty property, object value)
         {
             if (property == null)
+            {
                 throw new ArgumentNullException("property");
+            }
 
             if (value != null && property.PropertyType.IsEnum)
+            {
                 return Extensions.EnumToObject(property.PropertyType, value);
+            }
 
             if (value != null && value.GetType().IsEnum)
+            {
                 return Extensions.EnumToObject(value.GetType(), value);
+            }
 
             if (property.PropertyType != typeof(string))
-                return ConversionService.ChangeType(value, property.PropertyType);
+            {
+                return ConversionHelper.ChangeType(value, property.PropertyType);
+            }
 
-            var options = PropertyGridOptionsAttribute.FromProperty(property);
+            PropertyGridOptionsAttribute options = PropertyGridOptionsAttribute.FromProperty(property);
             if (options == null)
-                return ConversionService.ChangeType(value, property.PropertyType);
+            {
+                return ConversionHelper.ChangeType(value, property.PropertyType);
+            }
 
             return EnumToObject(options, property.PropertyType, value);
         }
@@ -93,36 +85,51 @@ namespace SoftFluent.Windows
         public static object EnumToObject(PropertyGridOptionsAttribute options, Type propertyType, object value)
         {
             if (options == null)
+            {
                 throw new ArgumentNullException("options");
+            }
 
             if (propertyType == null)
+            {
                 throw new ArgumentNullException("propertyType");
+            }
 
             if (value != null && propertyType.IsEnum)
+            {
                 return Extensions.EnumToObject(propertyType, value);
+            }
 
             if (value != null && value.GetType().IsEnum)
+            {
                 return Extensions.EnumToObject(value.GetType(), value);
+            }
 
             if (propertyType != typeof(string))
-                return ConversionService.ChangeType(value, propertyType);
+            {
+                return ConversionHelper.ChangeType(value, propertyType);
+            }
 
             if (options == null || options.EnumNames == null || options.EnumValues == null || options.EnumValues.Length != options.EnumNames.Length)
-                return ConversionService.ChangeType(value, propertyType);
+            {
+                return ConversionHelper.ChangeType(value, propertyType);
+            }
 
             if (BaseConverter.IsNullOrEmptyString(value))
-                return string.Empty;
-
-            var sb = new StringBuilder();
-            string svalue = string.Format("{0}", value);
-            ulong ul;
-            if (!ulong.TryParse(svalue, out ul))
             {
-                var enums = ParseEnum(svalue);
-                if (enums.Count == 0)
-                    return string.Empty;
+                return string.Empty;
+            }
 
-                var enumValues = options.EnumValues.Select(v => string.Format("{0}", v)).ToArray();
+            StringBuilder sb = new StringBuilder();
+            string svalue = string.Format("{0}", value);
+            if (!ulong.TryParse(svalue, out ulong ul))
+            {
+                List<string> enums = ParseEnum(svalue);
+                if (enums.Count == 0)
+                {
+                    return string.Empty;
+                }
+
+                string[] enumValues = options.EnumValues.Select(v => string.Format("{0}", v)).ToArray();
                 foreach (string enumValue in enums)
                 {
                     int index = IndexOf(enumValues, enumValue);
@@ -176,34 +183,23 @@ namespace SoftFluent.Windows
             return s;
         }
 
-        private static List<string> ParseEnum(string text)
-        {
-            var enums = new List<string>();
-            string[] split = text.Split(',', ';', '|', ' ');
-            if (split.Length >= 0)
-            {
-                foreach (string sp in split)
-                {
-                    if (string.IsNullOrWhiteSpace(sp))
-                        continue;
-
-                    enums.Add(sp.Trim());
-                }
-            }
-            return enums;
-        }
-
         public static ulong EnumToUInt64(PropertyGridProperty property, object value)
         {
             if (property == null)
+            {
                 throw new ArgumentNullException("property");
+            }
 
             if (value == null)
+            {
                 return 0;
+            }
 
             Type type = value.GetType();
             if (type.IsEnum)
+            {
                 return Extensions.EnumToUInt64(value);
+            }
 
             TypeCode typeCode = Convert.GetTypeCode(value);
             switch (typeCode)
@@ -221,24 +217,31 @@ namespace SoftFluent.Windows
                     return Convert.ToUInt64(value);
             }
 
-            var att = PropertyGridOptionsAttribute.FromProperty(property);
+            PropertyGridOptionsAttribute att = PropertyGridOptionsAttribute.FromProperty(property);
             if (att == null || att.EnumNames == null)
+            {
                 return 0;
+            }
 
             string svalue = string.Format("{0}", value);
-            ulong ul;
-            if (ulong.TryParse(svalue, out ul))
+            if (ulong.TryParse(svalue, out ulong ul))
+            {
                 return ul;
+            }
 
-            var enums = ParseEnum(svalue);
+            List<string> enums = ParseEnum(svalue);
             if (enums.Count == 0)
+            {
                 return 0;
+            }
 
             foreach (string name in enums)
             {
                 int index = IndexOf(att.EnumNames, name);
                 if (index < 0)
+                {
                     continue;
+                }
 
                 ulong ulvalue = Extensions.EnumToUInt64(att.EnumValues[index]);
                 ul |= ulvalue;
@@ -249,37 +252,25 @@ namespace SoftFluent.Windows
         public static int GetEnumMaxPower(PropertyGridOptionsAttribute options)
         {
             if (options == null)
+            {
                 throw new ArgumentNullException("options");
+            }
 
             return options.EnumMaxPower <= 0 ? 32 : options.EnumMaxPower;
-        }
-
-        internal static bool TryGetDefaultValue(PropertyGridOptionsAttribute options, out string value)
-        {
-            value = null;
-            if (options == null || !options.IsEnum && !options.IsFlagsEnum)
-                return false;
-
-            if (options.EnumNames != null && options.EnumNames.Length > 0)
-            {
-                value = options.EnumNames.First();
-                return true;
-            }
-            return false;
         }
 
         public virtual IEnumerable BuildItems(PropertyGridProperty property, Type targetType, object parameter, CultureInfo culture)
         {
             if (property == null)
+            {
                 throw new ArgumentNullException("property");
+            }
 
-            Type enumType;
-            bool nullable;
-            bool isEnumOrNullableEnum = PropertyGridProperty.IsEnumOrNullableEnum(property.PropertyType, out enumType, out nullable);
+            bool isEnumOrNullableEnum = PropertyGridProperty.IsEnumOrNullableEnum(property.PropertyType, out Type enumType, out bool nullable);
 
             PropertyGridItem zero = null;
-            var att = PropertyGridOptionsAttribute.FromProperty(property);
-            var items = new ObservableCollection<PropertyGridItem>();
+            PropertyGridOptionsAttribute att = PropertyGridOptionsAttribute.FromProperty(property);
+            ObservableCollection<PropertyGridItem> items = new ObservableCollection<PropertyGridItem>();
             if (isEnumOrNullableEnum)
             {
                 if (nullable)
@@ -302,9 +293,10 @@ namespace SoftFluent.Windows
                     {
                         string name = names[i];
                         ulong nameValue = EnumToUInt64(property, values.GetValue(i));
-                        string displayName;
-                        if (!ShowEnumField(property, enumType, names[i], out displayName))
+                        if (!ShowEnumField(property, enumType, names[i], out string displayName))
+                        {
                             continue;
+                        }
 
                         PropertyGridItem item = CreateItem();
                         item.Property = property;
@@ -359,9 +351,10 @@ namespace SoftFluent.Windows
                 {
                     for (int i = 0; i < names.Length; i++)
                     {
-                        string displayName;
-                        if (!ShowEnumField(property, enumType, names[i], out displayName))
+                        if (!ShowEnumField(property, enumType, names[i], out string displayName))
+                        {
                             continue;
+                        }
 
                         PropertyGridItem item = CreateItem();
                         item.Property = property;
@@ -382,7 +375,9 @@ namespace SoftFluent.Windows
                     if (att.EnumNames == null || att.EnumNames.Length == 0)
                     {
                         if (att.EnumValues == null || att.EnumValues.Length == 0)
+                        {
                             return items;
+                        }
 
                         att.EnumNames = new string[att.EnumValues.Length];
                         for (int i = 0; i < att.EnumValues.Length; i++)
@@ -422,16 +417,20 @@ namespace SoftFluent.Windows
                         if (v == null)
                         {
                             if (!propType.IsValueType)
+                            {
                                 return null;
+                            }
 
                             return Activator.CreateInstance(propType);
                         }
 
                         Type vType = v.GetType();
                         if (propType.IsAssignableFrom(vType))
+                        {
                             return v;
+                        }
 
-                        return ConversionService.ChangeType(v, propType);
+                        return ConversionHelper.ChangeType(v, propType);
                     };
 
                     if (att.IsFlagsEnum)
@@ -509,30 +508,72 @@ namespace SoftFluent.Windows
                 }
             }
 
-            var ctx = new Dictionary<string, object>();
-            ctx["items"] = items;
-            property.OnEvent(this, ActivatorService.CreateInstance<PropertyGridEventArgs>(property, ctx));
+            Dictionary<string, object> ctx = new Dictionary<string, object>
+            {
+                ["items"] = items
+            };
+            property.OnEvent(this, ActivatorHelper.CreateInstance<PropertyGridEventArgs>(property, ctx));
             return items;
+        }
+
+        public virtual PropertyGridItem CreateItem()
+        {
+            return ActivatorHelper.CreateInstance<PropertyGridItem>();
+        }
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            if (_binding == null)
+            {
+                throw new InvalidOperationException();
+            }
+
+            _binding.Converter = new Converter(this);
+            return _binding.ProvideValue(serviceProvider);
+        }
+
+        internal static bool TryGetDefaultValue(PropertyGridOptionsAttribute options, out string value)
+        {
+            value = null;
+            if (options == null || !options.IsEnum && !options.IsFlagsEnum)
+            {
+                return false;
+            }
+
+            if (options.EnumNames != null && options.EnumNames.Length > 0)
+            {
+                value = options.EnumNames.First();
+                return true;
+            }
+            return false;
         }
 
         protected virtual bool ShowEnumField(PropertyGridProperty property, Type type, string name, out string displayName)
         {
             if (property == null)
+            {
                 throw new ArgumentNullException("property");
+            }
 
             if (type == null)
+            {
                 throw new ArgumentNullException("type");
+            }
 
             if (name == null)
+            {
                 throw new ArgumentNullException("name");
+            }
 
             FieldInfo fi = type.GetField(name, BindingFlags.Static | BindingFlags.Public);
             displayName = fi.Name;
-            var ba = fi.GetAttribute<BrowsableAttribute>();
+            BrowsableAttribute ba = fi.GetAttribute<BrowsableAttribute>();
             if (ba != null && !ba.Browsable)
+            {
                 return false;
+            }
 
-            var da = fi.GetAttribute<DescriptionAttribute>();
+            DescriptionAttribute da = fi.GetAttribute<DescriptionAttribute>();
             if (da != null && !string.IsNullOrWhiteSpace(da.Description))
             {
                 displayName = da.Description;
@@ -540,28 +581,62 @@ namespace SoftFluent.Windows
             return true;
         }
 
-        protected class Converter : IValueConverter
+        private static int IndexOf(string[] names, string name)
         {
-            public Converter(PropertyGridComboBoxExtension extension)
+            for (int i = 0; i < names.Length; i++)
             {
-                Extension = extension;
+                if (names[i] == null)
+                {
+                    continue;
+                }
+
+                if (string.Compare(names[i], name, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    return i;
+                }
             }
+            return -1;
+        }
 
-            public PropertyGridComboBoxExtension Extension { get; private set; }
-
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        private static int IndexOf(object[] names, ulong value)
+        {
+            for (int i = 0; i < names.Length; i++)
             {
-                var property = value as PropertyGridProperty;
-                if (property != null)
-                    return Extension.BuildItems(property, targetType, parameter, culture);
+                if (names[i] == null)
+                {
+                    continue;
+                }
 
-                return value;
+                if (!ulong.TryParse(string.Format("{0}", names[i]), out ulong ul))
+                {
+                    continue;
+                }
+
+                if (ul == value)
+                {
+                    return i;
+                }
             }
+            return -1;
+        }
 
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        private static List<string> ParseEnum(string text)
+        {
+            List<string> enums = new List<string>();
+            string[] split = text.Split(',', ';', '|', ' ');
+            if (split.Length >= 0)
             {
-                return value;
+                foreach (string sp in split)
+                {
+                    if (string.IsNullOrWhiteSpace(sp))
+                    {
+                        continue;
+                    }
+
+                    enums.Add(sp.Trim());
+                }
             }
+            return enums;
         }
     }
 }

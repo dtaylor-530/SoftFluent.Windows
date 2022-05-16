@@ -2,12 +2,14 @@
 
 namespace SoftFluent.Windows
 {
-    public static class ActivatorService
+    public static class ActivatorHelper
     {
-        public static object CreateInstance(Type type, params object[] args)
+        public static object CreateInstance(this Type type, params object[] args)
         {
             if (type == null)
+            {
                 throw new ArgumentNullException("type");
+            }
 
             object obj = ServiceProvider.Current.GetService<IActivator>().CreateInstance(type, args);
             return obj;

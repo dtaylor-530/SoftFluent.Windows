@@ -66,49 +66,49 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActivatorService.cs" />
-    <Compile Include="BaseActivator.cs" />
-    <Compile Include="BaseConverter.cs" />
-    <Compile Include="BaseDecamelizer.cs" />
-    <Compile Include="BaseTypeResolver.cs" />
-    <Compile Include="ByteArrayControl.cs" />
-    <Compile Include="ChangeTypeConverter.cs" />
-    <Compile Include="ConversionService.cs">
+    <Compile Include="Utilities\ActivatorHelper.cs" />
+    <Compile Include="Service\BaseActivator.cs" />
+    <Compile Include="Service\BaseConverter.cs" />
+    <Compile Include="Service\BaseDecamelizer.cs" />
+    <Compile Include="Service\BaseTypeResolver.cs" />
+    <Compile Include="Controls\ByteArrayControl.cs" />
+    <Compile Include="Converter\ChangeTypeConverter.cs" />
+    <Compile Include="Utilities\ConversionHelper.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DecamelizationService.cs">
+    <Compile Include="Utilities\DecamelizationHelper.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DecamelizeOptions.cs" />
-    <Compile Include="DecamelizeTextOptions.cs" />
+    <Compile Include="Service\DecamelizeOptions.cs" />
+    <Compile Include="Abstract\DecamelizeTextOptions.cs" />
     <Compile Include="Diagnostics\Tracing.cs" />
-    <Compile Include="IActivator.cs" />
-    <Compile Include="IConverter.cs" />
-    <Compile Include="IDecamelizer.cs">
+    <Compile Include="Abstract\IActivator.cs" />
+    <Compile Include="Abstract\IConverter.cs" />
+    <Compile Include="Abstract\IDecamelizer.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="ITypeResolver.cs">
+    <Compile Include="Abstract\ITypeResolver.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyVersionInfo.cs" />
-    <Compile Include="ServiceProvider.cs" />
-    <Compile Include="TypeResolutionService.cs" />
+    <Compile Include="Service\ServiceProvider.cs" />
+    <Compile Include="Utilities\TypeResolutionHelper.cs" />
     <Compile Include="Utilities\Extensions.cs" />
-    <Compile Include="AutoObject.cs" />
+    <Compile Include="ViewModel\AutoObject.cs" />
     <Compile Include="Utilities\DataBindingEvaluator.cs" />
     <Compile Include="Utilities\DynamicObject.cs" />
     <Compile Include="Utilities\DynamicObjectProperty.cs" />
-    <Compile Include="UniversalConverter.cs" />
-    <Compile Include="UniversalConverterCase.cs" />
-    <Compile Include="UniversalConverterInput.cs" />
-    <Compile Include="UniversalConverterOperator.cs" />
-    <Compile Include="UniversalConverterOptions.cs" />
-    <Compile Include="PropertyGridDataTemplateSelector.cs" />
-    <Compile Include="DateTimePicker.cs" />
-    <Compile Include="EnumerableConverter.cs" />
-    <Compile Include="IPropertyGridCommandHandler.cs" />
-    <Compile Include="IPropertyGridEditor.cs" />
-    <Compile Include="IPropertyGridObject.cs" />
+    <Compile Include="UniversalConverter\UniversalConverter.cs" />
+    <Compile Include="UniversalConverter\UniversalConverterCase.cs" />
+    <Compile Include="UniversalConverter\UniversalConverterInput.cs" />
+    <Compile Include="UniversalConverter\UniversalConverterOperator.cs" />
+    <Compile Include="UniversalConverter\UniversalConverterOptions.cs" />
+    <Compile Include="PropertyGrid\PropertyGridDataTemplateSelector.cs" />
+    <Compile Include="Controls\DateTimePicker.cs" />
+    <Compile Include="Converter\EnumerableConverter.cs" />
+    <Compile Include="Abstract\IPropertyGridCommandHandler.cs" />
+    <Compile Include="Abstract\IPropertyGridEditor.cs" />
+    <Compile Include="Abstract\IPropertyGridObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -116,20 +116,21 @@
     <Compile Include="PropertyGrid.xaml.cs">
       <DependentUpon>PropertyGrid.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PropertyGridAttribute.cs" />
-    <Compile Include="PropertyGridComboBoxExtension.cs" />
-    <Compile Include="PropertyGridConverter.cs" />
-    <Compile Include="PropertyGridDataProvider.cs" />
-    <Compile Include="PropertyGridDataTemplate.cs" />
-    <Compile Include="PropertyGridEnumProperty.cs" />
-    <Compile Include="PropertyGridEventArgs.cs" />
-    <Compile Include="PropertyGridItem.cs" />
-    <Compile Include="PropertyGridOptionsAttribute.cs" />
-    <Compile Include="PropertyGridProperty.cs" />
-    <Compile Include="PropertyGridWindowManager.cs" />
-    <Compile Include="PropertyGridWindowOptions.cs" />
+    <Compile Include="Attribute\PropertyGridAttribute.cs" />
+    <Compile Include="Markup\PropertyGridComboBoxExtension.cs" />
+    <Compile Include="Converter\PropertyGridConverter.cs" />
+    <Compile Include="Service\PropertyGridDataProvider.cs" />
+    <Compile Include="PropertyGrid\PropertyGridDataTemplate.cs" />
+    <Compile Include="PropertyGrid\PropertyGridEnumProperty.cs" />
+    <Compile Include="PropertyGrid\PropertyGridEventArgs.cs" />
+    <Compile Include="PropertyGrid\PropertyGridItem.cs" />
+    <Compile Include="PropertyGrid\PropertyGridOptionsAttribute.cs" />
+    <Compile Include="PropertyGrid\PropertyGridProperty.cs" />
+    <Compile Include="PropertyGrid\PropertyGridWindowManager.cs" />
+    <Compile Include="PropertyGrid\PropertyGridWindowOptions.cs" />
     <Compile Include="Resources\SR.cs" />
-    <Compile Include="TypeDataTemplateSelector.cs" />
+    <Compile Include="DataTemplateSelector\TypeDataTemplateSelector.cs" />
+    <Compile Include="Utilities\InheritanceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Strings.resx" />
@@ -137,6 +138,7 @@
   <ItemGroup>
     <None Include="SoftFluent.Windows.snk" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

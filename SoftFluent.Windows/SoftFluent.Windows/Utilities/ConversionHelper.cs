@@ -2,12 +2,11 @@
 
 namespace SoftFluent.Windows
 {
-    public static class ConversionService
+    public static class ConversionHelper
     {
         public static bool TryChangeType<T>(object input, IFormatProvider provider, out T value)
         {
-            object v;
-            bool b = ServiceProvider.Current.GetService<IConverter>().TryChangeType(input, typeof(T), provider, out v);
+            bool b = ServiceProvider.Current.GetService<IConverter>().TryChangeType(input, typeof(T), provider, out object v);
             if (!b)
             {
                 if (v == null)
@@ -59,16 +58,19 @@ namespace SoftFluent.Windows
         public static object ChangeType(object input, Type conversionType, object defaultValue, IFormatProvider provider)
         {
             if (conversionType == null)
+            {
                 throw new ArgumentNullException("conversionType");
+            }
 
             if (defaultValue == null && conversionType.IsValueType)
             {
                 defaultValue = Activator.CreateInstance(conversionType);
             }
 
-            object value;
-            if (TryChangeType(input, conversionType, provider, out value))
+            if (TryChangeType(input, conversionType, provider, out object value))
+            {
                 return value;
+            }
 
             return defaultValue;
         }
@@ -85,9 +87,10 @@ namespace SoftFluent.Windows
 
         public static T ChangeType<T>(object input, T defaultValue, IFormatProvider provider)
         {
-            T value;
-            if (TryChangeType(input, provider, out value))
+            if (TryChangeType(input, provider, out T value))
+            {
                 return value;
+            }
 
             return defaultValue;
         }

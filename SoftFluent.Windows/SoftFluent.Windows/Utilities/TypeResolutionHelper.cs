@@ -2,7 +2,7 @@
 
 namespace SoftFluent.Windows
 {
-    public static class TypeResolutionService
+    public static class TypeResolutionHelper
     {
         public static Type ResolveType(string fullName)
         {

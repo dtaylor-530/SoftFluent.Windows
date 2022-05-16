@@ -1,7 +1,6 @@
-﻿
-namespace SoftFluent.Windows
+﻿namespace SoftFluent.Windows
 {
-    public static class DecamelizationService
+    public static class DecamelizationHelper
     {
         public static string Decamelize(string text)
         {

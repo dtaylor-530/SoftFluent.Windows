@@ -1,8 +1,8 @@
+using SoftFluent.Windows.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Markup;
-using SoftFluent.Windows.Utilities;
 
 namespace SoftFluent.Windows
 {
@@ -39,7 +39,9 @@ namespace SoftFluent.Windows
                     foreach (string name in names)
                     {
                         if (string.IsNullOrWhiteSpace(name))
+                        {
                             continue;
+                        }
 
                         Type type;
                         // a hack to handle nullable enum in a general way
@@ -49,7 +51,7 @@ namespace SoftFluent.Windows
                         }
                         else
                         {
-                            type = TypeResolutionService.ResolveType(name);
+                            type = TypeResolutionHelper.ResolveType(name);
                         }
                         if (type != null)
                         {
@@ -72,9 +74,11 @@ namespace SoftFluent.Windows
                     foreach (string name in names)
                     {
                         if (string.IsNullOrWhiteSpace(name))
+                        {
                             continue;
+                        }
 
-                        Type type = TypeResolutionService.ResolveType(name);
+                        Type type = TypeResolutionHelper.ResolveType(name);
                         if (type != null)
                         {
                             _resolvedCollectionItemPropertyTypes.Add(type);

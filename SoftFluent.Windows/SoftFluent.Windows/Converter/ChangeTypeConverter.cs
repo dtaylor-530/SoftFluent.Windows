@@ -8,7 +8,7 @@ namespace SoftFluent.Windows
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ConversionService.ChangeType(value, targetType, null, culture);
+            return ConversionHelper.ChangeType(value, targetType, null, culture);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -34,13 +34,19 @@ namespace SoftFluent.Windows.Utilities
         public virtual DynamicObjectProperty AddProperty(string name, Type type, IEnumerable<Attribute> attributes)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException("name");
+            }
 
             if (type == null)
+            {
                 throw new ArgumentNullException("type");
+            }
 
-            if (_properties.Find(x => x.Name == name) !=null)
+            if (_properties.Find(x => x.Name == name) != null)
+            {
                 throw new ArgumentException("Property '" + name + "' is already defined", "name");
+            }
 
             DynamicObjectProperty dop = CreateProperty(name, type, attributes);
             _properties.Add(dop);
@@ -62,13 +68,19 @@ namespace SoftFluent.Windows.Utilities
         public virtual DynamicObjectProperty AddProperty(string name, Type type, object defaultValue, bool readOnly, int sortOrder, Attribute[] attributes)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException("name");
+            }
 
             if (type == null)
+            {
                 throw new ArgumentNullException("type");
+            }
 
             if (_properties.Find(x => x.Name == name) != null)
+            {
                 throw new ArgumentException("Property '" + name + "' is already defined", "name");
+            }
 
             List<Attribute> newAtts;
             if (attributes != null)
@@ -102,7 +114,9 @@ namespace SoftFluent.Windows.Utilities
         public void SortProperties(IComparer<PropertyDescriptor> comparer)
         {
             if (comparer == null)
+            {
                 throw new ArgumentNullException("comparer");
+            }
 
             _properties.Sort(comparer);
         }
@@ -117,15 +131,20 @@ namespace SoftFluent.Windows.Utilities
         public virtual object GetPropertyValue(string name, Type type, object defaultValue)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException("name");
+            }
 
             if (type == null)
+            {
                 throw new ArgumentNullException("type");
+            }
 
-            defaultValue = ConversionService.ChangeType(defaultValue, type);
-            object obj;
-            if (_values.TryGetValue(name, out obj))
-                return ConversionService.ChangeType(obj, type, defaultValue);
+            defaultValue = ConversionHelper.ChangeType(defaultValue, type);
+            if (_values.TryGetValue(name, out object obj))
+            {
+                return ConversionHelper.ChangeType(obj, type, defaultValue);
+            }
 
             return defaultValue;
         }
@@ -140,11 +159,14 @@ namespace SoftFluent.Windows.Utilities
         public virtual T GetPropertyValue<T>(string name, T defaultValue)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException("name");
+            }
 
-            object obj;
-            if (_values.TryGetValue(name, out obj))
-                return ConversionService.ChangeType(obj, defaultValue);
+            if (_values.TryGetValue(name, out object obj))
+            {
+                return ConversionHelper.ChangeType(obj, defaultValue);
+            }
 
             return defaultValue;
         }
@@ -160,7 +182,9 @@ namespace SoftFluent.Windows.Utilities
         public virtual bool TryGetPropertyValue(string name, out object value)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException("name");
+            }
 
             return _values.TryGetValue(name, out value);
         }
@@ -174,11 +198,14 @@ namespace SoftFluent.Windows.Utilities
         public virtual object GetPropertyValue(string name, object defaultValue)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException("name");
+            }
 
-            object obj;
-            if (_values.TryGetValue(name, out obj))
+            if (_values.TryGetValue(name, out object obj))
+            {
                 return obj;
+            }
 
             return defaultValue;
         }
@@ -191,10 +218,11 @@ namespace SoftFluent.Windows.Utilities
         public virtual void SetPropertyValue(string name, object value)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException("name");
+            }
 
-            object existing;
-            bool exists = _values.TryGetValue(name, out existing);
+            bool exists = _values.TryGetValue(name, out object existing);
             if (!exists)
             {
                 _values.Add(name, value);
@@ -204,11 +232,14 @@ namespace SoftFluent.Windows.Utilities
                 if (value == null)
                 {
                     if (existing == null)
+                    {
                         return;
-
+                    }
                 }
                 else if (value.Equals(existing))
-                        return;
+                {
+                    return;
+                }
 
                 _values[name] = value;
             }
@@ -227,7 +258,9 @@ namespace SoftFluent.Windows.Utilities
         protected virtual DynamicObjectProperty CreateProperty(string name, Type type, IEnumerable<Attribute> attributes)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException("name");
+            }
 
             return new DynamicObjectProperty(name, type, attributes);
         }
@@ -242,10 +275,10 @@ namespace SoftFluent.Windows.Utilities
         public virtual string ToStringName { get; set; }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
+        /// A <see cref="string" /> that represents this instance.
         /// </returns>
         public override string ToString()
         {
@@ -253,17 +286,19 @@ namespace SoftFluent.Windows.Utilities
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String"/> that represents this instance.
+        /// Returns a <see cref="string"/> that represents this instance.
         /// </summary>
         /// <param name="format">The format.</param>
         /// <param name="formatProvider">The format provider.</param>
         /// <returns>
-        /// A <see cref="System.String"/> that represents this instance.
+        /// A <see cref="string"/> that represents this instance.
         /// </returns>
         public virtual string ToString(string format, IFormatProvider formatProvider)
         {
             if (string.IsNullOrEmpty(format))
+            {
                 return ToString();
+            }
 
             return Extensions.Format(this, format, formatProvider);
         }
@@ -272,13 +307,7 @@ namespace SoftFluent.Windows.Utilities
         /// Gets the attributes.
         /// </summary>
         /// <value>The attributes.</value>
-        public virtual IList<Attribute> Attributes
-        {
-            get
-            {
-                return _attributes;
-            }
-        }
+        public virtual IList<Attribute> Attributes => _attributes;
 
         AttributeCollection ICustomTypeDescriptor.GetAttributes()
         {
@@ -359,22 +388,19 @@ namespace SoftFluent.Windows.Utilities
         /// Gets the editors.
         /// </summary>
         /// <value>The editors.</value>
-        public virtual IDictionary<Type, object> Editors
-        {
-            get
-            {
-                return _editors;
-            }
-        }
+        public virtual IDictionary<Type, object> Editors => _editors;
 
         object ICustomTypeDescriptor.GetEditor(Type editorBaseType)
         {
             if (editorBaseType == null)
+            {
                 throw new ArgumentNullException("editorBaseType");
+            }
 
-            object editor;
-            if (_editors.TryGetValue(editorBaseType, out editor))
+            if (_editors.TryGetValue(editorBaseType, out object editor))
+            {
                 return editor;
+            }
 
             return null;
         }
@@ -383,27 +409,25 @@ namespace SoftFluent.Windows.Utilities
         /// Gets the events.
         /// </summary>
         /// <value>The events.</value>
-        public virtual IList<EventDescriptor> Events
-        {
-            get
-            {
-                return _events;
-            }
-        }
+        public virtual IList<EventDescriptor> Events => _events;
 
         EventDescriptorCollection ICustomTypeDescriptor.GetEvents(Attribute[] attributes)
         {
             if (attributes == null || attributes.Length == 0)
+            {
                 return ((ICustomTypeDescriptor)this).GetEvents();
+            }
 
-            var list = new List<EventDescriptor>();
+            List<EventDescriptor> list = new List<EventDescriptor>();
             foreach (EventDescriptor evt in _events)
             {
                 if (evt.Attributes.Count == 0)
+                {
                     continue;
+                }
 
                 bool cont = false;
-                foreach (var att in attributes)
+                foreach (Attribute att in attributes)
                 {
                     if (!HasMatchingAttribute(evt, att))
                     {
@@ -422,9 +446,11 @@ namespace SoftFluent.Windows.Utilities
 
         private static bool HasMatchingAttribute(MemberDescriptor member, Attribute attribute)
         {
-            var att = member.Attributes[attribute.GetType()];
+            Attribute att = member.Attributes[attribute.GetType()];
             if (att == null)
+            {
                 return attribute.IsDefaultAttribute();
+            }
 
             return attribute.Match(att);
         }
@@ -437,13 +463,17 @@ namespace SoftFluent.Windows.Utilities
         PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties(Attribute[] attributes)
         {
             if (attributes == null || attributes.Length == 0)
+            {
                 return ((ICustomTypeDescriptor)this).GetProperties();
+            }
 
-            var list = new List<PropertyDescriptor>();
+            List<PropertyDescriptor> list = new List<PropertyDescriptor>();
             foreach (PropertyDescriptor prop in _properties)
             {
                 if (prop.Attributes.Count == 0)
+                {
                     continue;
+                }
 
                 bool cont = false;
                 foreach (Attribute att in attributes)
@@ -480,13 +510,7 @@ namespace SoftFluent.Windows.Utilities
         /// Gets the properties.
         /// </summary>
         /// <value>The properties.</value>
-        public virtual IList<PropertyDescriptor> Properties
-        {
-            get
-            {
-                return _properties;
-            }
-        }
+        public virtual IList<PropertyDescriptor> Properties => _properties;
 
         PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties()
         {
@@ -565,12 +589,14 @@ namespace SoftFluent.Windows.Utilities
                 separator = Environment.NewLine;
             }
 
-            var list = new List<ValidationException>();
+            List<ValidationException> list = new List<ValidationException>();
             ValidateMember(culture, list, memberName);
             if (list.Count == 0)
+            {
                 return null;
+            }
 
-            var sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();
             foreach (ValidationException e in list)
             {
                 if (sb.Length != 0)
@@ -591,23 +617,13 @@ namespace SoftFluent.Windows.Utilities
         public virtual void ValidateMember(CultureInfo culture, IList<ValidationException> list, string memberName)
         {
             if (list == null)
+            {
                 throw new ArgumentNullException("list");
-        }
-
-        string IDataErrorInfo.Error
-        {
-            get
-            {
-                return Validate();
             }
         }
 
-        string IDataErrorInfo.this[string columnName]
-        {
-            get
-            {
-                return ValidateMember(columnName);
-            }
-        }
+        string IDataErrorInfo.Error => Validate();
+
+        string IDataErrorInfo.this[string columnName] => ValidateMember(columnName);
     }
 }
