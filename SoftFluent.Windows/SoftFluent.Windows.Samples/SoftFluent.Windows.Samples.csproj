@@ -59,7 +59,12 @@
     <Compile Include="..\SoftFluent.Windows\Properties\AssemblyVersionInfo.cs">
       <Link>Properties\AssemblyVersionInfo.cs</Link>
     </Compile>
-    <Compile Include="Utilities.cs" />
+    <Compile Include="Infrastructure\Address.cs" />
+    <Compile Include="Infrastructure\AddressConverter.cs" />
+    <Compile Include="Infrastructure\Customer.cs" />
+    <Compile Include="Infrastructure\Customer2.cs" />
+    <Compile Include="Infrastructure\PointConverter.cs" />
+    <Compile Include="Infrastructure\Utilities.cs" />
     <Page Include="AddressListEditorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -75,7 +80,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Model.cs" />
+    <Compile Include="Infrastructure\Model.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -93,6 +98,7 @@
       <Name>SoftFluent.Windows</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

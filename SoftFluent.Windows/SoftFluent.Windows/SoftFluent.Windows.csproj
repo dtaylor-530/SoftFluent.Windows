@@ -64,8 +64,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Resources\DataTemplates.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Utilities\Helper.cs" />
     <Compile Include="Utilities\ActivatorHelper.cs" />
     <Compile Include="Service\BaseActivator.cs" />
     <Compile Include="Service\BaseConverter.cs" />
@@ -119,7 +128,7 @@
     <Compile Include="Attribute\PropertyGridAttribute.cs" />
     <Compile Include="Markup\PropertyGridComboBoxExtension.cs" />
     <Compile Include="Converter\PropertyGridConverter.cs" />
-    <Compile Include="Service\PropertyGridDataProvider.cs" />
+    <Compile Include="Service\PropertyGridListSource.cs" />
     <Compile Include="PropertyGrid\PropertyGridDataTemplate.cs" />
     <Compile Include="PropertyGrid\PropertyGridEnumProperty.cs" />
     <Compile Include="PropertyGrid\PropertyGridEventArgs.cs" />

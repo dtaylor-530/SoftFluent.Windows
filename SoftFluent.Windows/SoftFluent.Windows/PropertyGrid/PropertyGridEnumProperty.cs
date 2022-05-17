@@ -1,11 +1,12 @@
-using System.Reflection;
 using SoftFluent.Windows.Utilities;
+using System.Linq;
+using System.Reflection;
 
 namespace SoftFluent.Windows
 {
     public class PropertyGridEnumProperty : PropertyGridProperty
     {
-        public PropertyGridEnumProperty(PropertyGridDataProvider provider)
+        public PropertyGridEnumProperty(PropertyGridListSource provider)
             : base(provider)
         {
             EnumAttributes = provider.CreateDynamicObject();
@@ -17,9 +18,9 @@ namespace SoftFluent.Windows
             EnumAttributes.Properties.Clear();
             foreach (FieldInfo fi in PropertyType.GetFields(BindingFlags.Static | BindingFlags.Public))
             {
-                if (fi.Name.Equals(string.Format("{0}", base.Value)))
+                if (fi.Name.Equals($"{base.Value}"))
                 {
-                    PropertyGridDataProvider.AddDynamicProperties(fi.GetAttributes<PropertyGridAttribute>(), EnumAttributes);
+                    EnumAttributes.AddDynamicProperties(fi.GetAttributes<PropertyGridAttribute>().ToArray());
                 }
             }
         }

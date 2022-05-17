@@ -5,7 +5,7 @@
         Title="MainWindow" Height="638" Width="608">
 <Grid>
     <Grid.Resources>
-            <samples:Customer2 x:Key="Customer"/>
+        <samples:Customer2 x:Key="Customer"/>
     </Grid.Resources>
     <sfw:PropertyGrid Name="MyGrid" xmlns:sfw="clr-namespace:SoftFluent.Windows;assembly=SoftFluent.Windows" SelectedObject="{StaticResource Customer}" />
 </Grid>

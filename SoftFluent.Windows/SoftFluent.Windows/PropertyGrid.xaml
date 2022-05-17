@@ -10,51 +10,13 @@
     d:DesignWidth="300"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/SoftFluent.Windows;component/Resources/DataTemplates.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="/SoftFluent.Windows;component/Resources/Styles.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
 
-        <Style TargetType="ToolTip">
-            <Style.Triggers>
-                <Trigger Property="Content" Value="{x:Static system:String.Empty}">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </Trigger>
-                <Trigger Property="Content" Value="{x:Null}">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <windows:PropertyGridConverter x:Key="PropertyGridConverter" />
-        <Style x:Key="ValidationLabel" TargetType="{x:Type Label}">
-            <Setter Property="DataGridCell.ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-        </Style>
-        <Style x:Key="ValidationTextBox2" TargetType="{x:Type TextBox}">
-            <Setter Property="DataGridCell.ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-        </Style>
-        <Style x:Key="ValidationTextBox" TargetType="{x:Type TextBox}">
-            <Setter Property="Validation.ErrorTemplate">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Border
-                            Width="1"
-                            Height="23"
-                            BorderBrush="Red"
-                            BorderThickness="1" />
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="Validation.HasError" Value="true">
-                    <Setter Property="DataGridCell.ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <CollectionViewSource x:Key="PropertiesSource">
-            <CollectionViewSource.GroupDescriptions>
-                <PropertyGroupDescription PropertyName="Category" />
-            </CollectionViewSource.GroupDescriptions>
-        </CollectionViewSource>
-
-        <Window
+            <Window
             x:Key="CollectionEditorWindow"
             Name="CollectionEditorWindow"
             Title="Collection Editor"
@@ -62,108 +24,108 @@
             Height="500"
             x:Shared="false"
             FocusManager.FocusedElement="{Binding ElementName=EditorSelector}">
-            <Window.CommandBindings>
-                <CommandBinding
+                <Window.CommandBindings>
+                    <CommandBinding
                     CanExecute="OnEditorWindowCloseCanExecute"
                     Command="Close"
                     Executed="OnEditorWindowCloseExecuted" />
-            </Window.CommandBindings>
-            <Window.InputBindings>
-                <KeyBinding Key="Escape" Command="Close" />
-            </Window.InputBindings>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="30" />
-                </Grid.RowDefinitions>
-                <Grid Name="CollectionEditorListGrid" Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="5" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <ListView
+                </Window.CommandBindings>
+                <Window.InputBindings>
+                    <KeyBinding Key="Escape" Command="Close" />
+                </Window.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="30" />
+                    </Grid.RowDefinitions>
+                    <Grid Name="CollectionEditorListGrid" Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ListView
                         Name="EditorSelector"
                         Grid.Column="0"
                         ItemsSource="{Binding Value}"
                         SelectedIndex="0"
                         SelectionChanged="OnEditorSelectorSelectionChanged"
                         SelectionMode="Single" />
-                    <GridSplitter
+                        <GridSplitter
                         Grid.Column="1"
                         Width="5"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Stretch"
                         ShowsPreview="True" />
-                    <windows:PropertyGrid x:Name="CollectionEditorPropertiesGrid" Grid.Column="2" />
-                </Grid>
-                <Button
+                        <windows:PropertyGrid x:Name="CollectionEditorPropertiesGrid" Grid.Column="2" />
+                    </Grid>
+                    <Button
                     Grid.Row="1"
                     Width="100"
                     Margin="5,5,5,5"
                     HorizontalAlignment="Right"
                     Command="Close"
                     Content="Close" />
-            </Grid>
-        </Window>
-        <Window
+                </Grid>
+            </Window>
+            <Window
             x:Key="ByteArrayEditorWindow"
             Name="ByteArrayEditorWindow"
             Title="Byte Array Editor"
             Width="700"
             Height="500"
             x:Shared="false">
-            <Window.CommandBindings>
-                <CommandBinding
+                <Window.CommandBindings>
+                    <CommandBinding
                     CanExecute="OnEditorWindowCloseCanExecute"
                     Command="Close"
                     Executed="OnEditorWindowCloseExecuted" />
-            </Window.CommandBindings>
-            <Window.InputBindings>
-                <KeyBinding Key="Escape" Command="Close" />
-            </Window.InputBindings>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="30" />
-                </Grid.RowDefinitions>
-                <windows:ByteArrayControl Grid.Row="0" Source="{Binding Value}" />
-                <Button
+                </Window.CommandBindings>
+                <Window.InputBindings>
+                    <KeyBinding Key="Escape" Command="Close" />
+                </Window.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="30" />
+                    </Grid.RowDefinitions>
+                    <windows:ByteArrayControl Grid.Row="0" Source="{Binding Value}" />
+                    <Button
                     Grid.Row="1"
                     Width="100"
                     Margin="5,5,5,5"
                     HorizontalAlignment="Right"
                     Command="Close"
                     Content="Close" />
-            </Grid>
-        </Window>
-        <Window
+                </Grid>
+            </Window>
+            <Window
             x:Key="ObjectEditorWindow"
             Name="ObjectEditorWindow"
             Title="Object Editor"
             Width="400"
             Height="400"
             x:Shared="false">
-            <Window.CommandBindings>
-                <CommandBinding
+                <Window.CommandBindings>
+                    <CommandBinding
                     CanExecute="OnEditorWindowCloseCanExecute"
                     Command="Close"
                     Executed="OnEditorWindowCloseExecuted" />
-            </Window.CommandBindings>
-            <Window.InputBindings>
-                <KeyBinding Key="Escape" Command="Close" />
-            </Window.InputBindings>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="45" />
-                </Grid.RowDefinitions>
-                <windows:PropertyGrid
+                </Window.CommandBindings>
+                <Window.InputBindings>
+                    <KeyBinding Key="Escape" Command="Close" />
+                </Window.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="45" />
+                    </Grid.RowDefinitions>
+                    <windows:PropertyGrid
                     x:Name="ObjectEditorPropertiesGrid"
                     Grid.Row="0"
                     DefaultCategoryName="General"
                     SelectedObject="{Binding Value}" />
-                <Button
+                    <Button
                     Name="ObjectEditorWindowClose"
                     Grid.Row="1"
                     Width="75"
@@ -175,39 +137,39 @@
                     Content="Close"
                     IsDefault="True"
                     IsEnabled="{Binding IsValid}" />
-            </Grid>
-        </Window>
-        <Window
+                </Grid>
+            </Window>
+            <Window
             x:Key="SavableObjectEditorWindow"
             Name="SavableObjectEditorWindow"
             Title="Object Editor"
             Width="400"
             Height="400"
             x:Shared="false">
-            <Window.CommandBindings>
-                <CommandBinding
+                <Window.CommandBindings>
+                    <CommandBinding
                     CanExecute="OnEditorWindowSaveCanExecute"
                     Command="Save"
                     Executed="OnEditorWindowSaveExecuted" />
-                <CommandBinding
+                    <CommandBinding
                     CanExecute="OnEditorWindowCloseCanExecute"
                     Command="Close"
                     Executed="OnEditorWindowCloseExecuted" />
-            </Window.CommandBindings>
-            <Window.InputBindings>
-                <KeyBinding Key="Escape" Command="Close" />
-            </Window.InputBindings>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="45" />
-                </Grid.RowDefinitions>
-                <windows:PropertyGrid
+                </Window.CommandBindings>
+                <Window.InputBindings>
+                    <KeyBinding Key="Escape" Command="Close" />
+                </Window.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="45" />
+                    </Grid.RowDefinitions>
+                    <windows:PropertyGrid
                     x:Name="SavableObjectEditorPropertiesGrid"
                     Grid.Row="0"
                     DefaultCategoryName="General"
                     SelectedObject="{Binding ClonedValue}" />
-                <Button
+                    <Button
                     Name="SavableObjectEditorWindowClose"
                     Grid.Row="1"
                     Width="75"
@@ -218,7 +180,7 @@
                     Command="Close"
                     Content="Cancel"
                     IsDefault="True" />
-                <Button
+                    <Button
                     Name="SavableObjectEditorWindowSave"
                     Grid.Row="1"
                     Width="75"
@@ -229,36 +191,36 @@
                     Command="Save"
                     Content="Save"
                     IsEnabled="{Binding ClonedValue.IsValid}" />
-            </Grid>
-        </Window>
-        <Window
+                </Grid>
+            </Window>
+            <Window
             x:Key="ReadOnlyObjectEditorWindow"
             Name="ReadOnlyObjectEditorWindow"
             Title="Object Editor"
             Width="400"
             Height="400"
             x:Shared="false">
-            <Window.CommandBindings>
-                <CommandBinding
+                <Window.CommandBindings>
+                    <CommandBinding
                     CanExecute="OnEditorWindowCloseCanExecute"
                     Command="Close"
                     Executed="OnEditorWindowCloseExecuted" />
-            </Window.CommandBindings>
-            <Window.InputBindings>
-                <KeyBinding Key="Escape" Command="Close" />
-            </Window.InputBindings>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="45" />
-                </Grid.RowDefinitions>
-                <windows:PropertyGrid
+                </Window.CommandBindings>
+                <Window.InputBindings>
+                    <KeyBinding Key="Escape" Command="Close" />
+                </Window.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="45" />
+                    </Grid.RowDefinitions>
+                    <windows:PropertyGrid
                     x:Name="ReadOnlyObjectEditorPropertiesGrid"
                     Grid.Row="0"
                     DefaultCategoryName="General"
                     IsReadOnly="True"
                     SelectedObject="{Binding Value}" />
-                <Button
+                    <Button
                     Name="ReadOnlyObjectEditorWindowClose"
                     Grid.Row="1"
                     Width="75"
@@ -270,30 +232,30 @@
                     Content="Close"
                     IsDefault="True"
                     IsEnabled="{Binding IsValid}" />
-            </Grid>
-        </Window>
-        <Window
+                </Grid>
+            </Window>
+            <Window
             x:Key="BigTextEditorWindow"
             Name="BigTextEditorWindow"
             Title="Text"
             Width="400"
             Height="400"
             x:Shared="false">
-            <Window.CommandBindings>
-                <CommandBinding
+                <Window.CommandBindings>
+                    <CommandBinding
                     CanExecute="OnEditorWindowCloseCanExecute"
                     Command="Close"
                     Executed="OnEditorWindowCloseExecuted" />
-            </Window.CommandBindings>
-            <Window.InputBindings>
-                <KeyBinding Key="Escape" Command="Close" />
-            </Window.InputBindings>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="45" />
-                </Grid.RowDefinitions>
-                <TextBox
+                </Window.CommandBindings>
+                <Window.InputBindings>
+                    <KeyBinding Key="Escape" Command="Close" />
+                </Window.InputBindings>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="45" />
+                    </Grid.RowDefinitions>
+                    <TextBox
                     Grid.Row="0"
                     AcceptsReturn="True"
                     FontFamily="{Binding Attributes.FontFamily}"
@@ -301,7 +263,7 @@
                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     Text="{Binding Value}" />
-                <Button
+                    <Button
                     Name="BigTextEditorWindowClose"
                     Grid.Row="1"
                     Width="75"
@@ -312,112 +274,43 @@
                     Command="Close"
                     Content="Close"
                     IsDefault="True" />
-            </Grid>
-        </Window>
+                </Grid>
+            </Window>
 
-        <DataTemplate x:Key="DateTimePicker">
-            <windows:DateTimePicker SelectedDate="{Binding Value, UpdateSourceTrigger=PropertyChanged}" SelectedDateTime="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
-        </DataTemplate>
-        <DataTemplate x:Key="ColorEnumEditor">
-            <TextBox
-                Background="{Binding EnumAttributes.Background}"
-                Foreground="{Binding EnumAttributes.Foreground}"
-                IsReadOnly="{Binding IsReadOnly}"
-                Text="{Binding Value}" />
-        </DataTemplate>
-        <DataTemplate x:Key="BigTextEditor">
-            <Grid>
-                <TextBox
-                    VerticalContentAlignment="Center"
-                    Background="{Binding Attributes.Background}"
-                    Foreground="{Binding Attributes.Foreground}"
-                    IsEnabled="False"
-                    MaxLines="1"
-                    Text="{Binding TextValue, Mode=OneWay}" />
-                <Button
-                    Width="24"
-                    HorizontalAlignment="Right"
-                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
-                    CommandParameter="BigTextEditorWindow"
-                    Content="..." />
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="ObjectEditor">
-            <Grid>
-                <TextBox IsReadOnly="True" Text="{Binding TextValue, Mode=OneWay}" />
-                <Button
-                    Width="24"
-                    HorizontalAlignment="Right"
-                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
-                    CommandParameter="ObjectEditorWindow"
-                    Content="..." />
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="SavableObjectEditor">
-            <Grid>
-                <TextBox IsReadOnly="True" Text="{Binding TextValue, Mode=TwoWay}" />
-                <Button
-                    Width="24"
-                    HorizontalAlignment="Right"
-                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
-                    CommandParameter="SavableObjectEditorWindow"
-                    Content="..." />
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="ReadOnlyObjectEditor">
-            <Grid>
-                <TextBox IsReadOnly="True" Text="{Binding TextValue, Mode=OneWay}" />
-                <Button
-                    Width="24"
-                    HorizontalAlignment="Right"
-                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
-                    CommandParameter="ReadOnlyObjectEditorWindow"
-                    Content="..." />
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="ProgressEditor">
-            <Grid>
-                <ProgressBar
-                    Maximum="100"
-                    Minimum="0"
-                    Value="{Binding Value}" />
-                <TextBlock HorizontalAlignment="Center" Text="{Binding TextValue, StringFormat={}{0}%}" />
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="TextEditor">
-            <Grid>
-                <TextBox
-                    Background="{Binding Attributes.Background}"
-                    FontFamily="{Binding Attributes.FontFamily}"
-                    FontSize="{Binding Attributes.FontSize}"
-                    Foreground="{Binding Attributes.Foreground}"
-                    Style="{StaticResource ValidationTextBox2}"
-                    Text="{Binding TextValue, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
-            </Grid>
-        </DataTemplate>
-        <DataTemplate x:Key="FormatTextEditor">
-            <Grid>
-                <Label
-                    Height="20"
-                    Padding="3,0,0,0"
-                    VerticalContentAlignment="Center"
-                    Background="{Binding Attributes.Background}"
-                    Content="{Binding TextValue, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
-                    ContentStringFormat="{Binding Attributes.Format}"
-                    FontFamily="{Binding Attributes.FontFamily}"
-                    FontSize="{Binding Attributes.FontSize}"
-                    Foreground="{Binding Attributes.Foreground}"
-                    Style="{StaticResource ValidationLabel}" />
-            </Grid>
-        </DataTemplate>
+            <CollectionViewSource x:Key="PropertiesSource">
+                <CollectionViewSource.GroupDescriptions>
+                    <PropertyGroupDescription PropertyName="Category" />
+                </CollectionViewSource.GroupDescriptions>
+            </CollectionViewSource>
+        </ResourceDictionary>
     </UserControl.Resources>
+
     <DockPanel>
         <ComboBox
+            FontSize="14"
             Name="LevelComboBox"
             DockPanel.Dock="Top"
             SelectedIndex="0" />
+        <Expander Header="Properties"     DockPanel.Dock="Top">
+            <ItemsControl
+                ItemsSource="{Binding Source={StaticResource PropertiesSource}}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid></UniformGrid>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type windows:PropertyGridProperty}">
+                        <CheckBox IsChecked="{Binding IsVisible }">
+                            <CheckBox.Content>
+                                <TextBlock Text="{Binding Name}"></TextBlock>
+                            </CheckBox.Content>
+                        </CheckBox>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Expander>
         <ScrollViewer>
-
             <DataGrid
                 Name="PropertiesGrid"
                 AutoGenerateColumns="False"
@@ -435,6 +328,16 @@
                 ToggleButton.Indeterminate="OnToggleButtonIsCheckedChanged"
                 ToggleButton.Unchecked="OnToggleButtonIsCheckedChanged"
                 VerticalGridLinesBrush="#D0D0D0">
+                <DataGrid.RowStyle>
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsVisible}" Value="False">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
+
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Width="SizeToCells"

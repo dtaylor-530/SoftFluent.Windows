@@ -14,15 +14,97 @@ namespace SoftFluent.Windows.Utilities
     public class DynamicObject : ICustomTypeDescriptor, IFormattable, INotifyPropertyChanged, IDataErrorInfo
     {
         private readonly List<Attribute> _attributes = new List<Attribute>();
+        private readonly Dictionary<Type, object> _editors = new Dictionary<Type, object>();
         private readonly List<EventDescriptor> _events = new List<EventDescriptor>();
         private readonly List<PropertyDescriptor> _properties = new List<PropertyDescriptor>();
-        private readonly Dictionary<Type, object> _editors = new Dictionary<Type, object>();
         private readonly Dictionary<string, object> _values = new Dictionary<string, object>();
+
+        /// <summary>
+        /// Gets the attributes.
+        /// </summary>
+        /// <value>The attributes.</value>
+        public virtual IList<Attribute> Attributes => _attributes;
+
+        /// <summary>
+        /// Returns the class name of this instance of a component.
+        /// </summary>
+        /// <value>The class name.</value>
+        /// <returns>
+        /// The class name of the object, or null if the class does not have a name.
+        /// </returns>
+        public virtual string ClassName { get; set; }
+
+        /// <summary>
+        /// Returns the name of this instance of a component.
+        /// </summary>
+        /// <value>The component name.</value>
+        /// <returns>
+        /// The name of the object, or null if the object does not have a name.
+        /// </returns>
+        public virtual string ComponentName { get; set; }
+
+        /// <summary>
+        /// Returns a type converter for this instance of a component.
+        /// </summary>
+        /// <value>The converter.</value>
+        /// <returns>
+        /// A <see cref="T:System.ComponentModel.TypeConverter"/> that is the converter for this object, or null if there is no <see cref="T:System.ComponentModel.TypeConverter"/> for this object.
+        /// </returns>
+        public virtual TypeConverter Converter { get; set; }
+
+        /// <summary>
+        /// Returns the default event for this instance of a component.
+        /// </summary>
+        /// <value>The default event.</value>
+        /// <returns>
+        /// An <see cref="T:System.ComponentModel.EventDescriptor"/> that represents the default event for this object, or null if this object does not have events.
+        /// </returns>
+        public virtual EventDescriptor DefaultEvent { get; set; }
+
+        /// <summary>
+        /// Returns the default property for this instance of a component.
+        /// </summary>
+        /// <value>The default property.</value>
+        /// <returns>
+        /// A <see cref="T:System.ComponentModel.PropertyDescriptor"/> that represents the default property for this object, or null if this object does not have properties.
+        /// </returns>
+        public virtual PropertyDescriptor DefaultProperty { get; set; }
+
+        /// <summary>
+        /// Gets the editors.
+        /// </summary>
+        /// <value>The editors.</value>
+        public virtual IDictionary<Type, object> Editors => _editors;
+
+        string IDataErrorInfo.Error => Validate();
+
+        /// <summary>
+        /// Gets the events.
+        /// </summary>
+        /// <value>The events.</value>
+        public virtual IList<EventDescriptor> Events => _events;
+
+        /// <summary>
+        /// Gets the properties.
+        /// </summary>
+        /// <value>The properties.</value>
+        public virtual IList<PropertyDescriptor> Properties => _properties;
+
+        /// <summary>
+        /// Returns the name used as the return of a ToString() call.
+        /// </summary>
+        /// <value>The name used as the return of a ToString() call.</value>
+        /// <returns>
+        /// The name used as the return of a ToString() call, or null if the default value is to be used.
+        /// </returns>
+        public virtual string ToStringName { get; set; }
 
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        string IDataErrorInfo.this[string columnName] => ValidateMember(columnName);
 
         /// <summary>
         /// Adds a new property.
@@ -82,15 +164,7 @@ namespace SoftFluent.Windows.Utilities
                 throw new ArgumentException("Property '" + name + "' is already defined", "name");
             }
 
-            List<Attribute> newAtts;
-            if (attributes != null)
-            {
-                newAtts = new List<Attribute>(attributes);
-            }
-            else
-            {
-                newAtts = new List<Attribute>();
-            }
+            List<Attribute> newAtts = attributes != null ? new List<Attribute>(attributes) : new List<Attribute>();
 
             newAtts.RemoveAll(a => a is ReadOnlyAttribute);
             newAtts.RemoveAll(a => a is DefaultValueAttribute);
@@ -107,18 +181,130 @@ namespace SoftFluent.Windows.Utilities
             return dop;
         }
 
-        /// <summary>
-        /// Sorts the properties using the specified comparer.
-        /// </summary>
-        /// <param name="comparer">The comparer to use.</param>
-        public void SortProperties(IComparer<PropertyDescriptor> comparer)
+        AttributeCollection ICustomTypeDescriptor.GetAttributes()
         {
-            if (comparer == null)
+            return new AttributeCollection(_attributes.ToArray());
+        }
+
+        string ICustomTypeDescriptor.GetClassName()
+        {
+            return ClassName;
+        }
+
+        string ICustomTypeDescriptor.GetComponentName()
+        {
+            return ComponentName;
+        }
+
+        TypeConverter ICustomTypeDescriptor.GetConverter()
+        {
+            return Converter;
+        }
+
+        EventDescriptor ICustomTypeDescriptor.GetDefaultEvent()
+        {
+            return DefaultEvent;
+        }
+
+        PropertyDescriptor ICustomTypeDescriptor.GetDefaultProperty()
+        {
+            return DefaultProperty;
+        }
+
+        object ICustomTypeDescriptor.GetEditor(Type editorBaseType)
+        {
+            if (editorBaseType == null)
             {
-                throw new ArgumentNullException("comparer");
+                throw new ArgumentNullException("editorBaseType");
             }
 
-            _properties.Sort(comparer);
+            if (_editors.TryGetValue(editorBaseType, out object editor))
+            {
+                return editor;
+            }
+
+            return null;
+        }
+
+        EventDescriptorCollection ICustomTypeDescriptor.GetEvents(Attribute[] attributes)
+        {
+            if (attributes == null || attributes.Length == 0)
+            {
+                return ((ICustomTypeDescriptor)this).GetEvents();
+            }
+
+            List<EventDescriptor> list = new List<EventDescriptor>();
+            foreach (EventDescriptor evt in _events)
+            {
+                if (evt.Attributes.Count == 0)
+                {
+                    continue;
+                }
+
+                bool cont = false;
+                foreach (Attribute att in attributes)
+                {
+                    if (!HasMatchingAttribute(evt, att))
+                    {
+                        cont = true;
+                        break;
+                    }
+                }
+
+                if (!cont)
+                {
+                    list.Add(evt);
+                }
+            }
+            return new EventDescriptorCollection(list.ToArray());
+        }
+
+        EventDescriptorCollection ICustomTypeDescriptor.GetEvents()
+        {
+            return new EventDescriptorCollection(_events.ToArray());
+        }
+
+        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties(Attribute[] attributes)
+        {
+            if (attributes == null || attributes.Length == 0)
+            {
+                return ((ICustomTypeDescriptor)this).GetProperties();
+            }
+
+            List<PropertyDescriptor> list = new List<PropertyDescriptor>();
+            foreach (PropertyDescriptor prop in _properties)
+            {
+                if (prop.Attributes.Count == 0)
+                {
+                    continue;
+                }
+
+                bool cont = false;
+                foreach (Attribute att in attributes)
+                {
+                    if (!HasMatchingAttribute(prop, att))
+                    {
+                        cont = true;
+                        break;
+                    }
+                }
+
+                if (!cont)
+                {
+                    list.Add(prop);
+                }
+            }
+            return new PropertyDescriptorCollection(list.ToArray());
+        }
+
+        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties()
+        {
+            return new PropertyDescriptorCollection(_properties.ToArray());
+        }
+
+        object ICustomTypeDescriptor.GetPropertyOwner(PropertyDescriptor pd)
+        {
+            return this;
         }
 
         /// <summary>
@@ -169,24 +355,6 @@ namespace SoftFluent.Windows.Utilities
             }
 
             return defaultValue;
-        }
-
-        /// <summary>
-        /// Gets the property value.
-        /// </summary>
-        /// <param name="name">The property name.</param>
-        /// <param name="value">The value.</param>
-        /// <returns>
-        /// true if  the property value exists; false otherwise.
-        /// </returns>
-        public virtual bool TryGetPropertyValue(string name, out object value)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
-
-            return _values.TryGetValue(name, out value);
         }
 
         /// <summary>
@@ -247,32 +415,18 @@ namespace SoftFluent.Windows.Utilities
         }
 
         /// <summary>
-        /// Creates a property object.
+        /// Sorts the properties using the specified comparer.
         /// </summary>
-        /// <param name="name">The property name. May not be null.</param>
-        /// <param name="type">The property type. May not be null.</param>
-        /// <param name="attributes">The property custom attributes or null.</param>
-        /// <returns>
-        /// An instance of the DynamicObjectProperty type.
-        /// </returns>
-        protected virtual DynamicObjectProperty CreateProperty(string name, Type type, IEnumerable<Attribute> attributes)
+        /// <param name="comparer">The comparer to use.</param>
+        public void SortProperties(IComparer<PropertyDescriptor> comparer)
         {
-            if (name == null)
+            if (comparer == null)
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException("comparer");
             }
 
-            return new DynamicObjectProperty(name, type, attributes);
+            _properties.Sort(comparer);
         }
-
-        /// <summary>
-        /// Returns the name used as the return of a ToString() call.
-        /// </summary>
-        /// <value>The name used as the return of a ToString() call.</value>
-        /// <returns>
-        /// The name used as the return of a ToString() call, or null if the default value is to be used.
-        /// </returns>
-        public virtual string ToStringName { get; set; }
 
         /// <summary>
         /// Returns a <see cref="string" /> that represents this instance.
@@ -304,222 +458,21 @@ namespace SoftFluent.Windows.Utilities
         }
 
         /// <summary>
-        /// Gets the attributes.
-        /// </summary>
-        /// <value>The attributes.</value>
-        public virtual IList<Attribute> Attributes => _attributes;
-
-        AttributeCollection ICustomTypeDescriptor.GetAttributes()
-        {
-            return new AttributeCollection(_attributes.ToArray());
-        }
-
-        /// <summary>
-        /// Returns the class name of this instance of a component.
-        /// </summary>
-        /// <value>The class name.</value>
-        /// <returns>
-        /// The class name of the object, or null if the class does not have a name.
-        /// </returns>
-        public virtual string ClassName { get; set; }
-
-        string ICustomTypeDescriptor.GetClassName()
-        {
-            return ClassName;
-        }
-
-        /// <summary>
-        /// Returns the name of this instance of a component.
-        /// </summary>
-        /// <value>The component name.</value>
-        /// <returns>
-        /// The name of the object, or null if the object does not have a name.
-        /// </returns>
-        public virtual string ComponentName { get; set; }
-
-        string ICustomTypeDescriptor.GetComponentName()
-        {
-            return ComponentName;
-        }
-
-        /// <summary>
-        /// Returns a type converter for this instance of a component.
-        /// </summary>
-        /// <value>The converter.</value>
-        /// <returns>
-        /// A <see cref="T:System.ComponentModel.TypeConverter"/> that is the converter for this object, or null if there is no <see cref="T:System.ComponentModel.TypeConverter"/> for this object.
-        /// </returns>
-        public virtual TypeConverter Converter { get; set; }
-
-        TypeConverter ICustomTypeDescriptor.GetConverter()
-        {
-            return Converter;
-        }
-
-        /// <summary>
-        /// Returns the default event for this instance of a component.
-        /// </summary>
-        /// <value>The default event.</value>
-        /// <returns>
-        /// An <see cref="T:System.ComponentModel.EventDescriptor"/> that represents the default event for this object, or null if this object does not have events.
-        /// </returns>
-        public virtual EventDescriptor DefaultEvent { get; set; }
-
-        EventDescriptor ICustomTypeDescriptor.GetDefaultEvent()
-        {
-            return DefaultEvent;
-        }
-
-        /// <summary>
-        /// Returns the default property for this instance of a component.
-        /// </summary>
-        /// <value>The default property.</value>
-        /// <returns>
-        /// A <see cref="T:System.ComponentModel.PropertyDescriptor"/> that represents the default property for this object, or null if this object does not have properties.
-        /// </returns>
-        public virtual PropertyDescriptor DefaultProperty { get; set; }
-
-        PropertyDescriptor ICustomTypeDescriptor.GetDefaultProperty()
-        {
-            return DefaultProperty;
-        }
-
-        /// <summary>
-        /// Gets the editors.
-        /// </summary>
-        /// <value>The editors.</value>
-        public virtual IDictionary<Type, object> Editors => _editors;
-
-        object ICustomTypeDescriptor.GetEditor(Type editorBaseType)
-        {
-            if (editorBaseType == null)
-            {
-                throw new ArgumentNullException("editorBaseType");
-            }
-
-            if (_editors.TryGetValue(editorBaseType, out object editor))
-            {
-                return editor;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the events.
-        /// </summary>
-        /// <value>The events.</value>
-        public virtual IList<EventDescriptor> Events => _events;
-
-        EventDescriptorCollection ICustomTypeDescriptor.GetEvents(Attribute[] attributes)
-        {
-            if (attributes == null || attributes.Length == 0)
-            {
-                return ((ICustomTypeDescriptor)this).GetEvents();
-            }
-
-            List<EventDescriptor> list = new List<EventDescriptor>();
-            foreach (EventDescriptor evt in _events)
-            {
-                if (evt.Attributes.Count == 0)
-                {
-                    continue;
-                }
-
-                bool cont = false;
-                foreach (Attribute att in attributes)
-                {
-                    if (!HasMatchingAttribute(evt, att))
-                    {
-                        cont = true;
-                        break;
-                    }
-                }
-
-                if (!cont)
-                {
-                    list.Add(evt);
-                }
-            }
-            return new EventDescriptorCollection(list.ToArray());
-        }
-
-        private static bool HasMatchingAttribute(MemberDescriptor member, Attribute attribute)
-        {
-            Attribute att = member.Attributes[attribute.GetType()];
-            if (att == null)
-            {
-                return attribute.IsDefaultAttribute();
-            }
-
-            return attribute.Match(att);
-        }
-
-        EventDescriptorCollection ICustomTypeDescriptor.GetEvents()
-        {
-            return new EventDescriptorCollection(_events.ToArray());
-        }
-
-        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties(Attribute[] attributes)
-        {
-            if (attributes == null || attributes.Length == 0)
-            {
-                return ((ICustomTypeDescriptor)this).GetProperties();
-            }
-
-            List<PropertyDescriptor> list = new List<PropertyDescriptor>();
-            foreach (PropertyDescriptor prop in _properties)
-            {
-                if (prop.Attributes.Count == 0)
-                {
-                    continue;
-                }
-
-                bool cont = false;
-                foreach (Attribute att in attributes)
-                {
-                    if (!HasMatchingAttribute(prop, att))
-                    {
-                        cont = true;
-                        break;
-                    }
-                }
-
-                if (!cont)
-                {
-                    list.Add(prop);
-                }
-            }
-            return new PropertyDescriptorCollection(list.ToArray());
-        }
-
-        /// <summary>
-        /// Called when a property value has changed.
+        /// Gets the property value.
         /// </summary>
         /// <param name="name">The property name.</param>
-        protected virtual void OnPropertyChanged(string name)
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// true if  the property value exists; false otherwise.
+        /// </returns>
+        public virtual bool TryGetPropertyValue(string name, out object value)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            if (name == null)
             {
-                handler(this, new PropertyChangedEventArgs(name));
+                throw new ArgumentNullException("name");
             }
-        }
 
-        /// <summary>
-        /// Gets the properties.
-        /// </summary>
-        /// <value>The properties.</value>
-        public virtual IList<PropertyDescriptor> Properties => _properties;
-
-        PropertyDescriptorCollection ICustomTypeDescriptor.GetProperties()
-        {
-            return new PropertyDescriptorCollection(_properties.ToArray());
-        }
-
-        object ICustomTypeDescriptor.GetPropertyOwner(PropertyDescriptor pd)
-        {
-            return this;
+            return _values.TryGetValue(name, out value);
         }
 
         /// <summary>
@@ -536,18 +489,6 @@ namespace SoftFluent.Windows.Utilities
         /// <summary>
         /// Validates the member.
         /// </summary>
-        /// <param name="memberName">The name of the member to validate or null to validate the whole object.</param>
-        /// <returns>
-        /// A text describing the error or null if there was no error.
-        /// </returns>
-        public string ValidateMember(string memberName)
-        {
-            return ValidateMember(null, memberName);
-        }
-
-        /// <summary>
-        /// Validates the member.
-        /// </summary>
         /// <param name="culture">The culture to use for error messages.</param>
         /// <returns>
         /// A text describing the error or null if there was no error.
@@ -555,6 +496,18 @@ namespace SoftFluent.Windows.Utilities
         public string Validate(CultureInfo culture)
         {
             return ValidateMember(culture, null);
+        }
+
+        /// <summary>
+        /// Validates the member.
+        /// </summary>
+        /// <param name="memberName">The name of the member to validate or null to validate the whole object.</param>
+        /// <returns>
+        /// A text describing the error or null if there was no error.
+        /// </returns>
+        public string ValidateMember(string memberName)
+        {
+            return ValidateMember(null, memberName);
         }
 
         /// <summary>
@@ -622,8 +575,47 @@ namespace SoftFluent.Windows.Utilities
             }
         }
 
-        string IDataErrorInfo.Error => Validate();
+        /// <summary>
+        /// Creates a property object.
+        /// </summary>
+        /// <param name="name">The property name. May not be null.</param>
+        /// <param name="type">The property type. May not be null.</param>
+        /// <param name="attributes">The property custom attributes or null.</param>
+        /// <returns>
+        /// An instance of the DynamicObjectProperty type.
+        /// </returns>
+        protected virtual DynamicObjectProperty CreateProperty(string name, Type type, IEnumerable<Attribute> attributes)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException("name");
+            }
 
-        string IDataErrorInfo.this[string columnName] => ValidateMember(columnName);
+            return new DynamicObjectProperty(name, type, attributes);
+        }
+
+        /// <summary>
+        /// Called when a property value has changed.
+        /// </summary>
+        /// <param name="name">The property name.</param>
+        protected virtual void OnPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        private static bool HasMatchingAttribute(MemberDescriptor member, Attribute attribute)
+        {
+            Attribute att = member.Attributes[attribute.GetType()];
+            if (att == null)
+            {
+                return attribute.IsDefaultAttribute();
+            }
+
+            return attribute.Match(att);
+        }
     }
 }
