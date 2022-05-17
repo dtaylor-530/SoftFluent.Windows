@@ -74,6 +74,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\UITextBlock.cs" />
     <Compile Include="Utilities\Helper.cs" />
     <Compile Include="Utilities\ActivatorHelper.cs" />
     <Compile Include="Service\BaseActivator.cs" />
@@ -147,7 +148,6 @@
   <ItemGroup>
     <None Include="SoftFluent.Windows.snk" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

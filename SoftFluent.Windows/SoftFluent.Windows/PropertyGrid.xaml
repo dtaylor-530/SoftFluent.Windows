@@ -6,6 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
     xmlns:windows="clr-namespace:SoftFluent.Windows"
+    xmlns:uiTextBlockControl="clr-namespace:UITextBlockControl;assembly=UITextBlock"
+    xmlns:uiTextBlockControl1="clr-namespace:UITextBlockControl"
     d:DesignHeight="300"
     d:DesignWidth="300"
     mc:Ignorable="d">
@@ -303,7 +305,9 @@
                     <DataTemplate DataType="{x:Type windows:PropertyGridProperty}">
                         <CheckBox IsChecked="{Binding IsVisible }">
                             <CheckBox.Content>
-                                <TextBlock Text="{Binding Name}"></TextBlock>
+                                <uiTextBlockControl1:UITextBlock
+                                    TextTrimming="CharacterEllipsis"
+                                    Text="{Binding Name}"/>
                             </CheckBox.Content>
                         </CheckBox>
                     </DataTemplate>

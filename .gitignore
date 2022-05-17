@@ -219,3 +219,4 @@ pip-log.txt
 # Nuget
 SoftFluent.Windows/nuget/lib/
 SoftFluent.Windows/nuget/*.nupkg
+/SoftFluent.Windows/.vs/SoftFluent.Windows

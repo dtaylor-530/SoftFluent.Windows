@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoftFluent.Windows", "SoftF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoftFluent.Windows.Samples", "SoftFluent.Windows.Samples\SoftFluent.Windows.Samples.csproj", "{815070AF-96B7-460C-AD63-58F50464465F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoftFluent.Windows.Core", "SoftFluent.Windows.Core\SoftFluent.Windows.Core.csproj", "{81F8EE9D-7621-420A-B499-96CA6325E6A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoftFluent.Windows.Core", "SoftFluent.Windows.Core\SoftFluent.Windows.Core.csproj", "{81F8EE9D-7621-420A-B499-96CA6325E6A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
