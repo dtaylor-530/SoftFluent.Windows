@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:samples="clr-namespace:SoftFluent.Windows.Samples"
+    xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF"
     Title="MainWindow"
     Width="608"
     Height="638">
@@ -10,8 +11,7 @@
         <Grid.Resources>
             <samples:Customer2 x:Key="Customer" />
         </Grid.Resources>
-        <sfw:PropertyGrid
-            xmlns:sfw="clr-namespace:SoftFluent.Windows;assembly=SoftFluent.Windows"
+        <windows:PropertyGrid
             Name="MyGrid"
             SelectedObject="{StaticResource Customer}" />
     </Grid>

@@ -1,0 +1,109 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:windows="clr-namespace:SoftFluent.Windows"
+                    xmlns:windows1="clr-namespace:SoftFluent.Windows;assembly=Infrastructure.WPF">
+
+
+    <windows:PropertyGridConverter x:Key="PropertyGridConverter" />
+
+    <Style x:Key="ValidationLabel" TargetType="{x:Type Label}">
+        <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
+    </Style>
+
+    <DataTemplate x:Key="DateTimePicker" DataType="{x:Type windows:PropertyGridProperty}">
+        <windows1:DateTimePicker SelectedDate="{Binding Value, UpdateSourceTrigger=PropertyChanged}" SelectedDateTime="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="ColorEnumEditor" DataType="{x:Type windows:PropertyGridProperty}">
+        <TextBox
+                Background="{Binding EnumAttributes.Background}"
+                Foreground="{Binding EnumAttributes.Foreground}"
+                IsReadOnly="{Binding IsReadOnly}"
+                Text="{Binding Value}" />
+    </DataTemplate>
+    <DataTemplate x:Key="BigTextEditor" DataType="{x:Type windows:PropertyGridProperty}">
+        <Grid>
+            <TextBox
+                    VerticalContentAlignment="Center"
+                    Background="{Binding Attributes.Background}"
+                    Foreground="{Binding Attributes.Foreground}"
+                    IsEnabled="False"
+                    MaxLines="1"
+                    Text="{Binding TextValue, Mode=OneWay}" />
+            <Button
+                    Width="24"
+                    HorizontalAlignment="Right"
+                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
+                    CommandParameter="BigTextEditorWindow"
+                    Content="..." />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="ObjectEditor" DataType="{x:Type windows:PropertyGridProperty}">
+        <Grid>
+            <TextBox IsReadOnly="True" Text="{Binding TextValue, Mode=OneWay}" />
+            <Button
+                    Width="24"
+                    HorizontalAlignment="Right"
+                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
+                    CommandParameter="ObjectEditorWindow"
+                    Content="..." />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="SavableObjectEditor" DataType="{x:Type windows:PropertyGridProperty}">
+        <Grid>
+            <TextBox IsReadOnly="True" Text="{Binding TextValue, Mode=TwoWay}" />
+            <Button
+                    Width="24"
+                    HorizontalAlignment="Right"
+                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
+                    CommandParameter="SavableObjectEditorWindow"
+                    Content="..." />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="ReadOnlyObjectEditor" DataType="{x:Type windows:PropertyGridProperty}">
+        <Grid>
+            <TextBox IsReadOnly="True" Text="{Binding TextValue, Mode=OneWay}" />
+            <Button
+                    Width="24"
+                    HorizontalAlignment="Right"
+                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
+                    CommandParameter="ReadOnlyObjectEditorWindow"
+                    Content="..." />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="ProgressEditor" DataType="{x:Type windows:PropertyGridProperty}">
+        <Grid>
+            <ProgressBar
+                    Maximum="100"
+                    Minimum="0"
+                    Value="{Binding Value}" />
+            <TextBlock HorizontalAlignment="Center" Text="{Binding TextValue, StringFormat={}{0}%}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="TextEditor" DataType="{x:Type windows:PropertyGridProperty}">
+        <Grid>
+            <TextBox
+                    Background="{Binding Attributes.Background}"
+                    FontFamily="{Binding Attributes.FontFamily}"
+                    FontSize="{Binding Attributes.FontSize}"
+                    Foreground="{Binding Attributes.Foreground}"
+                    Style="{StaticResource ValidationTextBox2}"
+                    Text="{Binding TextValue, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
+        </Grid>
+    </DataTemplate>
+    <DataTemplate x:Key="FormatTextEditor" DataType="{x:Type windows:PropertyGridProperty}">
+        <Grid>
+            <Label
+                    Height="20"
+                    Padding="3,0,0,0"
+                    VerticalContentAlignment="Center"
+                    Background="{Binding Attributes.Background}"
+                    Content="{Binding TextValue, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                    ContentStringFormat="{Binding Attributes.Format}"
+                    FontFamily="{Binding Attributes.FontFamily}"
+                    FontSize="{Binding Attributes.FontSize}"
+                    Foreground="{Binding Attributes.Foreground}"
+                    Style="{StaticResource ValidationLabel}" />
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

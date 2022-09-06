@@ -3,26 +3,27 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:samples="clr-namespace:SoftFluent.Windows.Samples"
-    xmlns:sfw="clr-namespace:SoftFluent.Windows;assembly=SoftFluent.Windows"
     xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
     xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF"
+    xmlns:windows1="clr-namespace:SoftFluent.Windows;assembly=UniversalConverter"
     StartupUri="MainWindow.xaml">
     <Application.Resources>
 
-        <sfw:UniversalConverter x:Key="BoolToDefaultValueBackgroundConverter">
-            <sfw:UniversalConverter.Switch>
-                <sfw:UniversalConverterCase ConvertedValue="#F0F0F0" Value="true" />
-            </sfw:UniversalConverter.Switch>
-        </sfw:UniversalConverter>
+        <windows1:UniversalConverter x:Key="BoolToDefaultValueBackgroundConverter">
+            <windows1:UniversalConverter.Switch>
+                <windows1:UniversalConverterCase ConvertedValue="#F0F0F0" Value="true" />
+            </windows1:UniversalConverter.Switch>
+        </windows1:UniversalConverter>
 
-        <sfw:ChangeTypeConverter x:Key="ChangeTypeConverter" />
+        <windows:ChangeTypeConverter x:Key="ChangeTypeConverter" />
 
         <DataTemplate x:Key="AddressListEditor">
             <DockPanel LastChildFill="true" ToolTip="{Binding Value, Mode=OneWay}">
                 <Button
                     Width="24"
                     HorizontalContentAlignment="Center"
-                    Command="{x:Static sfw:PropertyGrid.BrowseCommand}"
+                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
                     CommandParameter="AddressListEditorWindow"
                     Content="..."
                     DockPanel.Dock="Right"
@@ -59,7 +60,7 @@
                 <Button
                     Width="24"
                     HorizontalContentAlignment="Center"
-                    Command="{x:Static sfw:PropertyGrid.BrowseCommand}"
+                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
                     CommandParameter="CustomEditorWindow"
                     Content="..."
                     DockPanel.Dock="Right"
@@ -68,7 +69,7 @@
                 <Button
                     Width="Auto"
                     HorizontalContentAlignment="Center"
-                    Command="{x:Static sfw:PropertyGrid.BrowseCommand}"
+                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
                     CommandParameter="UrlPreviewWindow"
                     Content="Preview"
                     DockPanel.Dock="Right" />
