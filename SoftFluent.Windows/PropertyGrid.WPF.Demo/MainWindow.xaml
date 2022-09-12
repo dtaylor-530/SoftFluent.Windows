@@ -2,17 +2,22 @@
     x:Class="SoftFluent.Windows.Samples.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:samples="clr-namespace:SoftFluent.Windows.Samples"
     xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF"
+    xmlns:samples1="clr-namespace:SoftFluent.Windows.Samples;assembly=PropertyGrid.Demo.Model"
     Title="MainWindow"
     Width="608"
     Height="638">
+    <FrameworkElement.DataContext>
+        <samples1:Customer2 />
+    </FrameworkElement.DataContext>
+    <FrameworkElement.Resources>
+        <DataTemplate DataType="{x:Type samples1:Customer2}">
+            <windows:PropertyGrid
+                Name="MyGrid"
+                SelectedObject="{Binding }" />
+        </DataTemplate>
+    </FrameworkElement.Resources>
     <Grid>
-        <Grid.Resources>
-            <samples:Customer2 x:Key="Customer" />
-        </Grid.Resources>
-        <windows:PropertyGrid
-            Name="MyGrid"
-            SelectedObject="{StaticResource Customer}" />
+        <ContentControl Content="{Binding }"/>
     </Grid>
 </Window>

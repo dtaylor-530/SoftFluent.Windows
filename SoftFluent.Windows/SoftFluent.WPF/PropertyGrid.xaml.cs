@@ -10,6 +10,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Abstractions;
+using PropertyGrid.WPF;
 
 namespace SoftFluent.Windows {
 
@@ -42,7 +43,7 @@ namespace SoftFluent.Windows {
           NewGuidCommand = new RoutedCommand();
 
       private int _inheritanceLevel;
-      private ActivatorHelper activatorHelper = new ActivatorHelper(new BaseActivator());
+      private IActivator activatorHelper = new BaseActivator();
       public PropertyGrid() {
          InitializeComponent();
          AddCommandBindings();
@@ -58,6 +59,12 @@ namespace SoftFluent.Windows {
 
       public virtual double ChildEditorWindowOffset { get; set; } = 20;
       public virtual bool DecamelizePropertiesDisplayNames { get; set; } = true;
+
+      public async Task InvokeAsync(Action action)
+      {
+          await this.Dispatcher.InvokeAsync(action);
+      }
+
       public virtual string DefaultCategoryName { get; set; } = CategoryAttribute.Default.Category;
 
       public bool IsGrouping {
@@ -75,7 +82,7 @@ namespace SoftFluent.Windows {
             throw new ArgumentNullException("property");
          }
 
-         if (PropertyGridOptionsAttribute.FromProperty(property) is PropertyGridOptionsAttribute att) {
+         if (SoftFluent.Abstractions.Helper.FromProperty(property) is IPropertyGridOptionsAttribute att) {
             return att.CollectionEditorHasOnlyOneColumn;
          }
 
@@ -90,12 +97,12 @@ namespace SoftFluent.Windows {
          return activatorHelper.CreateInstance<PropertyGridEventArgs>(property);
       }
 
-      public virtual PropertyGridListSource CreatePropertyListSource(object value) {
+      public virtual IPropertyGridListSource CreatePropertyListSource(object value) {
          return activatorHelper.CreateInstance<PropertyGridListSource>(activatorHelper, this, value, _inheritanceLevel);
       }
 
-      public virtual PropertyGridListSource GetListSource() {
-         return PropertiesSource.Source as PropertyGridListSource;
+      public virtual IPropertyGridListSource GetListSource() {
+         return PropertiesSource.Source as IPropertyGridListSource;
       }
 
       public virtual IPropertyGridProperty GetProperty(string name) {
@@ -128,7 +135,7 @@ namespace SoftFluent.Windows {
          }
 
          if (GetProperty(e.PropertyName) is var property) {
-            bool forceRaise = PropertyGridOptionsAttribute.FromProperty(property) is var options &&
+            bool forceRaise = SoftFluent.Abstractions.Helper.FromProperty(property) is var options &&
                               options.ForcePropertyChanged;
 
             property.RefreshValueFromDescriptor(true, forceRaise, true);
@@ -137,7 +144,7 @@ namespace SoftFluent.Windows {
       }
 
       public virtual void OnToggleButtonIsCheckedChanged(object sender, RoutedEventArgs e) {
-         Helper.Update(e);
+         Helper2.Update(e);
       }
 
       public void RefreshComboBox() {
@@ -151,17 +158,17 @@ namespace SoftFluent.Windows {
          }
 
          object selected = SelectedObject;
-         PropertyGridListSource source = await Task.Run(() => CreatePropertyListSource(selected));
+         IPropertyGridListSource source = await Task.Run(() => CreatePropertyListSource(selected));
          PropertiesSource.Source = source;
       }
 
-      public virtual bool? ShowEditor(PropertyGridProperty property, object parameter) {
+      public virtual bool? ShowEditor(IPropertyGridProperty property, object parameter) {
          if (property == null) {
             throw new ArgumentNullException("property");
          }
 
          if (GetEditor(property, parameter) is Window editor) {
-            return Helper.ShowEditor(property, editor);
+            return Helper2.ShowEditor(property, editor);
          }
          return null;
       }
@@ -171,8 +178,8 @@ namespace SoftFluent.Windows {
       }
 
 
-      protected virtual Window GetEditor(PropertyGridProperty property, object parameter) {
-         return Helper.GetEditor(this, property, parameter);
+      protected virtual Window GetEditor(IPropertyGridProperty property, object parameter) {
+         return Helper2.GetEditor(this, property, parameter);
       }
 
       protected virtual void OnBrowseCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
@@ -182,12 +189,24 @@ namespace SoftFluent.Windows {
             return;
          }
 
-         if (PropertyGridProperty.FromEvent(e) is PropertyGridProperty property) {
+         if (PropertyGrid.FromEvent(e) is IPropertyGridProperty property) {
             property.Executed(sender, e);
             if (!e.Handled) {
                ShowEditor(property, e.Parameter);
             }
          }
+      }
+      public static IPropertyGridProperty FromEvent(RoutedEventArgs e) {
+         if (e == null) {
+            return null;
+         }
+
+         FrameworkElement fe = e.OriginalSource as FrameworkElement;
+         if (fe == null) {
+            return null;
+         }
+
+         return fe.DataContext as IPropertyGridProperty;
       }
 
       protected virtual void OnEditorSelectorSelectionChanged(object sender, SelectionChangedEventArgs e) {
@@ -196,7 +215,7 @@ namespace SoftFluent.Windows {
 
       protected virtual void OnEditorWindowCloseCanExecute(object sender, CanExecuteRoutedEventArgs e) {
          if (sender is Window window) {
-            if (window.DataContext is PropertyGridProperty prop) {
+            if (window.DataContext is IPropertyGridProperty prop) {
                prop.CanExecute(sender, e);
                if (e.Handled) {
                   return;
@@ -209,7 +228,7 @@ namespace SoftFluent.Windows {
 
       protected virtual void OnEditorWindowCloseExecuted(object sender, ExecutedRoutedEventArgs e) {
          if (sender is Window window) {
-            if (window.DataContext is PropertyGridProperty prop) {
+            if (window.DataContext is IPropertyGridProperty prop) {
                prop.Executed(sender, e);
                if (e.Handled) {
                   return;
@@ -220,7 +239,7 @@ namespace SoftFluent.Windows {
       }
 
       protected virtual void OnEditorWindowSaveCanExecute(object sender, CanExecuteRoutedEventArgs e) {
-         if (sender is Window window && window.DataContext is PropertyGridProperty prop) {
+         if (sender is Window window && window.DataContext is IPropertyGridProperty prop) {
             prop.CanExecute(sender, e);
             if (e.Handled) {
                return;
@@ -230,20 +249,20 @@ namespace SoftFluent.Windows {
       }
 
       protected virtual void OnEditorWindowSaveExecuted(object sender, ExecutedRoutedEventArgs e) {
-         if (sender is Window window && window.DataContext is PropertyGridProperty prop) {
+         if (sender is Window window && window.DataContext is IPropertyGridProperty prop) {
             prop.Executed(sender, e);
          }
       }
 
       protected virtual void OnGuidCommandCanExecute(object sender, CanExecuteRoutedEventArgs e) {
-         if (PropertyGridProperty.FromEvent(e) is PropertyGridProperty property &&
+         if (PropertyGrid.FromEvent(e) is IPropertyGridProperty property &&
              (property.PropertyType == typeof(Guid) || property.PropertyType == typeof(Guid?))) {
             e.CanExecute = true;
          }
       }
 
       protected virtual void OnGuidCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
-         Helper.ChangeText(e);
+         Helper2.ChangeText(e);
       }
 
       protected virtual void OnPropertyChanged(object sender, PropertyGridEventArgs e) {
@@ -253,7 +272,7 @@ namespace SoftFluent.Windows {
       }
 
       protected virtual void OnUIElementPreviewKeyUp(object sender, KeyEventArgs e) {
-         Helper.OnUIElementPreviewKeyUp(e);
+         Helper2.OnUIElementPreviewKeyUp(e);
       }
 
       #region DependencyProperties

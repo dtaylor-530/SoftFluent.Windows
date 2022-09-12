@@ -7,88 +7,133 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Abstractions;
+using PropertyGrid.Infrastructure;
 using SoftFluent.Windows;
 using SoftFluent.Windows.Utilities;
 
 namespace Utilities {
    public static class Helper {
 
-    
 
-
-      public static object EnumToObject(Type enumType, object value) {
-         if (enumType == null) {
-            throw new ArgumentNullException("enumType");
+      public static PropertyGridProperty CreateProperty(this PropertyGridListSource Grid, PropertyDescriptor descriptor, IActivator activator) {
+         if (descriptor == null) {
+            throw new ArgumentNullException("descriptor");
          }
 
-         if (!enumType.IsEnum) {
-            throw new ArgumentException(null, "enumType");
+         bool forceReadWrite = false;
+         PropertyGridProperty property = null;
+         PropertyGridOptionsAttribute options = descriptor.GetAttribute<PropertyGridOptionsAttribute>();
+         if (options != null) {
+            forceReadWrite = options.ForceReadWrite;
+            if (options.PropertyType != null) {
+               property = (PropertyGridProperty)Activator.CreateInstance(options.PropertyType, Grid, activator);
+            }
          }
 
-         if (value == null) {
-            throw new ArgumentNullException("value");
+         if (property == null) {
+            options = descriptor.PropertyType.GetAttribute<PropertyGridOptionsAttribute>();
+            if (options != null) {
+               if (!forceReadWrite) {
+                  forceReadWrite = options.ForceReadWrite;
+               }
+
+               if (options.PropertyType != null) {
+                  property = (PropertyGridProperty)Activator.CreateInstance(options.PropertyType, Grid);
+               }
+            }
          }
 
-         Type underlyingType = Enum.GetUnderlyingType(enumType);
-         if (underlyingType == typeof(long)) {
-            return Enum.ToObject(enumType, ConversionHelper.ChangeType<long>(value));
+         if (property == null) {
+            property = Grid.CreateProperty();
          }
 
-         if (underlyingType == typeof(ulong)) {
-            return Enum.ToObject(enumType, ConversionHelper.ChangeType<ulong>(value));
+         Grid.Describe(property, descriptor);
+         if (forceReadWrite) {
+            property.IsReadOnly = false;
          }
 
-         if (underlyingType == typeof(int)) {
-            return Enum.ToObject(enumType, ConversionHelper.ChangeType<int>(value));
-         }
-
-         if ((underlyingType == typeof(uint))) {
-            return Enum.ToObject(enumType, ConversionHelper.ChangeType<uint>(value));
-         }
-
-         if (underlyingType == typeof(short)) {
-            return Enum.ToObject(enumType, ConversionHelper.ChangeType<short>(value));
-         }
-
-         if (underlyingType == typeof(ushort)) {
-            return Enum.ToObject(enumType, ConversionHelper.ChangeType<ushort>(value));
-         }
-
-         if (underlyingType == typeof(byte)) {
-            return Enum.ToObject(enumType, ConversionHelper.ChangeType<byte>(value));
-         }
-
-         if (underlyingType == typeof(sbyte)) {
-            return Enum.ToObject(enumType, ConversionHelper.ChangeType<sbyte>(value));
-         }
-
-         throw new ArgumentException(null, "enumType");
+         property.OnDescribed();
+         property.RefreshValueFromDescriptor(true, false, true);
+         return property;
       }
 
-      public static ulong EnumToUInt64(object value) {
-         if (value == null) {
-            throw new ArgumentNullException("value");
-         }
 
-         TypeCode typeCode = Convert.GetTypeCode(value);
-         switch (typeCode) {
-            case TypeCode.SByte:
-            case TypeCode.Int16:
-            case TypeCode.Int32:
-            case TypeCode.Int64:
-               return (ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture);
 
-            case TypeCode.Byte:
-            case TypeCode.UInt16:
-            case TypeCode.UInt32:
-            case TypeCode.UInt64:
-               return Convert.ToUInt64(value, CultureInfo.InvariantCulture);
 
-            //case TypeCode.String:
-            default:
-               return ConversionHelper.ChangeType<ulong>(value);
-         }
-      }
+      //public static object EnumToObject(Type enumType, object value) {
+      //   if (enumType == null) {
+      //      throw new ArgumentNullException("enumType");
+      //   }
+
+      //   if (!enumType.IsEnum) {
+      //      throw new ArgumentException(null, "enumType");
+      //   }
+
+      //   if (value == null) {
+      //      throw new ArgumentNullException("value");
+      //   }
+
+      //   Type underlyingType = Enum.GetUnderlyingType(enumType);
+      //   if (underlyingType == typeof(long)) {
+      //      return Enum.ToObject(enumType, ConversionHelper.ChangeType<long>(value));
+      //   }
+
+      //   if (underlyingType == typeof(ulong)) {
+      //      return Enum.ToObject(enumType, ConversionHelper.ChangeType<ulong>(value));
+      //   }
+
+      //   if (underlyingType == typeof(int)) {
+      //      return Enum.ToObject(enumType, ConversionHelper.ChangeType<int>(value));
+      //   }
+
+      //   if ((underlyingType == typeof(uint))) {
+      //      return Enum.ToObject(enumType, ConversionHelper.ChangeType<uint>(value));
+      //   }
+
+      //   if (underlyingType == typeof(short)) {
+      //      return Enum.ToObject(enumType, ConversionHelper.ChangeType<short>(value));
+      //   }
+
+      //   if (underlyingType == typeof(ushort)) {
+      //      return Enum.ToObject(enumType, ConversionHelper.ChangeType<ushort>(value));
+      //   }
+
+      //   if (underlyingType == typeof(byte)) {
+      //      return Enum.ToObject(enumType, ConversionHelper.ChangeType<byte>(value));
+      //   }
+
+      //   if (underlyingType == typeof(sbyte)) {
+      //      return Enum.ToObject(enumType, ConversionHelper.ChangeType<sbyte>(value));
+      //   }
+
+      //   throw new ArgumentException(null, "enumType");
+      //}
+
+      //public static ulong EnumToUInt64(object value) {
+      //   if (value == null) {
+      //      throw new ArgumentNullException("value");
+      //   }
+
+      //   TypeCode typeCode = Convert.GetTypeCode(value);
+      //   switch (typeCode) {
+      //      case TypeCode.SByte:
+      //      case TypeCode.Int16:
+      //      case TypeCode.Int32:
+      //      case TypeCode.Int64:
+      //         return (ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture);
+
+      //      case TypeCode.Byte:
+      //      case TypeCode.UInt16:
+      //      case TypeCode.UInt32:
+      //      case TypeCode.UInt64:
+      //         return Convert.ToUInt64(value, CultureInfo.InvariantCulture);
+
+      //      //case TypeCode.String:
+      //      default:
+      //         return ConversionHelper.ChangeType<ulong>(value);
+      //   }
+      //}
 
 
       public static string Format(object obj, string format, IFormatProvider formatProvider) {
@@ -136,7 +181,7 @@ namespace Utilities {
                }
 
                if (format[0] == '#') {
-                  sb.Append(DecamelizationHelper.Decamelize(pi.Name));
+                  sb.Append(BaseDecamelizer.Decamelize(pi.Name));
                }
                else {
                   sb.Append(pi.Name);
@@ -224,5 +269,99 @@ namespace Utilities {
          }
          return DataBindingEvaluator.Eval(obj, format, formatProvider, null, false);
       }
+
+      public static void Describe(this IPropertyGrid propertyGrid, PropertyGridProperty property, PropertyDescriptor descriptor) {
+         if (property == null) {
+            throw new ArgumentNullException("property");
+         }
+
+         if (descriptor == null) {
+            throw new ArgumentNullException("descriptor");
+         }
+
+         property.Descriptor = descriptor;
+         property.Name = descriptor.Name;
+         property.PropertyType = descriptor.PropertyType;
+
+         // unset by default. conversion service does the default job
+         //property.Converter = descriptor.Converter;
+
+         property.Category =
+             string.IsNullOrWhiteSpace(descriptor.Category) ||
+             Extensions2.EqualsIgnoreCase(descriptor.Category, CategoryAttribute.Default.Category)
+                 ? propertyGrid.DefaultCategoryName
+                 : descriptor.Category;
+         property.IsReadOnly = descriptor.IsReadOnly;
+         property.Description = descriptor.Description;
+         property.DisplayName = descriptor.DisplayName;
+         if (propertyGrid.DecamelizePropertiesDisplayNames && property.DisplayName == descriptor.Name) {
+            property.DisplayName = BaseDecamelizer.Decamelize(property.DisplayName);
+         }
+
+         property.IsEnum = descriptor.PropertyType.IsEnum;
+         property.IsFlagsEnum = descriptor.PropertyType.IsEnum && Extensions2.IsFlagsEnum(descriptor.PropertyType);
+
+         PropertyGridOptionsAttribute options = Extensions2.GetAttribute<PropertyGridOptionsAttribute>((MemberDescriptor)descriptor);
+         if (options != null) {
+            if (options.SortOrder != 0) {
+               property.SortOrder = options.SortOrder;
+            }
+
+            property.IsEnum = options.IsEnum;
+            property.IsFlagsEnum = options.IsFlagsEnum;
+         }
+
+         DefaultValueAttribute att = Extensions2.GetAttribute<DefaultValueAttribute>((MemberDescriptor)descriptor);
+         if (att != null) {
+            property.HasDefaultValue = true;
+            property.DefaultValue = att.Value;
+         }
+         else if (options != null) {
+            if (options.HasDefaultValue) {
+               property.HasDefaultValue = true;
+               property.DefaultValue = options.DefaultValue;
+            }
+            else {
+               if (TryGetDefaultValue(options, out string defaultValue)) {
+                  property.DefaultValue = defaultValue;
+                  property.HasDefaultValue = true;
+               }
+            }
+         }
+
+         property.Attributes.AddDynamicProperties(descriptor.Attributes.OfType<PropertyGridAttribute>().ToArray());
+         property.TypeAttributes.AddDynamicProperties(Extensions2.GetAttributes<PropertyGridAttribute>(descriptor.PropertyType)
+             .ToArray());
+
+         static bool TryGetDefaultValue(PropertyGridOptionsAttribute options, out string value) {
+            value = null;
+            if (options == null || !options.IsEnum && !options.IsFlagsEnum) {
+               return false;
+            }
+
+            if (options.EnumNames != null && options.EnumNames.Length > 0) {
+               value = options.EnumNames.First();
+               return true;
+            }
+            return false;
+         }
+      }
+
+
+      public static void AddDynamicProperties(this DynamicObject dynamicObject, ICollection<PropertyGridAttribute> attributes) {
+         if (attributes == null || dynamicObject == null) {
+            return;
+         }
+
+         foreach (PropertyGridAttribute pga in attributes) {
+            if (string.IsNullOrWhiteSpace(pga.Name)) {
+               continue;
+            }
+
+            DynamicObjectProperty prop = dynamicObject.AddProperty(pga.Name, pga.Type, null);
+            prop.SetValue(dynamicObject, pga.Value);
+         }
+      }
+
    }
 }

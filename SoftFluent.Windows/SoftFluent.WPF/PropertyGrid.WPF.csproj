@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.WPF\Infrastructure.WPF.csproj" />
+    <ProjectReference Include="..\PropertyGrid.WPF.Infrastructure\PropertyGrid.WPF.Infrastructure.csproj" />
     <ProjectReference Include="..\PropertyGrid\PropertyGrid.csproj" />
-    <ProjectReference Include="..\Utilities\Utilities.csproj" />
+    <ProjectReference Include="..\UniversalConverter\UniversalConverter.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +22,11 @@
     <Page Update="Resources\Styles.xaml">
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Attribute\" />
+    <Folder Include="PropertyGrid\" />
   </ItemGroup>
 
 </Project>

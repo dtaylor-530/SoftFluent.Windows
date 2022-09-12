@@ -1,10 +1,11 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:windows="clr-namespace:SoftFluent.Windows"
-                    xmlns:windows1="clr-namespace:SoftFluent.Windows;assembly=Infrastructure.WPF">
+                    xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid"
+                    xmlns:windows1="clr-namespace:SoftFluent.Windows;assembly=Infrastructure.WPF"
+                    xmlns:windows2="clr-namespace:SoftFluent.Windows">
 
 
-    <windows:PropertyGridConverter x:Key="PropertyGridConverter" />
+    <windows1:PropertyGridConverter x:Key="PropertyGridConverter" />
 
     <Style x:Key="ValidationLabel" TargetType="{x:Type Label}">
         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
@@ -14,7 +15,7 @@
         <windows1:DateTimePicker SelectedDate="{Binding Value, UpdateSourceTrigger=PropertyChanged}" SelectedDateTime="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
     </DataTemplate>
 
-    <DataTemplate x:Key="ColorEnumEditor" DataType="{x:Type windows:PropertyGridProperty}">
+    <DataTemplate x:Key="ColorEnumEditor" DataType="{x:Type windows:PropertyGridEnumProperty}">
         <TextBox
                 Background="{Binding EnumAttributes.Background}"
                 Foreground="{Binding EnumAttributes.Foreground}"
@@ -33,7 +34,7 @@
             <Button
                     Width="24"
                     HorizontalAlignment="Right"
-                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
+                    Command="{x:Static windows2:PropertyGrid.BrowseCommand}"
                     CommandParameter="BigTextEditorWindow"
                     Content="..." />
         </Grid>
@@ -44,7 +45,7 @@
             <Button
                     Width="24"
                     HorizontalAlignment="Right"
-                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
+                    Command="{x:Static windows2:PropertyGrid.BrowseCommand}"
                     CommandParameter="ObjectEditorWindow"
                     Content="..." />
         </Grid>
@@ -55,7 +56,7 @@
             <Button
                     Width="24"
                     HorizontalAlignment="Right"
-                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
+                    Command="{x:Static windows2:PropertyGrid.BrowseCommand}"
                     CommandParameter="SavableObjectEditorWindow"
                     Content="..." />
         </Grid>
@@ -66,7 +67,7 @@
             <Button
                     Width="24"
                     HorizontalAlignment="Right"
-                    Command="{x:Static windows:PropertyGrid.BrowseCommand}"
+                    Command="{x:Static windows2:PropertyGrid.BrowseCommand}"
                     CommandParameter="ReadOnlyObjectEditorWindow"
                     Content="..." />
         </Grid>

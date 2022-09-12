@@ -1,13 +1,13 @@
 ﻿
 namespace SoftFluent.Windows
 {
-    public class DecamelizeOptions
-    {
-        public DecamelizeOptions()
-        {
-            TextOptions = DecamelizeTextOptions.Default;
-        }
+    //public class DecamelizeOptions // : IDecamelizeOptions
+    //{
+    //    public DecamelizeOptions()
+    //    {
+    //        TextOptions = DecamelizeTextOptions.Default;
+    //    }
 
-        public virtual DecamelizeTextOptions TextOptions { get; set; }
-    }
+    //    public virtual DecamelizeTextOptions TextOptions { get; set; }
+    //}
 }

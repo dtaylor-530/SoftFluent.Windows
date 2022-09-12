@@ -1,7 +1,11 @@
 ﻿using System.Collections;
 using System.ComponentModel;
+using System.Globalization;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security;
 using System.Text;
+using SoftFluent.Windows;
 using SoftFluent.Windows.Utilities;
 
 namespace Utilities
@@ -49,7 +53,80 @@ namespace Utilities
         }
 
 
-        public static bool EqualsIgnoreCase(this string thisString, string text)
+      public static object EnumToObject(Type enumType, object value) {
+         if (enumType == null) {
+            throw new ArgumentNullException("enumType");
+         }
+
+         if (!enumType.IsEnum) {
+            throw new ArgumentException(null, "enumType");
+         }
+
+         if (value == null) {
+            throw new ArgumentNullException("value");
+         }
+
+         Type underlyingType = Enum.GetUnderlyingType(enumType);
+         if (underlyingType == typeof(long)) {
+            return Enum.ToObject(enumType, ConversionHelper.ChangeType<long>(value));
+         }
+
+         if (underlyingType == typeof(ulong)) {
+            return Enum.ToObject(enumType, ConversionHelper.ChangeType<ulong>(value));
+         }
+
+         if (underlyingType == typeof(int)) {
+            return Enum.ToObject(enumType, ConversionHelper.ChangeType<int>(value));
+         }
+
+         if ((underlyingType == typeof(uint))) {
+            return Enum.ToObject(enumType, ConversionHelper.ChangeType<uint>(value));
+         }
+
+         if (underlyingType == typeof(short)) {
+            return Enum.ToObject(enumType, ConversionHelper.ChangeType<short>(value));
+         }
+
+         if (underlyingType == typeof(ushort)) {
+            return Enum.ToObject(enumType, ConversionHelper.ChangeType<ushort>(value));
+         }
+
+         if (underlyingType == typeof(byte)) {
+            return Enum.ToObject(enumType, ConversionHelper.ChangeType<byte>(value));
+         }
+
+         if (underlyingType == typeof(sbyte)) {
+            return Enum.ToObject(enumType, ConversionHelper.ChangeType<sbyte>(value));
+         }
+
+         throw new ArgumentException(null, "enumType");
+      }
+
+      public static ulong EnumToUInt64(object value) {
+         if (value == null) {
+            throw new ArgumentNullException("value");
+         }
+
+         TypeCode typeCode = Convert.GetTypeCode(value);
+         switch (typeCode) {
+            case TypeCode.SByte:
+            case TypeCode.Int16:
+            case TypeCode.Int32:
+            case TypeCode.Int64:
+               return (ulong)Convert.ToInt64(value, CultureInfo.InvariantCulture);
+
+            case TypeCode.Byte:
+            case TypeCode.UInt16:
+            case TypeCode.UInt32:
+            case TypeCode.UInt64:
+               return Convert.ToUInt64(value, CultureInfo.InvariantCulture);
+
+            //case TypeCode.String:
+            default:
+               return ConversionHelper.ChangeType<ulong>(value);
+         }
+      }
+      public static bool EqualsIgnoreCase(this string thisString, string text)
         {
             return EqualsIgnoreCase(thisString, text, false);
         }
@@ -116,8 +193,23 @@ namespace Utilities
 
             return (T)o[0];
         }
+        public static string ConvertToUnsecureString(this SecureString securePassword) {
+           if (securePassword == null)
+              throw new ArgumentNullException("securePassword");
 
-        public static T GetAttribute<T>(this MemberDescriptor descriptor) where T : Attribute
+           IntPtr unmanagedString = IntPtr.Zero;
+           try {
+              unmanagedString = Marshal.SecureStringToGlobalAllocUnicode(securePassword);
+              return Marshal.PtrToStringUni(unmanagedString);
+           }
+           finally {
+              Marshal.ZeroFreeGlobalAllocUnicode(unmanagedString);
+           }
+        }
+
+
+
+      public static T GetAttribute<T>(this MemberDescriptor descriptor) where T : Attribute
         {
             if (descriptor == null)
             {
@@ -149,7 +241,42 @@ namespace Utilities
             return (IEnumerable<T>)Attribute.GetCustomAttributes(element, typeof(T));
         }
 
-      
+
+
+        public static string NormalizeGuidParameter(object parameter) {
+           const string guidParameters = "DNBPX";
+           string p = $"{parameter}".ToUpperInvariant();
+           if (p.Length == 0) {
+              return guidParameters[0].ToString(CultureInfo.InvariantCulture);
+           }
+
+           char ch = guidParameters.FirstOrDefault(c => c == p[0]);
+           return ch == 0 ? guidParameters[0].ToString(CultureInfo.InvariantCulture) : ch.ToString(CultureInfo.InvariantCulture);
+        }
+
+      public static bool IsEnumOrNullableEnum(Type type, out Type enumType, out bool nullable) {
+           if (type == null) {
+              throw new ArgumentNullException("type");
+           }
+
+           nullable = false;
+           if (type.IsEnum) {
+              enumType = type;
+              return true;
+           }
+
+           if (type.Name == typeof(Nullable<>).Name) {
+              Type[] args = type.GetGenericArguments();
+              if (args.Length == 1 && args[0].IsEnum) {
+                 enumType = args[0];
+                 nullable = true;
+                 return true;
+              }
+           }
+
+           enumType = null;
+           return false;
+        }
 
         public static Type GetElementType(Type collectionType)
         {
