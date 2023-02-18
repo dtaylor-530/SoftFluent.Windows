@@ -220,3 +220,5 @@ pip-log.txt
 SoftFluent.Windows/nuget/lib/
 SoftFluent.Windows/nuget/*.nupkg
 /SoftFluent.Windows/.vs/SoftFluent.Windows
+/SoftFluent.Windows/.vs/ProjectEvaluation
+.vshistory
