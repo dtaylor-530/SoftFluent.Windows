@@ -114,7 +114,7 @@ namespace SoftFluent.Windows {
 
          grid.RefreshComboBox();
 
-         if (Extensions2.GetAttribute<ReadOnlyAttribute>(e.NewValue.GetType()) is ReadOnlyAttribute roa &&
+         if (Extensions.GetAttribute<ReadOnlyAttribute>(e.NewValue.GetType()) is ReadOnlyAttribute roa &&
              roa.IsReadOnly) {
             grid.IsReadOnly = true;
          }
@@ -192,7 +192,7 @@ namespace SoftFluent.Windows {
                @where = b => true;
             }
 
-            foreach (DependencyProperty prop in Extensions.EnumerateMarkupDependencyProperties(element)) {
+            foreach (DependencyProperty prop in VisualTreeExtensions.EnumerateMarkupDependencyProperties(element)) {
                BindingExpression expr = BindingOperations.GetBindingExpression(element, prop);
                if (expr != null && expr.ParentBinding != null && @where(expr.ParentBinding)) {
                   action(expr);

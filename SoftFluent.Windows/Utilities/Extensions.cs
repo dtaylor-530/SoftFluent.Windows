@@ -10,14 +10,14 @@ using SoftFluent.Windows.Utilities;
 
 namespace Utilities
 {
-    public static class Extensions2
+    public static class Extensions
     {
         private const string _hexaChars = "0123456789ABCDEF";
 
-        public static string ConcatenateCollection(IEnumerable collection, string expression, string separator)
-        {
-            return ConcatenateCollection(collection, expression, separator, null);
-        }
+        //public static string ConcatenateCollection(IEnumerable collection, string expression, string separator)
+        //{
+        //    return ConcatenateCollection(collection, expression, separator, null);
+        //}
 
         public static string ConcatenateCollection(IEnumerable collection, string expression, string separator, IFormatProvider formatProvider)
         {

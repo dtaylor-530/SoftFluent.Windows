@@ -15,7 +15,7 @@ using Utilities;
 
 namespace SoftFluent.Windows.Utilities
 {
-   public static class Extensions
+   public static class VisualTreeExtensions
     {
 
 

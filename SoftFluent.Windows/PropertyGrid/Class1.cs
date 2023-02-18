@@ -18,11 +18,11 @@ namespace PropertyGrid {
          }
 
          if (value != null && property.PropertyType.IsEnum) {
-            return Extensions2.EnumToObject(property.PropertyType, value);
+            return Extensions.EnumToObject(property.PropertyType, value);
          }
 
          if (value != null && value.GetType().IsEnum) {
-            return Extensions2.EnumToObject(value.GetType(), value);
+            return Extensions.EnumToObject(value.GetType(), value);
          }
 
          if (property.PropertyType != typeof(string)) {
@@ -47,11 +47,11 @@ namespace PropertyGrid {
          }
 
          if (value != null && propertyType.IsEnum) {
-            return Extensions2.EnumToObject(propertyType, value);
+            return Extensions.EnumToObject(propertyType, value);
          }
 
          if (value != null && value.GetType().IsEnum) {
-            return Extensions2.EnumToObject(value.GetType(), value);
+            return Extensions.EnumToObject(value.GetType(), value);
          }
 
          if (propertyType != typeof(string)) {
@@ -130,7 +130,7 @@ namespace PropertyGrid {
 
          Type type = value.GetType();
          if (type.IsEnum) {
-            return Extensions2.EnumToUInt64(value);
+            return Extensions.EnumToUInt64(value);
          }
 
          TypeCode typeCode = Convert.GetTypeCode(value);
@@ -169,7 +169,7 @@ namespace PropertyGrid {
                continue;
             }
 
-            ulong ulvalue = Extensions2.EnumToUInt64(att.EnumValues[index]);
+            ulong ulvalue = Extensions.EnumToUInt64(att.EnumValues[index]);
             ul |= ulvalue;
          }
          return ul;

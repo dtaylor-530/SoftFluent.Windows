@@ -932,7 +932,7 @@ namespace SoftFluent.Windows
                     byte[] inputBytes = input as byte[];
                     if (inputBytes != null)
                     {
-                        value = Extensions2.ToHexa(inputBytes);
+                        value = Extensions.ToHexa(inputBytes);
                     }
                     else
                     {

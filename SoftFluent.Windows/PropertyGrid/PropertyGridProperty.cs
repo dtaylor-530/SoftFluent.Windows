@@ -85,7 +85,7 @@ namespace SoftFluent.Windows {
                return null;
             }
 
-            return Extensions2.GetElementType(PropertyType);
+            return Extensions.GetElementType(PropertyType);
          }
       }
 

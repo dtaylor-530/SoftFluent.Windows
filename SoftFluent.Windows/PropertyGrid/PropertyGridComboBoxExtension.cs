@@ -30,12 +30,12 @@ namespace SoftFluent.Windows
 
             if (value != null && property.PropertyType.IsEnum)
             {
-                return Extensions2.EnumToObject(property.PropertyType, value);
+                return Extensions.EnumToObject(property.PropertyType, value);
             }
 
             if (value != null && value.GetType().IsEnum)
             {
-                return Extensions2.EnumToObject(value.GetType(), value);
+                return Extensions.EnumToObject(value.GetType(), value);
             }
 
             if (property.PropertyType != typeof(string))
@@ -66,12 +66,12 @@ namespace SoftFluent.Windows
 
             if (value != null && propertyType.IsEnum)
             {
-                return Extensions2.EnumToObject(propertyType, value);
+                return Extensions.EnumToObject(propertyType, value);
             }
 
             if (value != null && value.GetType().IsEnum)
             {
-                return Extensions2.EnumToObject(value.GetType(), value);
+                return Extensions.EnumToObject(value.GetType(), value);
             }
 
             if (propertyType != typeof(string))
@@ -168,7 +168,7 @@ namespace SoftFluent.Windows
             Type type = value.GetType();
             if (type.IsEnum)
             {
-                return Extensions2.EnumToUInt64(value);
+                return Extensions.EnumToUInt64(value);
             }
 
             TypeCode typeCode = Convert.GetTypeCode(value);
@@ -213,7 +213,7 @@ namespace SoftFluent.Windows
                     continue;
                 }
 
-                ulong ulvalue = Extensions2.EnumToUInt64(att.EnumValues[index]);
+                ulong ulvalue = Extensions.EnumToUInt64(att.EnumValues[index]);
                 ul |= ulvalue;
             }
             return ul;
@@ -237,7 +237,7 @@ namespace SoftFluent.Windows
                 throw new ArgumentNullException("property");
             }
 
-            bool isEnumOrNullableEnum = Extensions2.IsEnumOrNullableEnum(property.PropertyType, out Type enumType, out bool nullable);
+            bool isEnumOrNullableEnum = Extensions.IsEnumOrNullableEnum(property.PropertyType, out Type enumType, out bool nullable);
 
             PropertyGridItem zero = null;
             IPropertyGridOptionsAttribute att = SoftFluent.Abstractions. Helper.FromProperty(property);
@@ -256,7 +256,7 @@ namespace SoftFluent.Windows
 
                 string[] names = Enum.GetNames(enumType);
                 Array values = Enum.GetValues(enumType);
-                if (Extensions2.IsFlagsEnum(enumType))
+                if (Extensions.IsFlagsEnum(enumType))
                 {
                     ulong uvalue = EnumToUInt64(property, property.Value);
 
@@ -282,7 +282,7 @@ namespace SoftFluent.Windows
                         }
 
                         // determine if this name is in fact a combination of other names
-                        ulong bitsCount = (ulong)Extensions2.GetEnumMaxPower(enumType) - 1; // skip first
+                        ulong bitsCount = (ulong)Extensions.GetEnumMaxPower(enumType) - 1; // skip first
                         ulong b = 1;
                         for (ulong bit = 1; bit < bitsCount; bit++) // signed, skip highest bit
                         {

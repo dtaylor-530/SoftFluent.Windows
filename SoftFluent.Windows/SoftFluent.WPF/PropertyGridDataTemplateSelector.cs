@@ -111,7 +111,7 @@ namespace SoftFluent.Windows
             {
                 Type enumType;
                 bool nullable;
-                Extensions2.IsEnumOrNullableEnum(propertyType, out enumType, out nullable);
+                Extensions.IsEnumOrNullableEnum(propertyType, out enumType, out nullable);
                 if (nullable)
                     return true;
             }
@@ -124,7 +124,7 @@ namespace SoftFluent.Windows
                     if (!options.IsFlagsEnum)
                         return true;
 
-                    if (Extensions2.IsFlagsEnum(type))
+                    if (Extensions.IsFlagsEnum(type))
                         return true;
 
                     if (template.IsFlagsEnum.HasValue && template.IsFlagsEnum.Value)

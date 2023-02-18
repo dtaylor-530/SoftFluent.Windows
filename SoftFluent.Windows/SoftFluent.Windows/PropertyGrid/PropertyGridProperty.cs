@@ -332,8 +332,8 @@ namespace SoftFluent.Windows {
       public virtual void OnDescribed() {
       }
 
-      public virtual void OnEvent(object sender, PropertyGridEventArgs e) {
-         EventHandler<PropertyGridEventArgs> handler = Event;
+      public virtual void OnEvent(object sender, IPropertyGridEventArgs e) {
+         EventHandler<IPropertyGridEventArgs> handler = Event;
          if (handler != null) {
             handler(sender, e);
          }

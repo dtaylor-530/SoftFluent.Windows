@@ -226,7 +226,7 @@ namespace Utilities {
                      expression = format.Substring(1, pos - 1);
                   }
                }
-               return Utilities.Extensions2.ConcatenateCollection(enumerable, expression, separator, formatProvider);
+               return Utilities.Extensions.ConcatenateCollection(enumerable, expression, separator, formatProvider);
             }
          }
          else if (format.IndexOf(',') >= 0) {
@@ -288,7 +288,7 @@ namespace Utilities {
 
          property.Category =
              string.IsNullOrWhiteSpace(descriptor.Category) ||
-             Extensions2.EqualsIgnoreCase(descriptor.Category, CategoryAttribute.Default.Category)
+             Extensions.EqualsIgnoreCase(descriptor.Category, CategoryAttribute.Default.Category)
                  ? propertyGrid.DefaultCategoryName
                  : descriptor.Category;
          property.IsReadOnly = descriptor.IsReadOnly;
@@ -299,9 +299,9 @@ namespace Utilities {
          }
 
          property.IsEnum = descriptor.PropertyType.IsEnum;
-         property.IsFlagsEnum = descriptor.PropertyType.IsEnum && Extensions2.IsFlagsEnum(descriptor.PropertyType);
+         property.IsFlagsEnum = descriptor.PropertyType.IsEnum && Extensions.IsFlagsEnum(descriptor.PropertyType);
 
-         PropertyGridOptionsAttribute options = Extensions2.GetAttribute<PropertyGridOptionsAttribute>((MemberDescriptor)descriptor);
+         PropertyGridOptionsAttribute options = Extensions.GetAttribute<PropertyGridOptionsAttribute>((MemberDescriptor)descriptor);
          if (options != null) {
             if (options.SortOrder != 0) {
                property.SortOrder = options.SortOrder;
@@ -311,7 +311,7 @@ namespace Utilities {
             property.IsFlagsEnum = options.IsFlagsEnum;
          }
 
-         DefaultValueAttribute att = Extensions2.GetAttribute<DefaultValueAttribute>((MemberDescriptor)descriptor);
+         DefaultValueAttribute att = Extensions.GetAttribute<DefaultValueAttribute>((MemberDescriptor)descriptor);
          if (att != null) {
             property.HasDefaultValue = true;
             property.DefaultValue = att.Value;
@@ -330,7 +330,7 @@ namespace Utilities {
          }
 
          property.Attributes.AddDynamicProperties(descriptor.Attributes.OfType<PropertyGridAttribute>().ToArray());
-         property.TypeAttributes.AddDynamicProperties(Extensions2.GetAttributes<PropertyGridAttribute>(descriptor.PropertyType)
+         property.TypeAttributes.AddDynamicProperties(Extensions.GetAttributes<PropertyGridAttribute>(descriptor.PropertyType)
              .ToArray());
 
          static bool TryGetDefaultValue(PropertyGridOptionsAttribute options, out string value) {

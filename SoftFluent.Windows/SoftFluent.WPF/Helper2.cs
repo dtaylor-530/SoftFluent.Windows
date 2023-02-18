@@ -95,12 +95,12 @@ namespace PropertyGrid.WPF {
       public static void ChangeText(ExecutedRoutedEventArgs e) {
          if (e.OriginalSource is TextBox tb) {
             if (SoftFluent.Windows.PropertyGrid.NewGuidCommand.Equals(e.Command)) {
-               tb.Text = Guid.NewGuid().ToString(Extensions2.NormalizeGuidParameter(e.Parameter));
+               tb.Text = Guid.NewGuid().ToString(Extensions.NormalizeGuidParameter(e.Parameter));
                return;
             }
 
             if (SoftFluent.Windows.PropertyGrid.EmptyGuidCommand.Equals(e.Command)) {
-               tb.Text = Guid.Empty.ToString(Extensions2.NormalizeGuidParameter(e.Parameter));
+               tb.Text = Guid.Empty.ToString(Extensions.NormalizeGuidParameter(e.Parameter));
                return;
             }
 
@@ -108,7 +108,7 @@ namespace PropertyGrid.WPF {
                Guid g = ConversionHelper.ChangeType(tb.Text.Trim(), Guid.Empty);
                byte[] bytes = g.ToByteArray();
                bytes[15]++;
-               tb.Text = new Guid(bytes).ToString(Extensions2.NormalizeGuidParameter(e.Parameter));
+               tb.Text = new Guid(bytes).ToString(Extensions.NormalizeGuidParameter(e.Parameter));
                return;
             }
          }
