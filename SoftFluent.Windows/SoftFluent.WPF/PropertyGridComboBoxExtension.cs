@@ -1,8 +1,8 @@
+using Abstractions;
 using System;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Markup;
-using Abstractions;
 
 namespace SoftFluent.Windows
 {

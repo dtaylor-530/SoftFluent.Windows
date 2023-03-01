@@ -12,7 +12,7 @@
                     xmlns:windows2="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid"
                     xmlns:samples1="clr-namespace:SoftFluent.Windows.Samples;assembly=Infrastructure.WPF"
                     xmlns:windows3="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF"
-                    xmlns:samples2="clr-namespace:SoftFluent.Windows.Samples;assembly=PropertyGrid.WPF.Infrastructure">
+                    xmlns:samples2="clr-namespace:PropertyGrid.WPF.Infrastructure;assembly=PropertyGrid.WPF">
     <windows1:UniversalConverter x:Key="BoolToDefaultValueBackgroundConverter">
         <windows1:UniversalConverter.Switch>
             <windows1:UniversalConverterCase ConvertedValue="#F0F0F0" Value="true" />

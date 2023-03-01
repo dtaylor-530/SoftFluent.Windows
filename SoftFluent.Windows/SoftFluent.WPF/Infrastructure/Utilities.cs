@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Markup;
 
-namespace SoftFluent.Windows.Samples
+namespace PropertyGrid.WPF.Infrastructure
 {
     public static class Utilities
     {
