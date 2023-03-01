@@ -10,7 +10,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     StartupUri="MainWindow.xaml">
     <Application.Resources>
-
-   
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/PropertyGrid.WPF.Templates;component/DataTemplates.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="/PropertyGrid.WPF.Templates;component/MoreDataTemplates.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="/PropertyGrid.WPF.Extra;component/Resources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

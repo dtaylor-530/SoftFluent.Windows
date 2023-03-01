@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF"
     xmlns:samples1="clr-namespace:SoftFluent.Windows.Samples;assembly=PropertyGrid.Demo.Model"
+    xmlns:local="clr-namespace:PropertyGrid.WPF.Demo.Infrastructure"
     Title="MainWindow"
     Width="608"
     Height="638">
@@ -13,6 +14,7 @@
     <FrameworkElement.Resources>
         <DataTemplate DataType="{x:Type samples1:Customer2}">
             <windows:PropertyGrid
+                Engine="{x:Static local:Engine.Instance}"
                 Name="MyGrid"
                 SelectedObject="{Binding }" />
         </DataTemplate>
