@@ -35,11 +35,6 @@ namespace SoftFluent.Windows
                 {
                     _properties.Add(prop);
                 }
-
-                if (options.Data is IPropertyGridObject pga)
-                {
-                    pga.FinalizeProperties(this, _properties);
-                }
             }
         }
 

@@ -306,8 +306,7 @@ namespace SoftFluent.Windows
 
         public virtual void CanExecute(object sender, EventArgs e)
         {
-            IPropertyGridCommandHandler handler = Value as IPropertyGridCommandHandler;
-            if (handler != null)
+            if (Value is IPropertyGridCommandHandler handler)
             {
                 handler.CanExecute(this, sender, e);
             }
@@ -320,8 +319,7 @@ namespace SoftFluent.Windows
                 return;
             }
 
-            ICloneable c = Value as ICloneable;
-            _clonedValue = c != null ? c.Clone() : Value;
+            _clonedValue = Value is ICloneable c ? c.Clone() : Value;
             _valueCloned = true;
         }
 
