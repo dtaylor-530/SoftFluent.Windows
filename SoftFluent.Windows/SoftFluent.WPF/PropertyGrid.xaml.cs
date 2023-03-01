@@ -17,8 +17,8 @@ namespace SoftFluent.Windows
 {
     public class PropertyGridOptions : IPropertyGridOptions
     {
-        public int InheritanceLevel { get;  set; }
-        public bool IsReadOnly { get;  set; }
+        public int InheritanceLevel { get; set; }
+        public bool IsReadOnly { get; set; }
         public object Data { get; set; }
 
         public string DefaultCategoryName { get; set; }
@@ -49,12 +49,6 @@ namespace SoftFluent.Windows
             GroupByCategoryProperty =
                DependencyProperty.Register("GroupByCategory", typeof(bool), typeof(PropertyGrid), new PropertyMetadata(Helper.GroupByCategoryChanged));
 
-        //OptionsProperty =
-        //DependencyProperty.Register("Options", typeof(IPropertyGridOptions), typeof(PropertyGrid), new PropertyMetadata());
-
-
-
-
         public IPropertyGridEngine Engine
         {
             get { return (IPropertyGridEngine)GetValue(EngineProperty); }
@@ -69,9 +63,9 @@ namespace SoftFluent.Windows
 
         private static void EnginePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if(d is PropertyGrid propertyGrid && e.NewValue is IPropertyGridEngine engine)
-            { 
-                
+            if (d is PropertyGrid propertyGrid && e.NewValue is IPropertyGridEngine engine)
+            {
+
             }
         }
 
