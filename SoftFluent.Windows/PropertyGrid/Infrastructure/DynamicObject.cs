@@ -454,7 +454,7 @@ namespace PropertyGrid.Infrastructure
                 return ToString();
             }
 
-            return Utilities.Helper.Format(this, format, formatProvider);
+            return Helper.Format(this, format, formatProvider);
         }
 
         /// <summary>
