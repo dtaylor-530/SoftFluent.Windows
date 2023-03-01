@@ -1,0 +1,13 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ex="clr-namespace:PropertyGrid.Extra;assembly=PropertyGrid.Extra">
+
+
+    <DataTemplate x:Key="ColorEnumEditor" DataType="{x:Type ex:PropertyGridEnumProperty}">
+        <TextBox
+                Background="{Binding EnumAttributes.Background}"
+                Foreground="{Binding EnumAttributes.Foreground}"
+                IsReadOnly="{Binding IsReadOnly}"
+                Text="{Binding Value}" />
+    </DataTemplate>
+</ResourceDictionary>
