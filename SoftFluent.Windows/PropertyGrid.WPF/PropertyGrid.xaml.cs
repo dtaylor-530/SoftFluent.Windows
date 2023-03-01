@@ -46,17 +46,11 @@ namespace SoftFluent.Windows
             ValueEditorTemplateSelectorProperty =
             DependencyProperty.Register("ValueEditorTemplateSelector", typeof(DataTemplateSelector), typeof(PropertyGrid),
                 new FrameworkPropertyMetadata(null)),
+            
             GroupByCategoryProperty =
-               DependencyProperty.Register("GroupByCategory", typeof(bool), typeof(PropertyGrid), new PropertyMetadata(Helper.GroupByCategoryChanged));
-
-        public IPropertyGridEngine Engine
-        {
-            get { return (IPropertyGridEngine)GetValue(EngineProperty); }
-            set { SetValue(EngineProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Engine.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty EngineProperty =
+               DependencyProperty.Register("GroupByCategory", typeof(bool), typeof(PropertyGrid), new PropertyMetadata(Helper.GroupByCategoryChanged)),
+            
+            EngineProperty =
             DependencyProperty.Register("Engine", typeof(IPropertyGridEngine), typeof(PropertyGrid),
 
                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsMeasure, EnginePropertyChanged));
@@ -122,8 +116,6 @@ namespace SoftFluent.Windows
 
         public CollectionViewSource PropertiesSource => (CollectionViewSource)FindResource("PropertiesSource");
         private static HashSet<Type> CollectionEditorHasOnlyOneColumnList => Helper.GetTypes();
-
-        //public event EventHandler<PropertyGridEventArgs> PropertyChanged;
 
         public virtual bool CollectionEditorHasOnlyOneColumn(IProperty property)
         {
@@ -362,6 +354,12 @@ namespace SoftFluent.Windows
         }
 
         #region DependencyProperties
+
+        public IPropertyGridEngine Engine
+        {
+            get { return (IPropertyGridEngine)GetValue(EngineProperty); }
+            set { SetValue(EngineProperty, value); }
+        }
 
         public bool GroupByCategory
         {

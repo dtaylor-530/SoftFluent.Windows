@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoftFluent.Windows", "SoftF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoftFluent.Windows.Samples", "SoftFluent.Windows.Samples\SoftFluent.Windows.Samples.csproj", "{815070AF-96B7-460C-AD63-58F50464465F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyGrid.WPF", "SoftFluent.WPF\PropertyGrid.WPF.csproj", "{CD4DB2BD-272E-43F2-8ABA-D269082AF3A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyGrid.WPF", "PropertyGrid.WPF\PropertyGrid.WPF.csproj", "{CD4DB2BD-272E-43F2-8ABA-D269082AF3A4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Abstractions", "Infrastructure\Abstractions.csproj", "{52039B6F-24AF-4C46-8196-2EF9603BE14E}"
 EndProject
