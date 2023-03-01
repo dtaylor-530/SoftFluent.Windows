@@ -17,7 +17,7 @@
     </DataTemplate>
     
 
-    <windows1:PropertyGridConverter x:Key="PropertyGridConverter" />
+    <!--<windows1:PropertyGridConverter x:Key="PropertyGridConverter" />-->
 
     <Style x:Key="ValidationLabel" TargetType="{x:Type Label}">
         <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors).CurrentItem.ErrorContent}" />
