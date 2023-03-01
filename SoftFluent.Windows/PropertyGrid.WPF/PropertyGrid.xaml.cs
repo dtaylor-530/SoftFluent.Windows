@@ -59,7 +59,7 @@ namespace SoftFluent.Windows
         {
             if (d is PropertyGrid propertyGrid && e.NewValue is IPropertyGridEngine engine)
             {
-
+                propertyGrid.RefreshSelectedObject();
             }
         }
 
@@ -70,6 +70,7 @@ namespace SoftFluent.Windows
             NewGuidCommand = new RoutedCommand();
 
         private int _inheritanceLevel;
+        private IPropertyGridEngine engine;
 
         public PropertyGrid()
         {
@@ -202,15 +203,17 @@ namespace SoftFluent.Windows
 
         public virtual async void RefreshSelectedObject()
         {
+            engine = Engine;
+            if (engine == null)
+                return;
+
             if (SelectedObject == null)
             {
                 return;
             }
 
             object selected = SelectedObject;
-            var engine = Engine;
-            if (engine == null)
-                return;
+       
             var options = Options;
             IPropertyEngine source = await Task.Run(() => engine.Convert(options));
             PropertiesSource.Source = source;
