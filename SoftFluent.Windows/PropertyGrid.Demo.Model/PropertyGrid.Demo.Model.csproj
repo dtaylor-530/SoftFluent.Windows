@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PropertyGrid.Extra\PropertyGrid.Extra.csproj" />
     <ProjectReference Include="..\PropertyGrid\PropertyGrid.csproj" />
   </ItemGroup>
 
