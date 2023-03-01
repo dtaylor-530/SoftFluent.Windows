@@ -10,7 +10,7 @@ namespace SoftFluent.Windows
     public class PropertyGridOptionsAttributeHelper
     {
 
-        public static DataTemplate SelectTemplate(IPropertyGridProperty property, object item, DependencyObject container)
+        public static DataTemplate SelectTemplate(IProperty property, object item, DependencyObject container)
         {
             if (property == null)
                 throw new ArgumentNullException("property");
