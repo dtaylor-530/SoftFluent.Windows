@@ -7,9 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.WPF\Infrastructure.WPF.csproj" />
+    <ProjectReference Include="..\PropertyGrid.WPF\PropertyGrid.WPF.csproj" />
     <ProjectReference Include="..\PropertyGrid\PropertyGrid.csproj" />
-    <ProjectReference Include="..\SoftFluent.WPF\PropertyGrid.WPF.csproj" />
     <ProjectReference Include="..\UniversalConverter\UniversalConverter.csproj" />
   </ItemGroup>
 
