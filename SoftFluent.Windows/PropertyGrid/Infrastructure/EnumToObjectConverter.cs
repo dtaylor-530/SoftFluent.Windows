@@ -11,17 +11,15 @@ using System.Text;
 
 using Abstractions;
 using Utilities;
+using SoftFluent.Windows;
 
-namespace SoftFluent.Windows
+namespace PropertyGrid.Infrastructure
 {
-    public class Helper5 
+    public class EnumToObjectConverter
     {
+        public static string DefaultZeroName { get; set; } = "None";
 
-
-
-      public static string DefaultZeroName { get; set; } = "None";
-
-      public static object EnumToObject(IPropertyGridProperty property, object value)
+        public static object EnumToObject(IProperty property, object value)
         {
             if (property == null)
             {
@@ -43,7 +41,7 @@ namespace SoftFluent.Windows
                 return ConversionHelper.ChangeType(value, property.PropertyType);
             }
 
-            IPropertyGridOptionsAttribute options = SoftFluent.Abstractions. Helper.FromProperty(property);
+            IPropertyGridOptionsAttribute options = SoftFluent.Abstractions.Helper.FromProperty(property);
             if (options == null)
             {
                 return ConversionHelper.ChangeType(value, property.PropertyType);
@@ -153,7 +151,7 @@ namespace SoftFluent.Windows
             return s;
         }
 
-        public static ulong EnumToUInt64(IPropertyGridProperty property, object value)
+        public static ulong EnumToUInt64(IProperty property, object value)
         {
             if (property == null)
             {
@@ -187,7 +185,7 @@ namespace SoftFluent.Windows
                     return Convert.ToUInt64(value);
             }
 
-            IPropertyGridOptionsAttribute att = SoftFluent.Abstractions. Helper.FromProperty(property);
+            IPropertyGridOptionsAttribute att = SoftFluent.Abstractions.Helper.FromProperty(property);
             if (att == null || att.EnumNames == null)
             {
                 return 0;
@@ -230,7 +228,7 @@ namespace SoftFluent.Windows
         }
 
 
-        public static IEnumerable BuildItems(IActivator _activator, PropertyGridProperty property, Type targetType, object parameter, CultureInfo culture)
+        public static IEnumerable BuildItems(PropertyGridProperty property)
         {
             if (property == null)
             {
@@ -240,7 +238,7 @@ namespace SoftFluent.Windows
             bool isEnumOrNullableEnum = Extensions.IsEnumOrNullableEnum(property.PropertyType, out Type enumType, out bool nullable);
 
             PropertyGridItem zero = null;
-            IPropertyGridOptionsAttribute att = SoftFluent.Abstractions. Helper.FromProperty(property);
+            IPropertyGridOptionsAttribute att = SoftFluent.Abstractions.Helper.FromProperty(property);
             ObservableCollection<PropertyGridItem> items = new ObservableCollection<PropertyGridItem>();
             if (isEnumOrNullableEnum)
             {
@@ -479,11 +477,12 @@ namespace SoftFluent.Windows
                 }
             }
 
-             return items;
-          PropertyGridItem CreateItem() {
-          
-             return _activator.CreateInstance<PropertyGridItem>();
-        }
+            return items;
+
+            PropertyGridItem CreateItem()
+            {
+                return new PropertyGridItem();
+            }
         }
 
 
@@ -581,7 +580,7 @@ namespace SoftFluent.Windows
         }
 
 
-    
 
-   }
+
+    }
 }
