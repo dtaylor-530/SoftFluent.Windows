@@ -23,9 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversalConverter", "Unive
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{CA795782-60B4-4351-AFD4-6A93795002D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PropertyGrid.Demo.Model", "PropertyGrid.Demo.Model\PropertyGrid.Demo.Model.csproj", "{BAC34E19-D859-4BA8-BEC3-DA170F8AAE17}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyGrid.Demo.Model", "PropertyGrid.Demo.Model\PropertyGrid.Demo.Model.csproj", "{BAC34E19-D859-4BA8-BEC3-DA170F8AAE17}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PropertyGrid.Abstractions", "PropertyGrid.Abstractions\PropertyGrid.Abstractions.csproj", "{7A1C0440-122C-46A7-8F62-8E3962864D42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyGrid.Abstractions", "PropertyGrid.Abstractions\PropertyGrid.Abstractions.csproj", "{7A1C0440-122C-46A7-8F62-8E3962864D42}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyGrid.WPF.Infrastructure", "PropertyGrid.WPF.Infrastructure\PropertyGrid.WPF.Infrastructure.csproj", "{31E568B0-A152-4902-AAAE-76528135F5FC}"
 EndProject
@@ -34,6 +34,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{7267B3D9-EB3C-4DB6-902C-DCCE836042D6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deprecated", "Deprecated", "{02E561E9-176D-4550-9D08-D5C65A453114}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PropertyGrid.Extra", "PropertyGrid.Extra\PropertyGrid.Extra.csproj", "{92046DE5-1A64-46AA-B1B0-24571E9180A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyGrid.WPF.Extra", "PropertyGrid.WPF.Extra\PropertyGrid.WPF.Extra.csproj", "{B5E7FD1F-4518-4E98-B155-037C814F1BC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PropertyGrid.WPF.Templates", "PropertyGrid.WPF.Templates\PropertyGrid.WPF.Templates.csproj", "{B653B9C2-75D3-4E02-B305-CE8E56D415C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -89,6 +95,18 @@ Global
 		{31E568B0-A152-4902-AAAE-76528135F5FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{31E568B0-A152-4902-AAAE-76528135F5FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{31E568B0-A152-4902-AAAE-76528135F5FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92046DE5-1A64-46AA-B1B0-24571E9180A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92046DE5-1A64-46AA-B1B0-24571E9180A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92046DE5-1A64-46AA-B1B0-24571E9180A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92046DE5-1A64-46AA-B1B0-24571E9180A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5E7FD1F-4518-4E98-B155-037C814F1BC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5E7FD1F-4518-4E98-B155-037C814F1BC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5E7FD1F-4518-4E98-B155-037C814F1BC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5E7FD1F-4518-4E98-B155-037C814F1BC8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B653B9C2-75D3-4E02-B305-CE8E56D415C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B653B9C2-75D3-4E02-B305-CE8E56D415C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B653B9C2-75D3-4E02-B305-CE8E56D415C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B653B9C2-75D3-4E02-B305-CE8E56D415C6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -106,6 +124,9 @@ Global
 		{BAC34E19-D859-4BA8-BEC3-DA170F8AAE17} = {CA795782-60B4-4351-AFD4-6A93795002D9}
 		{7A1C0440-122C-46A7-8F62-8E3962864D42} = {7267B3D9-EB3C-4DB6-902C-DCCE836042D6}
 		{31E568B0-A152-4902-AAAE-76528135F5FC} = {299B3356-A14D-4F79-96D4-400DB0656D47}
+		{92046DE5-1A64-46AA-B1B0-24571E9180A1} = {CA795782-60B4-4351-AFD4-6A93795002D9}
+		{B5E7FD1F-4518-4E98-B155-037C814F1BC8} = {CA795782-60B4-4351-AFD4-6A93795002D9}
+		{B653B9C2-75D3-4E02-B305-CE8E56D415C6} = {CA795782-60B4-4351-AFD4-6A93795002D9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BF120994-60DE-4F74-B89D-2710E31F33BC}
