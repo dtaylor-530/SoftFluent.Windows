@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace SoftFluent.Abstractions {
    public static class Helper {
-      public static IPropertyGridOptionsAttribute FromProperty(IPropertyGridProperty property) {
+      public static IPropertyGridOptionsAttribute FromProperty(IProperty property) {
          if (property == null)
             throw new ArgumentNullException("property");
 

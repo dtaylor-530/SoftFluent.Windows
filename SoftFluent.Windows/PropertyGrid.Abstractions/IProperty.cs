@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Abstractions {
-   public interface IPropertyGridProperty: IExecute {
+   public interface IProperty: IExecute {
       string Name { get; set; }
       IPropertyGridOptionsAttribute Options { get; set; }
       PropertyDescriptor Descriptor { get; set; }
@@ -22,13 +22,12 @@ namespace Abstractions {
       bool IsValid { get;  }
       bool IsFlagsEnum { get;  }
       string Category { get; set; }
-      IPropertyGridListSource ListSource { get;  }
       bool IsEnum { get;  }
       object Value { get; set; }
       string DefaultEditorResourceKey { get; }
       void RefreshValueFromDescriptor(bool b, bool forceRaise, bool b1);
-      void OnEvent(object propertyGridComboBoxExtension, IPropertyGridEventArgs createInstance);
-      object BuildItems(Type targetType, object parameter, CultureInfo culture);
+      //void OnEvent(object propertyGridComboBoxExtension, IPropertyGridEventArgs createInstance);
+      object BuildItems();
 
       IPropertyGridItem CreateItem();
    }

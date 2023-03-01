@@ -8,6 +8,6 @@ public interface IPropertyGridItem
    string Name { get; set; }
    object Value { get; set; }
    bool? IsChecked { get; set; }
-   IPropertyGridProperty Property { get; set; }
+   IProperty Property { get; set; }
    bool IsUnset { get; set; }
 }
