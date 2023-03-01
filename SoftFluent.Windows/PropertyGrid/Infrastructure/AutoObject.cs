@@ -309,11 +309,8 @@ namespace SoftFluent.Windows {
             return false;
          }
 
-         PropertyChangedEventHandler handler = PropertyChanged;
-         if (handler != null) {
-            handler(this, new PropertyChangedEventArgs(name));
-         }
-         return true;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            return true;
       }
 
       /// <summary>
