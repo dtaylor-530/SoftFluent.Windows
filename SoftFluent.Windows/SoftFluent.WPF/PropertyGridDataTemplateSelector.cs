@@ -28,7 +28,7 @@ namespace SoftFluent.Windows
             }
         }
 
-        protected virtual bool Filter(PropertyGridDataTemplate template, IPropertyGridProperty property)
+        protected virtual bool Filter(PropertyGridDataTemplate template, IProperty property)
         {
             if (template == null)
                 throw new ArgumentNullException("template");
@@ -85,7 +85,7 @@ namespace SoftFluent.Windows
             return false;
         }
 
-        public virtual bool IsAssignableFrom(Type type, Type propertyType, PropertyGridDataTemplate template, IPropertyGridProperty property)
+        public virtual bool IsAssignableFrom(Type type, Type propertyType, PropertyGridDataTemplate template, IProperty property)
         {
             if (type == null)
                 throw new ArgumentNullException("type");
@@ -140,7 +140,7 @@ namespace SoftFluent.Windows
             if (container == null)
                 throw new ArgumentNullException("container");
 
-            var property = item as IPropertyGridProperty;
+            var property = item as IProperty;
             if (property == null)
                 return base.SelectTemplate(item, container);
 

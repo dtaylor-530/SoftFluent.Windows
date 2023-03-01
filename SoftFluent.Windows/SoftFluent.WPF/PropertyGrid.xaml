@@ -7,16 +7,13 @@
     xmlns:system="clr-namespace:System;assembly=mscorlib"
     xmlns:windows="clr-namespace:SoftFluent.Windows"
     xmlns:windows1="clr-namespace:SoftFluent.Windows;assembly=Infrastructure.WPF"
-    xmlns:uiTextBlockControl="clr-namespace:UITextBlockControl;assembly=Infrastructure.WPF"
-    xmlns:windows2="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid" xmlns:windows3="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF.Infrastructure"
     d:DesignHeight="300"
     d:DesignWidth="300"
     mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/PropertyGrid.WPF;component/Resources/DataTemplates.xaml"></ResourceDictionary>
-                <ResourceDictionary Source="/PropertyGrid.WPF;component/Resources/MoreDataTemplates.xaml"></ResourceDictionary>
+  
                 <ResourceDictionary Source="/PropertyGrid.WPF;component/Resources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
 
@@ -303,7 +300,7 @@
                         <UniformGrid></UniformGrid>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
+                <!--<ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type windows2:PropertyGridProperty}">
                         <CheckBox IsChecked="{Binding IsVisible }">
                             <CheckBox.Content>
@@ -313,7 +310,7 @@
                             </CheckBox.Content>
                         </CheckBox>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
+                </ItemsControl.ItemTemplate>-->
             </ItemsControl>
         </Expander>
         <ScrollViewer>

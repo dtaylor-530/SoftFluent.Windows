@@ -1,21 +1,12 @@
-using SoftFluent.Windows.Utilities;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Windows.Data;
 using System.Windows.Markup;
 using Abstractions;
-using PropertyGrid.WPF;
-using Utilities;
 
-namespace SoftFluent.Windows {
-   public class PropertyGridComboBoxExtension : MarkupExtension {
+namespace SoftFluent.Windows
+{
+    public class PropertyGridComboBoxExtension : MarkupExtension {
       //static PropertyGridComboBoxExtension() {
       //   _activatorHelper = new ActivatorHelper(new BaseActivator());
       //}
@@ -29,9 +20,9 @@ namespace SoftFluent.Windows {
          public PropertyGridComboBoxExtension Extension { get;  }
 
          public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            IPropertyGridProperty property = value as IPropertyGridProperty;
+            IProperty property = value as IProperty;
             if (property != null) {
-               return property.BuildItems(targetType, parameter, culture);
+               return property.BuildItems();
             }
 
             return value;

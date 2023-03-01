@@ -17,67 +17,67 @@ namespace PropertyGrid.WPF {
 
 
       public static void Update(RoutedEventArgs e) {
-         if (e.OriginalSource is ToggleButton button) {
-            if (button.DataContext is IPropertyGridItem item && item.Property != null && item.Property.IsEnum &&
-                item.Property.IsFlagsEnum) {
-               if (button.IsChecked.HasValue) {
-                  ulong itemValue = Helper5.EnumToUInt64(item.Property, item.Value);
-                  ulong propertyValue = Helper5.EnumToUInt64(item.Property, item.Property.Value);
-                  ulong newValue;
-                  if (button.IsChecked.Value) {
-                     if (itemValue == 0) {
-                        newValue = 0;
-                     }
-                     else {
-                        newValue = propertyValue | itemValue;
-                     }
-                  }
-                  else {
-                     newValue = propertyValue & ~itemValue;
-                  }
+         //if (e.OriginalSource is ToggleButton button) {
+         //   if (button.DataContext is IPropertyGridItem item && item.Property != null && item.Property.IsEnum &&
+         //       item.Property.IsFlagsEnum) {
+         //      if (button.IsChecked.HasValue) {
+         //         ulong itemValue = Helper5.EnumToUInt64(item.Property, item.Value);
+         //         ulong propertyValue = Helper5.EnumToUInt64(item.Property, item.Property.Value);
+         //         ulong newValue;
+         //         if (button.IsChecked.Value) {
+         //            if (itemValue == 0) {
+         //               newValue = 0;
+         //            }
+         //            else {
+         //               newValue = propertyValue | itemValue;
+         //            }
+         //         }
+         //         else {
+         //            newValue = propertyValue & ~itemValue;
+         //         }
 
-                  object propValue = Helper5.EnumToObject(item.Property, newValue);
-                  item.Property.Value = propValue;
+         //         object propValue = Helper5.EnumToObject(item.Property, newValue);
+         //         item.Property.Value = propValue;
 
-                  if (button.GetVisualSelfOrParent<ListBoxItem>() is ListBoxItem li) {
-                     if (ItemsControl.ItemsControlFromItemContainer(li) is ItemsControl parent) {
-                        if (button.IsChecked == true && itemValue == 0) {
-                           foreach (IPropertyGridItem gridItem in parent.Items.OfType<IPropertyGridItem>()) {
-                              gridItem.IsChecked =
-                                 Helper5.EnumToUInt64(item.Property, gridItem.Value) == 0;
-                           }
-                        }
-                        else {
-                           foreach (IPropertyGridItem gridItem in parent.Items.OfType<IPropertyGridItem>()) {
-                              ulong gridItemValue =
-                                 Helper5.EnumToUInt64(item.Property, gridItem.Value);
-                              if (gridItemValue == 0) {
-                                 gridItem.IsChecked = newValue == 0;
-                                 continue;
-                              }
+         //         if (button.GetVisualSelfOrParent<ListBoxItem>() is ListBoxItem li) {
+         //            if (ItemsControl.ItemsControlFromItemContainer(li) is ItemsControl parent) {
+         //               if (button.IsChecked == true && itemValue == 0) {
+         //                  foreach (IPropertyGridItem gridItem in parent.Items.OfType<IPropertyGridItem>()) {
+         //                     gridItem.IsChecked =
+         //                        Helper5.EnumToUInt64(item.Property, gridItem.Value) == 0;
+         //                  }
+         //               }
+         //               else {
+         //                  foreach (IPropertyGridItem gridItem in parent.Items.OfType<IPropertyGridItem>()) {
+         //                     ulong gridItemValue =
+         //                        Helper5.EnumToUInt64(item.Property, gridItem.Value);
+         //                     if (gridItemValue == 0) {
+         //                        gridItem.IsChecked = newValue == 0;
+         //                        continue;
+         //                     }
 
-                              gridItem.IsChecked = (newValue & gridItemValue) == gridItemValue;
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-         }
+         //                     gridItem.IsChecked = (newValue & gridItemValue) == gridItemValue;
+         //                  }
+         //               }
+         //            }
+         //         }
+         //      }
+         //   }
+         //}
       }
-      public static bool? ShowEditor(IPropertyGridProperty property, Window editor) {
+      public static bool? ShowEditor(IProperty property, Window editor) {
          bool? ret;
-         IPropertyGridObject go = property.ListSource.Data as IPropertyGridObject;
-         if (go != null) {
-            if (go.TryShowEditor(property, editor, out ret)) {
-               return ret;
-            }
+         //IPropertyGridObject go = property.ListSource.Data as IPropertyGridObject;
+         //if (go != null) {
+         //   if (go.TryShowEditor(property, editor, out ret)) {
+         //      return ret;
+         //   }
 
-            SoftFluent.Windows.Helper.RefreshSelectedObject(editor);
-         }
+         //   SoftFluent.Windows.Helper.RefreshSelectedObject(editor);
+         //}
 
          ret = editor.ShowDialog();
-         go?.EditorClosed(property, editor);
+         //go?.EditorClosed(property, editor);
          return ret;
       }
       public static void OnUIElementPreviewKeyUp(KeyEventArgs e) {
@@ -115,7 +115,7 @@ namespace PropertyGrid.WPF {
       }
 
 
-      public static Window GetEditor(this SoftFluent.Windows.PropertyGrid propertyGrid, IPropertyGridProperty property, object parameter) {
+      public static Window GetEditor(this SoftFluent.Windows.PropertyGrid propertyGrid, IProperty property, object parameter) {
          if (property == null) {
             throw new ArgumentNullException("property");
          }
@@ -178,12 +178,6 @@ namespace PropertyGrid.WPF {
                else {
                   grid.ColumnDefinitions[1].Width = new GridLength(5, GridUnitType.Pixel);
                   grid.ColumnDefinitions[2].Width = new GridLength(1, GridUnitType.Star);
-               }
-            }
-
-            if (editor is IPropertyGridEditor pge) {
-               if (!pge.SetContext(property, parameter)) {
-                  return null;
                }
             }
          }

@@ -12,11 +12,6 @@ namespace SoftFluent.Windows {
 
    public static class Helper {
 
-
-
-
-
-
       public static DataGridColumn DataGridColumn(DataGrid grid) {
          return grid
              .Columns
@@ -24,11 +19,6 @@ namespace SoftFluent.Windows {
              .FirstOrDefault(c => c.CellTemplateSelector is PropertyGridDataTemplateSelector);
       }
 
-
-
-
-
-     
 
       public static HashSet<Type> GetTypes() {
          return new HashSet<Type>(new[]
@@ -78,23 +68,28 @@ namespace SoftFluent.Windows {
             throw new ArgumentNullException("childPropertyGridName");
          }
 
-         if (sender is FrameworkElement element && e.AddedItems.Count > 0) {
-            if (element.GetSelfOrParent<Window>() is Window window) {
-               if (LogicalTreeHelper.FindLogicalNode(window, childPropertyGridName) is PropertyGrid pg) {
-                  if (parentGrid != null) {
-                     pg.DefaultCategoryName = parentGrid.DefaultCategoryName;
-                  }
-                  pg.SelectedObject = e.AddedItems[0];
-               }
+            if (sender is FrameworkElement element && e.AddedItems.Count > 0)
+            {
+                if (element.GetSelfOrParent<Window>() is Window window)
+                {
+                    if (LogicalTreeHelper.FindLogicalNode(window, childPropertyGridName) is PropertyGrid pg)
+                    {
+                        if (parentGrid != null)
+                        {
+                            pg.DefaultCategoryName = parentGrid.DefaultCategoryName;
+                        }
+                        pg.SelectedObject = e.AddedItems[0];
+                    }
+                }
             }
-         }
-      }
+        }
 
       public static void RefreshSelectedObject(DependencyObject editor) {
-         foreach (PropertyGrid grid in editor.GetChildren<PropertyGrid>()) {
-            grid.RefreshSelectedObject();
-         }
-      }
+            foreach (PropertyGrid grid in editor.GetChildren<PropertyGrid>())
+            {
+                grid.RefreshSelectedObject();
+            }
+        }
 
       public static void SelectedObjectPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) {
          if (d is PropertyGrid propertyGrid) {
@@ -102,45 +97,56 @@ namespace SoftFluent.Windows {
          }
       }
 
-      public static void SelectedObjectPropertyChanged(PropertyGrid grid, DependencyPropertyChangedEventArgs e) {
-         if (e.OldValue is INotifyPropertyChanged pc) {
-            pc.PropertyChanged -= OnDispatcherSourcePropertyChanged;
-         }
 
-         if (e.NewValue == null) {
-            grid.PropertiesSource.Source = null;
-            return;
-         }
-
-         grid.RefreshComboBox();
-
-         if (Extensions.GetAttribute<ReadOnlyAttribute>(e.NewValue.GetType()) is ReadOnlyAttribute roa &&
-             roa.IsReadOnly) {
-            grid.IsReadOnly = true;
-         }
-         else {
-            grid.IsReadOnly = false;
-         }
-
-         if (e.NewValue is INotifyPropertyChanged npc) {
-            npc.PropertyChanged += OnDispatcherSourcePropertyChanged;
-         }
-
-         grid.PropertiesSource.Source = grid.CreatePropertyListSource(e.NewValue);
-
-         void OnDispatcherSourcePropertyChanged(object sender, PropertyChangedEventArgs eventArgs) {
-            if (sender is PropertyGrid dispatcherObject) {
-               if (!dispatcherObject.Dispatcher.CheckAccess()) {
-                  dispatcherObject.Dispatcher.Invoke(() => dispatcherObject.OnSourcePropertyChanged(sender, eventArgs));
-               }
-               else {
-                  dispatcherObject.OnSourcePropertyChanged(sender, eventArgs);
-               }
+        public static void SelectedObjectPropertyChanged(PropertyGrid grid, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.OldValue is INotifyPropertyChanged pc)
+            {
+                pc.PropertyChanged -= OnDispatcherSourcePropertyChanged;
             }
-         }
-      }
 
-      public static void SetGroupByCategory(PropertyGrid grid, bool value) {
+            if (e.NewValue == null)
+            {
+                grid.PropertiesSource.Source = null;
+                return;
+            }
+
+            grid.RefreshComboBox();
+
+            if (Extensions.GetAttribute<ReadOnlyAttribute>(e.NewValue.GetType()) is ReadOnlyAttribute roa &&
+                roa.IsReadOnly)
+            {
+                grid.IsReadOnly = true;
+            }
+            else
+            {
+                grid.IsReadOnly = false;
+            }
+
+            if (e.NewValue is INotifyPropertyChanged npc)
+            {
+                npc.PropertyChanged += OnDispatcherSourcePropertyChanged;
+            }
+            if (grid.Engine == null)
+                return;
+            grid.PropertiesSource.Source = grid.Engine.Convert(grid.Options);
+
+            void OnDispatcherSourcePropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
+            {
+                if (sender is PropertyGrid dispatcherObject)
+                {
+                    if (!dispatcherObject.Dispatcher.CheckAccess())
+                    {
+                        dispatcherObject.Dispatcher.Invoke(() => dispatcherObject.OnSourcePropertyChanged(sender, eventArgs));
+                    }
+                    else
+                    {
+                        dispatcherObject.OnSourcePropertyChanged(sender, eventArgs);
+                    }
+                }
+            }
+        }
+        public static void SetGroupByCategory(PropertyGrid grid, bool value) {
          switch (value) {
             case true when !grid.GroupByCategory:
                grid.PropertiesSource.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
