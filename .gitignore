@@ -222,3 +222,4 @@ SoftFluent.Windows/nuget/*.nupkg
 /SoftFluent.Windows/.vs/SoftFluent.Windows
 /SoftFluent.Windows/.vs/ProjectEvaluation
 .vshistory
+/SoftFluent.Windows/PropertyGrid.WPF.Demo/Data/data.sqlite
