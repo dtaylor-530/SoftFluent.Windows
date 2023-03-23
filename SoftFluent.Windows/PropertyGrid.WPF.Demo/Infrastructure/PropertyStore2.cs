@@ -279,7 +279,8 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
 
         private void Update(object a, Order order)
         {
-            if (store[order.Key] != a)
+            if (store.ContainsKey(order.Key) && store[order.Key] == a)
+                return;
             {
                 store[order.Key] = a;
                 dictionary[order.Key].OnNext(new PropertyChange(order.Key.Name, a));

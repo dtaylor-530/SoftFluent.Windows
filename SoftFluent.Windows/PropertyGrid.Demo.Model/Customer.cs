@@ -1,12 +1,7 @@
-﻿using Jellyfish;
-using System;
-using System.Collections.Generic;
+﻿using Abstractions;
+using Jellyfish;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Security;
 
 namespace SoftFluent.Windows.Samples
@@ -21,7 +16,7 @@ namespace SoftFluent.Windows.Samples
     //    }
     //}
 
-    public class Customer : ViewModel
+    public class Customer : ViewModel, IGuid
     {
         private readonly string[] arrayOfStrings;
         private ObservableCollection<Address> addresses;
@@ -32,7 +27,6 @@ namespace SoftFluent.Windows.Samples
         private string description;
         private string firstName;
         private Gender gender;
-        private Guid id;
         private string lastName;
         private List<string> listOfStrings;
         private string multiEnumString;
@@ -56,7 +50,7 @@ namespace SoftFluent.Windows.Samples
 
         public Customer()
         {
-            Id = Guid.NewGuid();
+
             ListOfStrings = new List<string>
             {
                 "string 1",
@@ -79,6 +73,10 @@ namespace SoftFluent.Windows.Samples
             MultiEnumString = "First, Second";
             SubObject = Address.Parse("1600 Amphitheatre Pkwy, Mountain View, CA 94043, USA");
         }
+
+        public Guid Guid => Guid.Parse("901f3c6d-1424-4771-8672-0b77d7c44342");
+
+
 
         [PropertyGridOptions(EditorDataTemplateResourceKey = "AddressListEditor", SortOrder = 10)]
         [DisplayName("Addresses (custom editor)")]
@@ -163,12 +161,6 @@ namespace SoftFluent.Windows.Samples
             set => this.Set(ref gender, value);
         }
 
-        [DisplayName("Guid (see menu on right-click)")]
-        public Guid Id
-        {
-            get => id;
-            set => this.Set(ref id, value);
-        }
 
         [PropertyGridOptions(SortOrder = 20)]
         public string LastName
@@ -337,7 +329,7 @@ namespace SoftFluent.Windows.Samples
             set => Status = value;
         }
 
- //       [PropertyGridOptions(IsEnum = true, EnumNames = new string[] { "1N\\/AL1D", "\\/AL1D", "UNKN0WN" }, EnumValues = new object[] { Status.Invalid, Status.Valid, Status.Unknown })]
+        //       [PropertyGridOptions(IsEnum = true, EnumNames = new string[] { "1N\\/AL1D", "\\/AL1D", "UNKN0WN" }, EnumValues = new object[] { Status.Invalid, Status.Valid, Status.Unknown })]
         [DisplayName("Status (enum as string list)")]
         [Category("Enums")]
         public string StatusColorString
@@ -352,7 +344,7 @@ namespace SoftFluent.Windows.Samples
         {
             get => subObject;
             set => this.Set(ref subObject, value);
-            }
+        }
 
         //[DisplayName("Sub Object (Address as Object)")]
         //[PropertyGridOptions(EditorDataTemplateResourceKey = "ObjectEditor", ForcePropertyChanged = true)]

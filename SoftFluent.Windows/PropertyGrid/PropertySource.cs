@@ -14,14 +14,15 @@ using SoftFluent.Windows;
 namespace SoftFluent.Windows
 {
 
-    public class PropertySource : AutoObject, IPropertySource
+    public class PropertySource : IPropertySource
     {
         private readonly IActivator _activator;
         private readonly IPropertyGridOptions options;
         private readonly ObservableCollection<IProperty> _properties = new();
 
-        public PropertySource(Guid guid, IActivator activator, IPropertyGridOptions options) : base(guid)
+        public PropertySource(IActivator activator, IPropertyGridOptions options)
         {
+
             _activator = activator;
             this.options = options;
 
@@ -52,6 +53,12 @@ namespace SoftFluent.Windows
 
         public virtual IObservable<IProperty> Properties()
         {
+            Guid guid = Guid.NewGuid();
+            if (options.Data is IGuid iguid)
+            {
+                guid = iguid.Guid;
+            }
+
             if (_properties.Any())
             {
                 return _properties.ToObservable();
@@ -59,9 +66,9 @@ namespace SoftFluent.Windows
 
             Type highestType = options.Data.GetType();
 
-            return NewMethod(highestType);
+            return Generate(highestType);
 
-            Subject<IProperty> NewMethod(Type highestType)
+            Subject<IProperty> Generate(Type highestType)
             {
                 Subject<IProperty> subject = new();
                 foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(options.Data).Cast<PropertyDescriptor>().OrderBy(d => d.Name))
@@ -72,7 +79,7 @@ namespace SoftFluent.Windows
                         descriptor.IsBrowsable
                      )
                     {
-                        MyHelper.CreateProperty(this.Guid, descriptor, _activator, options.Data).ToObservable()
+                        MyHelper.CreateProperty(guid, descriptor, _activator, options.Data).ToObservable()
                             .Subscribe(property =>
                         {
                             RefreshProperty(property);
@@ -85,30 +92,30 @@ namespace SoftFluent.Windows
         }
 
 
-        protected override T GetProperty<T>([CallerMemberName] string? name = null)
-        {
-            var baseValue = base.GetProperty<T>();
-            if (baseValue != null)
-                return baseValue;
+        //protected override T GetProperty<T>([CallerMemberName] string? name = null)
+        //{
+        //    var baseValue = base.GetProperty<T>();
+        //    if (baseValue != null)
+        //        return baseValue;
 
-            var property = GetProperty(name);
+        //    var property = GetProperty(name);
 
-            try
-            {
-                object value = property.Descriptor.GetValue(Options.Data);
-                return (T)value;
-            }
-            catch (Exception e)
-            {
-                if (property.PropertyType == typeof(string))
-                {
-                    property.Value = e.GetAllMessages();
-                }
-                property.IsError = true;
-                return default;
-            }
+        //    try
+        //    {
+        //        object value = property.Descriptor.GetValue(Options.Data);
+        //        return (T)value;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        if (property.PropertyType == typeof(string))
+        //        {
+        //            property.Value = e.GetAllMessages();
+        //        }
+        //        property.IsError = true;
+        //        return default;
+        //    }
 
-        }
+        //}
 
 
         public void RefreshProperty(IProperty property)

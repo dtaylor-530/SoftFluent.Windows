@@ -1,4 +1,5 @@
-﻿using Jellyfish;
+﻿using Abstractions;
+using Jellyfish;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.Metrics;
@@ -8,8 +9,11 @@ using System.Text;
 namespace SoftFluent.Windows.Samples
 {
     //[TypeConverter(typeof(AddressConverter))]
-    public class Address : ViewModel
+    public class Address : ViewModel, IGuid
     {
+        public Guid Guid => Guid.Parse("0cfdd55a-99ab-4c16-821e-101c47c1dfd7");
+
+
         private string city;
         private string country;
         private string line1;
@@ -172,7 +176,7 @@ namespace SoftFluent.Windows.Samples
                     continue;
                 }
 
-               // SetProperty(properties[i], (object)s);
+                // SetProperty(properties[i], (object)s);
             }
         }
     }

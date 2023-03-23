@@ -272,19 +272,19 @@ namespace SoftFluent.Windows
         }
 
 
-        protected virtual void OnGuidCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            if (PropertyGrid.FromEvent(e) is IProperty property &&
-                (property.PropertyType == typeof(Guid) || property.PropertyType == typeof(Guid?)))
-            {
-                e.CanExecute = true;
-            }
-        }
+        //protected virtual void OnGuidCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        //{
+        //    if (PropertyGrid.FromEvent(e) is IProperty property &&
+        //        (property.PropertyType == typeof(Guid) || property.PropertyType == typeof(Guid?)))
+        //    {
+        //        e.CanExecute = true;
+        //    }
+        //}
 
-        protected virtual void OnGuidCommandExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            Helper2.ChangeText(e);
-        }
+        //protected virtual void OnGuidCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        //{
+        //    Helper2.ChangeText(e);
+        //}
 
         protected virtual void OnUIElementPreviewKeyUp(object sender, KeyEventArgs e)
         {
