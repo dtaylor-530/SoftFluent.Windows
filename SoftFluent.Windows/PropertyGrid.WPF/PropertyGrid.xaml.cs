@@ -37,6 +37,7 @@ namespace SoftFluent.Windows
     {
 
         public static readonly RoutedEvent BrowseEvent = EventManager.RegisterRoutedEvent("Browse", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(PropertyGrid));
+        public static readonly RoutedEvent NavigateEvent = EventManager.RegisterRoutedEvent("Navigate", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(PropertyGrid));
 
         public static readonly DependencyProperty
             IsReadOnlyProperty =
@@ -77,26 +78,27 @@ namespace SoftFluent.Windows
 
         public static RoutedCommand
             BrowseCommand = new RoutedCommand(),
-            EmptyGuidCommand = new RoutedCommand(),
-            IncrementGuidCommand = new RoutedCommand(),
-            NewGuidCommand = new RoutedCommand();
+            NavigateCommand = new RoutedCommand();
+
 
         private int _inheritanceLevel;
         private IPropertyGridEngine engine;
         private IPropertySource source;
+        public SynchronizationContext context;
 
         public PropertyGrid()
         {
             InitializeComponent();
             AddCommandBindings();
             LevelComboBox.SelectionChanged += LevelComboBox_SelectionChanged;
-
+            context = SynchronizationContext.Current ?? throw new Exception("4g4e&&&&&");
             void AddCommandBindings()
             {
                 //CommandBindings.Add(new CommandBinding(NewGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
                 //CommandBindings.Add(new CommandBinding(EmptyGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
                 //CommandBindings.Add(new CommandBinding(IncrementGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
                 CommandBindings.Add(new CommandBinding(BrowseCommand, OnBrowseCommandExecuted));
+                CommandBindings.Add(new CommandBinding(NavigateCommand, OnNavigateCommandExecuted));
             }
         }
 
@@ -226,8 +228,8 @@ namespace SoftFluent.Windows
 
             var options = Options;
             ValueColumn.CellTemplateSelector = TemplateSelector;
-            source = await Task.Run(() => engine.Convert(options));
-            PropertiesSource.Source = new ListSource(source);
+            source =/* await Task.Run(() => */engine.Convert(options);//);
+            PropertiesSource.Source = new ListSource(source, context);
         }
 
         public virtual void UpdateCellBindings(IProperty dataItem, string childName, Func<Binding, bool> where, Action<BindingExpression> action)
@@ -251,6 +253,25 @@ namespace SoftFluent.Windows
                 if (!e.Handled)
                 {
                     ShowEditor(property);
+                }
+            }
+        }
+
+        protected virtual void OnNavigateCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            RoutedEventArgs browse = new RoutedEventArgs(NavigateEvent, e.OriginalSource);
+            this.RaiseEvent(browse);
+            if (browse.Handled)
+            {
+                return;
+            }
+
+            if (PropertyGrid.FromEvent(e) is IProperty property)
+            {
+                //property.Executed(sender, e);
+                if (!e.Handled)
+                {
+                    SelectedObject = property.Value;
                 }
             }
         }
@@ -333,6 +354,12 @@ namespace SoftFluent.Windows
         {
             add { AddHandler(BrowseEvent, value); }
             remove { RemoveHandler(BrowseEvent, value); }
+        }
+
+        public event RoutedEventHandler Navigate
+        {
+            add { AddHandler(NavigateEvent, value); }
+            remove { RemoveHandler(NavigateEvent, value); }
         }
 
 
@@ -430,8 +457,11 @@ namespace SoftFluent.Windows
 
         private void LevelComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _inheritanceLevel = Array.IndexOf((Array)LevelComboBox.ItemsSource, e.AddedItems[0]);
-            RefreshSelectedObject();
+            if (e.AddedItems.Count > 0)
+            {
+                _inheritanceLevel = Array.IndexOf((Array)LevelComboBox.ItemsSource, e.AddedItems[0]);
+                RefreshSelectedObject();
+            }
         }
     }
 
@@ -442,10 +472,10 @@ namespace SoftFluent.Windows
         IDisposable disposable;
         ObservableCollection<IProperty> collection = new();
 
-        public ListSource(IPropertySource propertySource)
+        public ListSource(IPropertySource propertySource, SynchronizationContext context)
         {
             this.propertySource = propertySource;
-            context = SynchronizationContext.Current ?? throw new Exception("4g4e&&&&&");
+            this.context = context;
         }
 
         public bool ContainsListCollection => false;

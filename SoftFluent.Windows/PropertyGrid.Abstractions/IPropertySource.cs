@@ -9,4 +9,5 @@ public interface IPropertySource
     IObservable<IProperty> Properties();
 
     void RefreshProperty(IProperty property);
+    public int Count { get; }
 }

@@ -1,4 +1,5 @@
-﻿using SoftFluent.Windows.Utilities;
+﻿using PropertyGrid.Abstractions;
+using SoftFluent.Windows.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -106,17 +107,30 @@ namespace SoftFluent.Windows
             }
         }
 
-        public static void SelectedObjectPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public static async void SelectedObjectPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            if(e.NewValue is null)
+            {
+
+            }
             if (d is PropertyGrid propertyGrid)
             {
-                Helper.SelectedObjectPropertyChanged(propertyGrid, e);
+                var engine = Helper.SelectedObjectPropertyChanged(propertyGrid, e);
+                if (engine is not null)
+                {
+                    var options = propertyGrid.Options;
+                    var source = await Task.Run(() => engine.Convert(options));
+                    //var source = engine.Convert(options);
+                    propertyGrid.PropertiesSource.Source = new ListSource(source, propertyGrid.context);
+                }
             }
+
         }
 
 
-        public static async void SelectedObjectPropertyChanged(PropertyGrid grid, DependencyPropertyChangedEventArgs e)
+        public static IPropertyGridEngine? SelectedObjectPropertyChanged(PropertyGrid grid, DependencyPropertyChangedEventArgs e)
         {
+
             if (e.OldValue is INotifyPropertyChanged pc)
             {
                 pc.PropertyChanged -= OnDispatcherSourcePropertyChanged;
@@ -125,7 +139,7 @@ namespace SoftFluent.Windows
             if (e.NewValue == null)
             {
                 grid.PropertiesSource.Source = null;
-                return;
+                return null;
             }
 
             grid.RefreshComboBox();
@@ -144,9 +158,12 @@ namespace SoftFluent.Windows
             {
                 npc.PropertyChanged += OnDispatcherSourcePropertyChanged;
             }
-            if (grid.Engine == null)
-                return;
-            grid.PropertiesSource.Source = await Task.Run(() => grid.Engine.Convert(grid.Options));
+            if (grid.Engine is not IPropertyGridEngine engine)
+                return null;
+
+            return engine;
+
+
 
             void OnDispatcherSourcePropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
             {

@@ -1,25 +1,31 @@
 using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using Abstractions;
 using Extensions = Utilities.Extensions;
 
 namespace SoftFluent.Windows
 {
-    public class Property : AutoObject, IProperty
+    public class Property2 : AutoObject, IProperty //, IComparable, IComparable<Property>
     {
-        public Property(Guid guid) : base(guid)
-        {  
+        private readonly string name;
+    
+
+        //private bool _isVisible = true;
+
+        public Property2(Guid guid) : base(guid)
+        {
+         
         }
 
         public object Data { get; set; }
-        public string Name => Descriptor.Name;
-        public string DisplayName => Descriptor.DisplayName;
-        public bool IsReadOnly => Descriptor.IsReadOnly;
+
+        public string Name { get; set; }
+        public string DisplayName => Name;
+        public bool IsReadOnly => false;
         public bool IsCollection => PropertyType != null ? PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(PropertyType) : false;
 
-        public bool IsFlagsEnum => Extensions.IsFlagsEnum(PropertyType);
-        public bool IsValueType => PropertyType.IsValueType;
         //public bool IsVisible
         //{
         //    get => _isVisible;
@@ -36,20 +42,22 @@ namespace SoftFluent.Windows
         //            null :
         //            ConversionHelper.ChangeType(Value, HasDefaultValue && ConversionHelper.ChangeType(DefaultValue, false));
 
-        public virtual string? Category => string.IsNullOrWhiteSpace(Descriptor.Category) ||
-                Extensions.EqualsIgnoreCase(Descriptor.Category, CategoryAttribute.Default.Category)
-                    ? null
-                    : Descriptor.Category;
+        public virtual string? Category => "default";
+            
+            //string.IsNullOrWhiteSpace(Descriptor.Category) ||
+            //    Extensions.EqualsIgnoreCase(Descriptor.Category, CategoryAttribute.Default.Category)
+            //        ? null
+            //        : Descriptor.Category;
 
         public virtual int CollectionCount => Value is IEnumerable enumerable ? enumerable.Cast<object>().Count() : 0;
 
         public virtual Type CollectionItemPropertyType => !IsCollection ? null : Extensions.GetElementType(PropertyType);
 
-        public virtual TypeConverter Converter => Descriptor.Converter;
+        //public virtual TypeConverter Converter => Descriptor.Converter;
 
         public virtual string Description { get => GetProperty<string>(); set => SetProperty(value); }
 
-        public virtual PropertyDescriptor Descriptor { get; set; }
+        //public virtual PropertyDescriptor Descriptor { get; set; }
 
         //public virtual bool HasDefaultValue => DefaultValue != default;
 
@@ -62,7 +70,7 @@ namespace SoftFluent.Windows
         //public virtual string Name { get; }
 
 
-        public virtual Type PropertyType => Descriptor.PropertyType;
+        public virtual Type PropertyType => Data.GetType();
 
 
         //public virtual IPropertyGridOptionsAttribute Options { get; set; }
@@ -112,27 +120,27 @@ namespace SoftFluent.Windows
 
         public virtual object? Value
         {
-            get => GetProperty<object>() ?? Descriptor.GetValue(Data);
+            get => Data;
             set
             {
-                if (!TryChangeType(value, PropertyType, CultureInfo.CurrentCulture, out object changedValue))
-                {
-                    throw new ArgumentException("Cannot convert value {" + value + "} to type '" + PropertyType.FullName + "'.");
-                }
+                //if (!TryChangeType(value, PropertyType, CultureInfo.CurrentCulture, out object changedValue))
+                //{
+                //    throw new ArgumentException("Cannot convert value {" + value + "} to type '" + PropertyType.FullName + "'.");
+                //}
 
-                if (Descriptor != null)
-                {
-                    try
-                    {
-                        Descriptor.SetValue(Data, changedValue);
-                        var finalValue = Descriptor.GetValue(Data);
-                        this.SetProperty(finalValue);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ArgumentException("Cannot set value {" + value + "} to object.", e);
-                    }
-                }
+                ////if (Descriptor != null)
+                ////{
+                //try
+                //{
+                //    //Descriptor.SetValue(Data, changedValue);
+                //    //var finalValue = Descriptor.GetValue(Data);
+                //    //this.SetProperty(finalValue);
+                //}
+                //catch (Exception e)
+                //{
+                //    throw new ArgumentException("Cannot set value {" + value + "} to object.", e);
+                //}
+                //}
             }
         }
 
@@ -141,8 +149,12 @@ namespace SoftFluent.Windows
 
         public string EditorTemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
 
+        public bool IsValueType => throw new NotImplementedException();
 
-        
+        public bool IsFlagsEnum => throw new NotImplementedException();
+
+
+
         //public virtual void CanExecute(object sender, EventArgs e)
         //{
         //    if (Value is IExecute handler)

@@ -279,7 +279,7 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
 
         private void Update(object a, Order order)
         {
-            if (store.ContainsKey(order.Key) && store[order.Key] == a)
+            if (store.ContainsKey(order.Key) && store[order.Key].Equals(a))
                 return;
             {
                 store[order.Key] = a;

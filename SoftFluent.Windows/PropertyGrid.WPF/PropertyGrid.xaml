@@ -343,7 +343,7 @@
                     <DataGridTextColumn
                         Width="SizeToCells"
                         Binding="{Binding DisplayName}"
-                        Foreground="Black"
+                        Foreground="Blue"
                         Header="Name"
                         IsReadOnly="True">
                         <DataGridTextColumn.CellStyle>
@@ -359,6 +359,15 @@
                                           >
                     </DataGridTemplateColumn>
 
+                    <DataGridTemplateColumn >
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button  Command="{x:Static windows:PropertyGrid.NavigateCommand}"> x </Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    
                     <DataGridTemplateColumn >
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>

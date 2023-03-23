@@ -6,20 +6,9 @@ using System.Security;
 
 namespace SoftFluent.Windows.Samples
 {
-
-    //public class ViewModel2 : ViewModel
-    //{
-    //    public void Set<T>(ref T field, T value, [CallerMemberName] string? name = null)
-    //    {
-    //        field = value;
-    //        OnPropertyChanged(name);
-    //    }
-    //}
-
     public class Customer : ViewModel, IGuid
     {
         private readonly string[] arrayOfStrings;
-        private ObservableCollection<Address> addresses;
         private byte[] byteArray1;
         private DateTime creationDateAndTime;
         private DateTime dateOfBirth;
@@ -63,7 +52,7 @@ namespace SoftFluent.Windows.Samples
             ByteArray1 = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
             WebSite = "http://www.softfluent.com";
             Status = Status.Valid;
-            addresses = new ObservableCollection<Address> { new Address { Line1 = "2018 156th Avenue NE", City = "Bellevue", State = "WA", ZipCode = 98007, Country = "USA" } };
+         
             DaysOfWeek = DaysOfWeek.WeekDays;
             PercentageOfSatisfaction = 50;
             PreferredColorName = "DodgerBlue";
@@ -78,13 +67,7 @@ namespace SoftFluent.Windows.Samples
 
 
 
-        [PropertyGridOptions(EditorDataTemplateResourceKey = "AddressListEditor", SortOrder = 10)]
-        [DisplayName("Addresses (custom editor)")]
-        [Category("Collections")]
-        public ObservableCollection<Address> Addresses
-        {
-            get => addresses;
-        }
+
 
         [Category("Collections")]
         public string[] ArrayOfStrings

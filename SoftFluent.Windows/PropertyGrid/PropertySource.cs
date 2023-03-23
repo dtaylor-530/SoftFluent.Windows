@@ -10,6 +10,7 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using SoftFluent.Windows;
+using System.Collections;
 
 namespace SoftFluent.Windows
 {
@@ -71,22 +72,55 @@ namespace SoftFluent.Windows
             Subject<IProperty> Generate(Type highestType)
             {
                 Subject<IProperty> subject = new();
-                foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(options.Data).Cast<PropertyDescriptor>().OrderBy(d => d.Name))
-                {
-                    int level = descriptor.ComponentType.InheritanceLevel(highestType);
 
-                    if (level <= options.InheritanceLevel &&
-                        descriptor.IsBrowsable
-                     )
+                if (options.Data is IEnumerable enumerable)
+                {
+                    int i = 0;
+                    foreach (var item in enumerable)
                     {
-                        MyHelper.CreateProperty(guid, descriptor, _activator, options.Data).ToObservable()
-                            .Subscribe(property =>
+                        try
                         {
-                            RefreshProperty(property);
-                            subject.OnNext(property);
-                        });
+
+                            MyHelper.CreateProperty2(guid, i.ToString(), _activator, item)
+                                .ToObservable()
+                                .Subscribe(property =>
+                                {
+                                    RefreshProperty(property);
+                                    subject.OnNext(property);
+                                });
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
                     }
                 }
+                else
+                    foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(options.Data).Cast<PropertyDescriptor>().OrderBy(d => d.Name))
+                    {
+                        try
+                        {
+                            int level = descriptor.ComponentType.InheritanceLevel(highestType);
+
+                            if (level <= options.InheritanceLevel &&
+                                descriptor.IsBrowsable
+                             )
+                            {
+                                MyHelper.CreateProperty(guid, descriptor, _activator, options.Data)
+                                    .ToObservable()
+                                    .Subscribe(property =>
+                                    {
+                                        RefreshProperty(property);
+                                    subject.OnNext(property);
+                                });
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
                 return subject;
             }
         }
@@ -117,34 +151,36 @@ namespace SoftFluent.Windows
 
         //}
 
+        public int Count => _properties.Count;
+
 
         public void RefreshProperty(IProperty property)
         {
-            if (property.Descriptor == null)
-            {
-                return;
-            }
-            try
-            {
-                //object value = property.Descriptor.GetValue(Options.Data);
-                //bool set = SetProperty(value, property.Name);
-                //OnPropertyChanged(property.Name);
-            }
-            catch (Exception e)
-            {
-                if (property.PropertyType == typeof(string))
-                {
-                    property.Value = e.GetAllMessages();
-                }
-                property.IsError = true;
-            }
+            //if (property.Descriptor == null)
+            //{
+            //    return;
+            //}
+            //try
+            //{
+            //    //object value = property.Descriptor.GetValue(Options.Data);
+            //    //bool set = SetProperty(value, property.Name);
+            //    //OnPropertyChanged(property.Name);
+            //}
+            //catch (Exception e)
+            //{
+            //    if (property.PropertyType == typeof(string))
+            //    {
+            //        property.Value = e.GetAllMessages();
+            //    }
+            //    property.IsError = true;
+            //}
         }
     }
 }
 
 static class MyHelper
 {
-    public static async Task<Property> CreateProperty(Guid parent, PropertyDescriptor descriptor, IActivator activator, object data)
+    public static async Task<IProperty> CreateProperty(Guid parent, PropertyDescriptor descriptor, IActivator activator, object data)
     {
         if (descriptor == null)
         {
@@ -157,6 +193,22 @@ static class MyHelper
         var property = (Property)await activator.CreateInstance(parent, descriptor.Name, typeof(Property));
         property.Descriptor = descriptor;
 
+        //property.Options = options;
+        property.Data = data;
+        //Describe(property, descriptor, gridOptions.DefaultCategoryName, gridOptions.DecamelizePropertiesDisplayNames);
+        return property;
+    }
+
+    public static async Task<IProperty> CreateProperty2(Guid parent, string name, IActivator activator, object data)
+    {
+ 
+
+        //PropertyGridOptionsAttribute options = descriptor.GetAttribute<PropertyGridOptionsAttribute>();
+
+
+        var property = (Property2)await activator.CreateInstance(parent, name, typeof(Property2));
+
+        property.Name = name;
         //property.Options = options;
         property.Data = data;
         //Describe(property, descriptor, gridOptions.DefaultCategoryName, gridOptions.DecamelizePropertiesDisplayNames);

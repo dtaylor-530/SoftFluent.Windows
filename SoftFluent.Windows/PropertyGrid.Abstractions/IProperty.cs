@@ -7,37 +7,34 @@ namespace Abstractions
 {
     public interface IProperty // : IExecute
     {
-        string Name => Descriptor.Name;
-        string DisplayName => Descriptor.DisplayName;
+        string Name { get; }
+        string DisplayName { get; }
 
         //IPropertyGridOptionsAttribute Options { get; set; }
-        PropertyDescriptor Descriptor { get; set; }
+        //PropertyDescriptor Descriptor { get; set; }
         Type CollectionItemPropertyType { get; }
-        Type PropertyType => Descriptor.PropertyType;
-        bool IsCollectionItemValueType => CollectionItemPropertyType.IsValueType;
-        bool IsValueType => PropertyType.IsValueType;
-        bool IsReadOnly => Descriptor.IsReadOnly;
+        Type PropertyType { get; }
+        bool IsCollectionItemValueType { get; }
+        bool IsValueType { get; }
+        bool IsReadOnly { get; }
         bool IsError { get; set; }
         bool IsValid { get; }
-        bool IsFlagsEnum => Extensions.IsFlagsEnum(PropertyType);
-        string? Category => string.IsNullOrWhiteSpace(Descriptor.Category) ||
-                Extensions.EqualsIgnoreCase(Descriptor.Category, CategoryAttribute.Default.Category)
-                    ? null
-                    : Descriptor.Category;
+        bool IsFlagsEnum { get; }
+        string? Category { get; }
         bool IsEnum => PropertyType.IsEnum;
         object Value { get; set; }
         //bool IsDefaultValue => DefaultValue == Value;
 
         public string TemplateKey { get; }
-        public string EditorTemplateKey { get;  }
+        public string EditorTemplateKey { get; }
 
-        object? DefaultValue => Extensions.GetAttribute<DefaultValueAttribute>((MemberDescriptor)Descriptor).Value;
+        //object? DefaultValue => Extensions.GetAttribute<DefaultValueAttribute>((MemberDescriptor)Descriptor).Value;
         //bool HasDefaultValue => DefaultValue != default;
         //string DefaultEditorResourceKey { get; }
 
         public virtual bool IsCollection => PropertyType != null ? PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(PropertyType) : false;
 
-      //  public int SortOrder => Options.SortOrder != 0 ? Options.SortOrder : default;
+        //  public int SortOrder => Options.SortOrder != 0 ? Options.SortOrder : default;
 
 
     }
