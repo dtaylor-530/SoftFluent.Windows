@@ -116,21 +116,21 @@ namespace SoftFluent.Windows
                     return true;
             }
 
-            var options = SoftFluent.Abstractions.Helper.FromProperty(property);
-            if (options != null)
-            {
-                if ((type.IsEnum || type == typeof(Enum)) && options.IsEnum)
-                {
-                    if (!options.IsFlagsEnum)
-                        return true;
+            //var options = SoftFluent.Abstractions.Helper.FromProperty(property);
+            //if (options != null)
+            //{
+            //    if ((type.IsEnum || type == typeof(Enum)) /*&& options.IsEnum*/)
+            //    {
+            //        //if (!options.IsFlagsEnum)
+            //        //    return true;
 
-                    if (Extensions.IsFlagsEnum(type))
-                        return true;
+            //        if (Extensions.IsFlagsEnum(type))
+            //            return true;
 
-                    if (template.IsFlagsEnum.HasValue && template.IsFlagsEnum.Value)
-                        return true;
-                }
-            }
+            //        if (template.IsFlagsEnum.HasValue && template.IsFlagsEnum.Value)
+            //            return true;
+            //    }
+            //}
 
             return false;
         }
@@ -160,37 +160,37 @@ namespace SoftFluent.Windows
                     return template;
             }
 
-            foreach (PropertyGridDataTemplate template in DataTemplates)
-            {
-                if (Filter(template, property))
-                    continue;
+            //foreach (PropertyGridDataTemplate template in DataTemplates)
+            //{
+            //    if (Filter(template, property))
+            //        continue;
 
-                if (template.IsCollection.HasValue && template.IsCollection.Value)
-                {
-                    if (string.IsNullOrWhiteSpace(template.CollectionItemPropertyType) && template.DataTemplate != null)
-                        return template.DataTemplate;
+            //    if (template.IsCollection.HasValue && template.IsCollection.Value)
+            //    {
+            //        if (string.IsNullOrWhiteSpace(template.CollectionItemPropertyType) && template.DataTemplate != null)
+            //            return template.DataTemplate;
 
-                    if (property.CollectionItemPropertyType != null)
-                    {
-                        foreach (Type type in template.ResolvedCollectionItemPropertyTypes)
-                        {
-                            if (IsAssignableFrom(type, property.CollectionItemPropertyType, template, property))
-                                return template.DataTemplate;
-                        }
-                    }
-                }
-                else
-                {
-                    if (string.IsNullOrWhiteSpace(template.PropertyType) && template.DataTemplate != null)
-                        return template.DataTemplate;
+            //        if (property.CollectionItemPropertyType != null)
+            //        {
+            //            foreach (Type type in template.ResolvedCollectionItemPropertyTypes)
+            //            {
+            //                if (IsAssignableFrom(type, property.CollectionItemPropertyType, template, property))
+            //                    return template.DataTemplate;
+            //            }
+            //        }
+            //    }
+            //    else
+            //    {
+            //        if (string.IsNullOrWhiteSpace(template.PropertyType) && template.DataTemplate != null)
+            //            return template.DataTemplate;
 
-                    foreach (Type type in template.ResolvedPropertyTypes)
-                    {
-                        if (IsAssignableFrom(type, property.PropertyType, template, property))
-                            return template.DataTemplate;
-                    }
-                }
-            }
+            //        foreach (Type type in template.ResolvedPropertyTypes)
+            //        {
+            //            if (IsAssignableFrom(type, property.PropertyType, template, property))
+            //                return template.DataTemplate;
+            //        }
+            //    }
+            //}
             return base.SelectTemplate(item, container);
         }
 

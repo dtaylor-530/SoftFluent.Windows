@@ -20,10 +20,10 @@ namespace SoftFluent.Windows
          public PropertyGridComboBoxExtension Extension { get;  }
 
          public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
-            IProperty property = value as IProperty;
-            if (property != null) {
-               return property.BuildItems();
-            }
+            //IProperty property = value as IProperty;
+            //if (property != null) {
+            //   return property.BuildItems();
+            //}
 
             return value;
          }

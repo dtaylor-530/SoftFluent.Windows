@@ -4,10 +4,10 @@
 
 
     <DataTemplate x:Key="ColorEnumEditor" DataType="{x:Type ex:PropertyGridEnumProperty}">
-        <TextBox
+        <!--<TextBox
                 Background="{Binding EnumAttributes.Background}"
                 Foreground="{Binding EnumAttributes.Foreground}"
                 IsReadOnly="{Binding IsReadOnly}"
-                Text="{Binding Value}" />
+                Text="{Binding Value}" />-->
     </DataTemplate>
 </ResourceDictionary>

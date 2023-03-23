@@ -7,9 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Evan.Wpf" Version="1.2.0" />
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Infrastructure.WPF\Infrastructure.WPF.csproj" />
     <ProjectReference Include="..\PropertyGrid.Abstractions\PropertyGrid.Abstractions.csproj" />
-    <ProjectReference Include="..\UniversalConverter\UniversalConverter.csproj" />
+    <ProjectReference Include="..\Utilities\Utilities.csproj" />
   </ItemGroup>
 
   <ItemGroup>

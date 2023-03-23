@@ -1,52 +1,62 @@
-﻿using System;
+﻿using Jellyfish;
+using System;
 using System.ComponentModel;
+using System.Diagnostics.Metrics;
+using System.Reflection.Emit;
 using System.Text;
 
 namespace SoftFluent.Windows.Samples
 {
-    [TypeConverter(typeof(AddressConverter))]
-    public class Address : AutoObject
+    //[TypeConverter(typeof(AddressConverter))]
+    public class Address : ViewModel
     {
+        private string city;
+        private string country;
+        private string line1;
+        private string line2;
+        private string state;
+        private int? zipCode;
+
         [PropertyGridOptions(SortOrder = 40)]
         public string City
         {
-            get => GetProperty<string>();
-            set => SetProperty(value);
+            get => city;
+            set => this.Set(ref city, value);
         }
 
         [PropertyGridOptions(SortOrder = 60)]
         public string Country
         {
-            get => GetProperty<string>();
-            set => SetProperty(value);
+            get => country;
+            set => this.Set(ref country, value);
         }
 
         [PropertyGridOptions(SortOrder = 10)]
         public string Line1
         {
-            get => GetProperty<string>();
-            set => SetProperty(value);
+            get => line1;
+            set => this.Set(ref line1, value);
         }
 
         [PropertyGridOptions(SortOrder = 20)]
         public string Line2
         {
-            get => GetProperty<string>();
-            set => SetProperty(value);
+            get => line2;
+            set => this.Set(ref line2, value);
         }
 
         [PropertyGridOptions(SortOrder = 50)]
         public string State
         {
-            get => GetProperty<string>();
-            set => SetProperty(value);
+            get => state;
+            set => this.Set(ref state, value);
         }
 
         [PropertyGridOptions(SortOrder = 30)]
         public int? ZipCode
         {
-            get => GetProperty<int?>();
-            set => SetProperty(value);
+            get => zipCode;
+            set => this.Set(ref zipCode, value);
         }
 
         // poor man's one line comma separated USA postal address parser
@@ -107,10 +117,10 @@ namespace SoftFluent.Windows.Samples
             return sb.ToString();
         }
 
-        protected override bool OnPropertyChanged(string name, bool setChanged, bool forceRaise)
-        {
-            return base.OnPropertyChanged(name, setChanged, forceRaise);
-        }
+        //protected override bool OnPropertyChanged(string name, bool setChanged, bool forceRaise)
+        //{
+        //    return base.OnPropertyChanged(name, setChanged, forceRaise);
+        //}
 
         private static void AppendJoin(StringBuilder sb, string value, string sep)
         {
@@ -162,7 +172,7 @@ namespace SoftFluent.Windows.Samples
                     continue;
                 }
 
-                SetProperty(properties[i], (object)s);
+               // SetProperty(properties[i], (object)s);
             }
         }
     }

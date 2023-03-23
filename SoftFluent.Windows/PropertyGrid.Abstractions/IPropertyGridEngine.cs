@@ -9,7 +9,7 @@ namespace PropertyGrid.Abstractions
 {
     public interface IPropertyGridEngine
     {
-        IPropertyEngine Convert(IPropertyGridOptions options);
+        IPropertySource Convert(IPropertyGridOptions options);
 
     }
 }

@@ -1,51 +1,64 @@
 ﻿using SoftFluent.Windows;
-using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Utilities;
 
-namespace Abstractions {
-   public interface IProperty: IExecute {
-      string Name { get; set; }
-      IPropertyGridOptionsAttribute Options { get; set; }
-      PropertyDescriptor Descriptor { get; set; }
-      Type CollectionItemPropertyType { get;  }
-      Type PropertyType { get; set; }
-      bool IsCollection { get;  }
-      bool IsCollectionItemValueType { get;  }
-      bool IsValueType { get;  }
-      bool IsReadOnly { get;  }
-      bool IsError { get;  }
-      bool IsValid { get;  }
-      bool IsFlagsEnum { get;  }
-      string Category { get; set; }
-      bool IsEnum { get;  }
-      object Value { get; set; }
-      string DefaultEditorResourceKey { get; }
-      void RefreshValueFromDescriptor(bool b, bool forceRaise, bool b1);
-      //void OnEvent(object propertyGridComboBoxExtension, IPropertyGridEventArgs createInstance);
-      object BuildItems();
+namespace Abstractions
+{
+    public interface IProperty // : IExecute
+    {
+        string Name => Descriptor.Name;
+        string DisplayName => Descriptor.DisplayName;
 
-      IPropertyGridItem CreateItem();
-   }
+        //IPropertyGridOptionsAttribute Options { get; set; }
+        PropertyDescriptor Descriptor { get; set; }
+        Type CollectionItemPropertyType { get; }
+        Type PropertyType => Descriptor.PropertyType;
+        bool IsCollectionItemValueType => CollectionItemPropertyType.IsValueType;
+        bool IsValueType => PropertyType.IsValueType;
+        bool IsReadOnly => Descriptor.IsReadOnly;
+        bool IsError { get; set; }
+        bool IsValid { get; }
+        bool IsFlagsEnum => Extensions.IsFlagsEnum(PropertyType);
+        string? Category => string.IsNullOrWhiteSpace(Descriptor.Category) ||
+                Extensions.EqualsIgnoreCase(Descriptor.Category, CategoryAttribute.Default.Category)
+                    ? null
+                    : Descriptor.Category;
+        bool IsEnum => PropertyType.IsEnum;
+        object Value { get; set; }
+        //bool IsDefaultValue => DefaultValue == Value;
 
-   public interface IPropertyGridOptionsAttribute
-   {
-      bool ForcePropertyChanged { get; set; }
-      string[] EnumNames { get; set; }
-      object[] EnumValues { get; set; }
-      string EnumSeparator { get; set; }
-      int EnumMaxPower { get; set; }
-      bool IsEnum { get; set; }
-      bool IsFlagsEnum { get; set; }
-      object EditorDataTemplateResourceKey { get; set; }
-      Type EditorType { get; set; }
-      string EditorDataTemplateSelectorPropertyPath { get; set; }
-      string EditorDataTemplatePropertyPath { get; set; }
-      bool CollectionEditorHasOnlyOneColumn { get; set; }
-      string EditorResourceKey { get;  }
-   }
+        public string TemplateKey { get; }
+        public string EditorTemplateKey { get;  }
+
+        object? DefaultValue => Extensions.GetAttribute<DefaultValueAttribute>((MemberDescriptor)Descriptor).Value;
+        //bool HasDefaultValue => DefaultValue != default;
+        //string DefaultEditorResourceKey { get; }
+
+        public virtual bool IsCollection => PropertyType != null ? PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(PropertyType) : false;
+
+      //  public int SortOrder => Options.SortOrder != 0 ? Options.SortOrder : default;
+
+
+    }
+
+    public interface IPropertyGridOptionsAttribute
+    {
+        bool ForcePropertyChanged { get; set; }
+        //string[] EnumNames { get; set; }
+        //object[] EnumValues { get; set; }
+        //string EnumSeparator { get; set; }
+        //int EnumMaxPower { get; set; }
+        //bool IsEnum { get; set; }
+        //bool IsFlagsEnum { get; set; }
+        object EditorDataTemplateResourceKey { get; set; }
+        Type EditorType { get; set; }
+        string EditorDataTemplateSelectorPropertyPath { get; set; }
+        string EditorDataTemplatePropertyPath { get; set; }
+        bool CollectionEditorHasOnlyOneColumn { get; set; }
+        string EditorResourceKey { get; }
+        bool HasDefaultValue { get; set; }
+        object DefaultValue { get; set; }
+        int SortOrder { get; set; }
+    }
 }

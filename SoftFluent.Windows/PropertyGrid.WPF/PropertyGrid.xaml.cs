@@ -1,17 +1,24 @@
 ﻿using Abstractions;
+using Evan.Wpf;
 using PropertyGrid.Abstractions;
 using PropertyGrid.WPF;
 using SoftFluent.Windows.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.DirectoryServices.ActiveDirectory;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using Utilities;
 
 namespace SoftFluent.Windows
 {
@@ -28,6 +35,7 @@ namespace SoftFluent.Windows
 
     public partial class PropertyGrid : UserControl
     {
+
         public static readonly RoutedEvent BrowseEvent = EventManager.RegisterRoutedEvent("Browse", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(PropertyGrid));
 
         public static readonly DependencyProperty
@@ -46,18 +54,22 @@ namespace SoftFluent.Windows
             ValueEditorTemplateSelectorProperty =
             DependencyProperty.Register("ValueEditorTemplateSelector", typeof(DataTemplateSelector), typeof(PropertyGrid),
                 new FrameworkPropertyMetadata(null)),
-            
+
             GroupByCategoryProperty =
                DependencyProperty.Register("GroupByCategory", typeof(bool), typeof(PropertyGrid), new PropertyMetadata(Helper.GroupByCategoryChanged)),
-            
+
             EngineProperty =
             DependencyProperty.Register("Engine", typeof(IPropertyGridEngine), typeof(PropertyGrid),
-
                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsMeasure, EnginePropertyChanged));
+
+        public static readonly DependencyProperty TemplateSelectorProperty = DependencyHelper.Register<DataTemplateSelector>();
+
+
+
 
         private static void EnginePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is PropertyGrid propertyGrid && e.NewValue is IPropertyGridEngine engine)
+            if (d is PropertyGrid propertyGrid && e.NewValue is IPropertyGridEngine _)
             {
                 propertyGrid.RefreshSelectedObject();
             }
@@ -71,6 +83,7 @@ namespace SoftFluent.Windows
 
         private int _inheritanceLevel;
         private IPropertyGridEngine engine;
+        private IPropertySource source;
 
         public PropertyGrid()
         {
@@ -80,9 +93,9 @@ namespace SoftFluent.Windows
 
             void AddCommandBindings()
             {
-                CommandBindings.Add(new CommandBinding(NewGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
-                CommandBindings.Add(new CommandBinding(EmptyGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
-                CommandBindings.Add(new CommandBinding(IncrementGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
+                //CommandBindings.Add(new CommandBinding(NewGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
+                //CommandBindings.Add(new CommandBinding(EmptyGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
+                //CommandBindings.Add(new CommandBinding(IncrementGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
                 CommandBindings.Add(new CommandBinding(BrowseCommand, OnBrowseCommandExecuted));
             }
         }
@@ -101,47 +114,49 @@ namespace SoftFluent.Windows
         public virtual double ChildEditorWindowOffset { get; set; } = 20;
         public virtual bool DecamelizePropertiesDisplayNames { get; set; } = true;
 
-
-        public async Task InvokeAsync(Action action)
-        {
-            await this.Dispatcher.InvokeAsync(action);
-        }
-
-        public virtual string DefaultCategoryName { get; set; } = CategoryAttribute.Default.Category;
-
         public bool IsGrouping
         {
             get => PropertiesSource.GroupDescriptions.Count > 0;
             set => Helper.SetGroupByCategory(this, value);
         }
 
+
+        //public async Task InvokeAsync(Action action)
+        //{
+        //    await this.Dispatcher.InvokeAsync(action);
+        //}
+
+        public virtual string DefaultCategoryName { get; set; } = CategoryAttribute.Default.Category;
+
+
+
         public CollectionViewSource PropertiesSource => (CollectionViewSource)FindResource("PropertiesSource");
-        private static HashSet<Type> CollectionEditorHasOnlyOneColumnList => Helper.GetTypes();
+        //private static HashSet<Type> CollectionEditorHasOnlyOneColumnList => Helper.GetTypes();
 
-        public virtual bool CollectionEditorHasOnlyOneColumn(IProperty property)
-        {
-            if (property == null)
-            {
-                throw new ArgumentNullException("property");
-            }
+        //public virtual bool CollectionEditorHasOnlyOneColumn(IProperty property)
+        //{
+        //    if (property == null)
+        //    {
+        //        throw new ArgumentNullException("property");
+        //    }
 
-            if (SoftFluent.Abstractions.Helper.FromProperty(property) is IPropertyGridOptionsAttribute att)
-            {
-                return att.CollectionEditorHasOnlyOneColumn;
-            }
+        //    if (SoftFluent.Abstractions.Helper.FromProperty(property) is IPropertyGridOptionsAttribute att)
+        //    {
+        //        return att.CollectionEditorHasOnlyOneColumn;
+        //    }
 
-            if (CollectionEditorHasOnlyOneColumnList.Contains(property.CollectionItemPropertyType))
-            {
-                return true;
-            }
+        //    if (CollectionEditorHasOnlyOneColumnList.Contains(property.CollectionItemPropertyType))
+        //    {
+        //        return true;
+        //    }
 
-            return !Helper.HasProperties(property.CollectionItemPropertyType);
-        }
+        //    return !Helper.HasProperties(property.CollectionItemPropertyType);
+        //}
 
-        public virtual IPropertyEngine GetListSource()
-        {
-            return PropertiesSource.Source as IPropertyEngine;
-        }
+        //public virtual IListSource GetListSource()
+        //{
+        //    return PropertiesSource.Source as IListSource;
+        //}
 
         public virtual IProperty GetProperty(string name)
         {
@@ -150,12 +165,8 @@ namespace SoftFluent.Windows
                 throw new ArgumentNullException("name");
             }
 
-            if (PropertiesSource.Source is IPropertyEngine context)
-            {
-                return context.GetProperty(name);
-            }
+            return source.GetProperty(name);
 
-            return null;
         }
 
         public virtual FrameworkElement GetValueCellContent(object dataItem)
@@ -182,13 +193,17 @@ namespace SoftFluent.Windows
 
             if (GetProperty(e.PropertyName) is var property)
             {
-                bool forceRaise = SoftFluent.Abstractions.Helper.FromProperty(property) is var options &&
-                                  options.ForcePropertyChanged;
-
-                property.RefreshValueFromDescriptor(true, forceRaise, true);
+                source.RefreshProperty(property);
                 //OnPropertyChanged(this, CreateEventArgs(property));
             }
+
+            //static bool ForceRaise(IProperty property)
+            //{
+            //    return SoftFluent.Abstractions.Helper.FromProperty(property) is var options &&
+            //            options.ForcePropertyChanged;
+            //}
         }
+
 
         public virtual void OnToggleButtonIsCheckedChanged(object sender, RoutedEventArgs e)
         {
@@ -204,33 +219,15 @@ namespace SoftFluent.Windows
         public virtual async void RefreshSelectedObject()
         {
             engine = Engine;
-            if (engine == null)
-                return;
-
-            if (SelectedObject == null)
+            if (engine == null || SelectedObject == null)
             {
                 return;
             }
 
-            object selected = SelectedObject;
-       
             var options = Options;
-            IPropertyEngine source = await Task.Run(() => engine.Convert(options));
-            PropertiesSource.Source = source;
-        }
-
-        public virtual bool? ShowEditor(IProperty property, object parameter)
-        {
-            if (property == null)
-            {
-                throw new ArgumentNullException("property");
-            }
-
-            if (GetEditor(property, parameter) is Window editor)
-            {
-                return Helper2.ShowEditor(property, editor);
-            }
-            return null;
+            ValueColumn.CellTemplateSelector = TemplateSelector;
+            source = await Task.Run(() => engine.Convert(options));
+            PropertiesSource.Source = new ListSource(source);
         }
 
         public virtual void UpdateCellBindings(IProperty dataItem, string childName, Func<Binding, bool> where, Action<BindingExpression> action)
@@ -238,10 +235,6 @@ namespace SoftFluent.Windows
             Helper.UpdateBindings(this, dataItem, childName, where, action);
         }
 
-        protected virtual Window GetEditor(IProperty property, object parameter)
-        {
-            return Helper2.GetEditor(this, property, parameter);
-        }
 
         protected virtual void OnBrowseCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
@@ -254,10 +247,10 @@ namespace SoftFluent.Windows
 
             if (PropertyGrid.FromEvent(e) is IProperty property)
             {
-                property.Executed(sender, e);
+                //property.Executed(sender, e);
                 if (!e.Handled)
                 {
-                    ShowEditor(property, e.Parameter);
+                    ShowEditor(property);
                 }
             }
         }
@@ -278,64 +271,6 @@ namespace SoftFluent.Windows
             return fe.DataContext as IProperty;
         }
 
-        protected virtual void OnEditorSelectorSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Helper.OnEditorSelectorSelectionChanged(this, "CollectionEditorPropertiesGrid", sender, e);
-        }
-
-        protected virtual void OnEditorWindowCloseCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            if (sender is Window window)
-            {
-                if (window.DataContext is IProperty prop)
-                {
-                    prop.CanExecute(sender, e);
-                    if (e.Handled)
-                    {
-                        return;
-                    }
-                }
-            }
-
-            e.CanExecute = true;
-        }
-
-        protected virtual void OnEditorWindowCloseExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (sender is Window window)
-            {
-                if (window.DataContext is IProperty prop)
-                {
-                    prop.Executed(sender, e);
-                    if (e.Handled)
-                    {
-                        return;
-                    }
-                }
-                window.Close();
-            }
-        }
-
-        protected virtual void OnEditorWindowSaveCanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            if (sender is Window window && window.DataContext is IProperty prop)
-            {
-                prop.CanExecute(sender, e);
-                if (e.Handled)
-                {
-                    return;
-                }
-            }
-            e.CanExecute = true;
-        }
-
-        protected virtual void OnEditorWindowSaveExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (sender is Window window && window.DataContext is IProperty prop)
-            {
-                prop.Executed(sender, e);
-            }
-        }
 
         protected virtual void OnGuidCommandCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
@@ -400,12 +335,131 @@ namespace SoftFluent.Windows
             remove { RemoveHandler(BrowseEvent, value); }
         }
 
+
+        public DataTemplateSelector TemplateSelector
+        {
+            get { return (DataTemplateSelector)GetValue(TemplateSelectorProperty); }
+            set { SetValue(TemplateSelectorProperty, value); }
+        }
+
+
         #endregion DependencyProperties
+
+
+        #region editor
+
+        public virtual bool? ShowEditor(IProperty property)
+        {
+            if (property == null)
+            {
+                throw new ArgumentNullException("property");
+            }
+
+            if (EditorSelector.GetEditor(this, property) is Window editor)
+            {
+                return EditorSelector.ShowEditor(property, editor);
+            }
+            return null;
+        }
+
+
+
+
+        protected virtual void OnEditorSelectorSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Helper.OnEditorSelectorSelectionChanged(this, "CollectionEditorPropertiesGrid", sender, e);
+        }
+
+        protected virtual void OnEditorWindowCloseCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (sender is Window window)
+            {
+                if (window.DataContext is IProperty prop)
+                {
+                    //prop.CanExecute(sender, e);
+                    if (e.Handled)
+                    {
+                        return;
+                    }
+                }
+            }
+
+            e.CanExecute = true;
+        }
+
+        protected virtual void OnEditorWindowCloseExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (sender is Window window)
+            {
+                if (window.DataContext is IProperty prop)
+                {
+                    //prop.Executed(sender, e);
+                    if (e.Handled)
+                    {
+                        return;
+                    }
+                }
+                window.Close();
+            }
+        }
+
+        protected virtual void OnEditorWindowSaveCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (sender is Window window && window.DataContext is IProperty prop)
+            {
+                // prop.CanExecute(sender, e);
+                if (e.Handled)
+                {
+                    return;
+                }
+            }
+            e.CanExecute = true;
+        }
+
+        protected virtual void OnEditorWindowSaveExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (sender is Window window && window.DataContext is IProperty prop)
+            {
+                // prop.Executed(sender, e);
+            }
+        }
+
+
+        #endregion
+
 
         private void LevelComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _inheritanceLevel = Array.IndexOf((Array)LevelComboBox.ItemsSource, e.AddedItems[0]);
             RefreshSelectedObject();
+        }
+    }
+
+    public class ListSource : IListSource
+    {
+        SynchronizationContext context;
+        private readonly IPropertySource propertySource;
+        IDisposable disposable;
+        ObservableCollection<IProperty> collection = new();
+
+        public ListSource(IPropertySource propertySource)
+        {
+            this.propertySource = propertySource;
+            context = SynchronizationContext.Current ?? throw new Exception("4g4e&&&&&");
+        }
+
+        public bool ContainsListCollection => false;
+
+        public IList GetList()
+        {
+
+            if (disposable == null)
+                disposable = propertySource
+                    .Properties()
+                    .ObserveOn(context)
+                    .Subscribe(a => collection.Add(a));
+
+            return collection;
         }
     }
 }

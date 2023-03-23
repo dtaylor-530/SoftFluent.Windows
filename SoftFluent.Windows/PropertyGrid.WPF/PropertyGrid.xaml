@@ -6,18 +6,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
     xmlns:windows="clr-namespace:SoftFluent.Windows"
-    xmlns:windows1="clr-namespace:SoftFluent.Windows;assembly=Infrastructure.WPF"
     d:DesignHeight="300"
     d:DesignWidth="300"
     mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-  
+            <ResourceDictionary.MergedDictionaries>  
                 <ResourceDictionary Source="/PropertyGrid.WPF;component/Resources/Styles.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
 
-            <Window
+            <!--<Window
             x:Key="CollectionEditorWindow"
             Name="CollectionEditorWindow"
             Title="Collection Editor"
@@ -276,7 +274,7 @@
                     Content="Close"
                     IsDefault="True" />
                 </Grid>
-            </Window>
+            </Window>-->
 
             <CollectionViewSource x:Key="PropertiesSource">
                 <CollectionViewSource.GroupDescriptions>
@@ -292,7 +290,7 @@
             Name="LevelComboBox"
             DockPanel.Dock="Top"
             SelectedIndex="0" />
-        <Expander Header="Properties"  DockPanel.Dock="Top">
+        <!--<Expander Header="Properties"  DockPanel.Dock="Top">
             <ItemsControl
                 ItemsSource="{Binding Source={StaticResource PropertiesSource}}">
                 <ItemsControl.ItemsPanel>
@@ -300,19 +298,19 @@
                         <UniformGrid></UniformGrid>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
-                <!--<ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type windows2:PropertyGridProperty}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type windows2:Property}">
                         <CheckBox IsChecked="{Binding IsVisible }">
                             <CheckBox.Content>
-                                <uiTextBlockControl:UITextBlock
+                                <infra:UITextBlock
                                     TextTrimming="CharacterEllipsis"
                                     Text="{Binding Name}"/>
                             </CheckBox.Content>
                         </CheckBox>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>-->
+                </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </Expander>
+        </Expander>-->
         <ScrollViewer>
             <DataGrid
                 Name="PropertiesGrid"
@@ -354,156 +352,21 @@
                             </Style>
                         </DataGridTextColumn.CellStyle>
                     </DataGridTextColumn>
-                    <DataGridTemplateColumn Width="*" Header="Value">
-                        <DataGridTemplateColumn.CellTemplateSelector>
-                            <windows:PropertyGridDataTemplateSelector>
-                                <windows:PropertyGridDataTemplate CollectionItemPropertyType="System.Byte" IsCollection="True">
-                                    <windows:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <TextBox IsReadOnly="True" Text="{Binding CollectionCount, Mode=OneWay}" />
-                                                <Button
-                                                Width="24"
-                                                HorizontalAlignment="Right"
-                                                Command="{x:Static windows:PropertyGrid.BrowseCommand}"
-                                                CommandParameter="ByteArrayEditorWindow"
-                                                Content="..." />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </windows:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                                <windows:PropertyGridDataTemplate IsCollection="True">
-                                    <windows:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <Grid>
-                                                <TextBox IsReadOnly="True" Text="{Binding CollectionCount, Mode=OneWay}" />
-                                                <Button
-                                                Width="24"
-                                                HorizontalAlignment="Right"
-                                                Command="{x:Static windows:PropertyGrid.BrowseCommand}"
-                                                Content="..." />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </windows:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                                <windows:PropertyGridDataTemplate
-                                    IsFlagsEnum="True"
-                                    IsReadOnly="False"
-                                    PropertyType="System.Enum|System.Nullable`1[System.Enum]">
-                                    <windows:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <ComboBox
-                                            Name="CB"
-                                            IsEditable="True"
-                                            IsReadOnly="True"
-                                            ItemsSource="{windows:PropertyGridComboBox {Binding}}"
-                                            SelectedValue="{Binding Value}"
-                                            SelectedValuePath="Value"
-                                            Text="{Binding Value}">
-                                                <ComboBox.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <CheckBox Width="200" IsChecked="{Binding IsChecked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                                                <TextBlock Text="{Binding Name}" />
-                                                            </CheckBox>
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </ComboBox.ItemTemplate>
-                                            </ComboBox>
-                                        </DataTemplate>
-                                    </windows:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                                <windows:PropertyGridDataTemplate IsReadOnly="False" PropertyType="System.Enum|System.Nullable`1[System.Enum]">
-                                    <windows:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <ComboBox
-                                            ItemsSource="{windows:PropertyGridComboBox {Binding}}"
-                                            SelectedValue="{Binding Value, UpdateSourceTrigger=PropertyChanged}"
-                                            SelectedValuePath="Value" />
-                                        </DataTemplate>
-                                    </windows:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                                <!--<windows:PropertyGridDataTemplate PropertyType="System.Boolean|System.Nullable`1[System.Boolean]" IsReadOnly="False">
-                                     <DataTemplate>
-                                     <ComboBox ItemsSource="{windows:PropertyGridComboBox {Binding}}" SelectedValue="{Binding Value}" SelectedValuePath="Value" />
-                                     </DataTemplate>
-                                     </windows:PropertyGridDataTemplate>-->
-                                <windows:PropertyGridDataTemplate PropertyType="System.Nullable`1[System.Boolean]">
-                                    <windows:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <CheckBox
-                                            IsChecked="{Binding BooleanValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                            IsEnabled="{Binding IsReadWrite}"
-                                            IsThreeState="True" />
-                                        </DataTemplate>
-                                    </windows:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                                <windows:PropertyGridDataTemplate IsReadOnly="False" PropertyType="System.Boolean">
-                                    <windows1:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <CheckBox
-                                            IsChecked="{Binding BooleanValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                            IsEnabled="{Binding IsReadWrite}"
-                                            IsThreeState="False" />
-                                        </DataTemplate>
-                                    </windows1:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                                <windows:PropertyGridDataTemplate IsReadOnly="False" PropertyType="System.DateTime|System.Nullable`1[System.DateTime]">
-                                    <windows:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <DatePicker SelectedDate="{Binding Value, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </windows:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                                <windows:PropertyGridDataTemplate IsReadOnly="False" PropertyType="System.Guid|System.Nullable`1[System.Guid]">
-                                    <windows:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <TextBox
-                                            VerticalContentAlignment="Center"
-                                            CharacterCasing="Upper"
-                                            FontFamily="Lucida Console"
-                                            MaxLength="32"
-                                            Style="{StaticResource ValidationTextBox}"
-                                            Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, StringFormat=N}">
-                                                <TextBox.ContextMenu>
-                                                    <ContextMenu>
-                                                        <MenuItem Command="Cut" />
-                                                        <MenuItem Command="Copy" />
-                                                        <MenuItem Command="Paste" />
-                                                        <Separator />
-                                                        <MenuItem Command="{x:Static windows:PropertyGrid.EmptyGuidCommand}" Header="Empty" />
-                                                        <MenuItem Command="{x:Static windows:PropertyGrid.IncrementGuidCommand}" Header="Increment Guid" />
-                                                        <MenuItem Command="{x:Static windows:PropertyGrid.NewGuidCommand}" Header="New Guid" />
-                                                        <!--<MenuItem Header="New Guid 00000000-0000-0000-0000-000000000000" CommandParameter="D" Command="{x:Static ssb:PropertyGrid.NewGuidCommand}" />
-                                                         <MenuItem Header="New Guid {00000000-0000-0000-0000-000000000000}" CommandParameter="B" Command="{x:Static ssb:PropertyGrid.NewGuidCommand}" />
-                                                         <MenuItem Header="New Guid (00000000-0000-0000-0000-000000000000)" CommandParameter="P" Command="{x:Static ssb:PropertyGrid.NewGuidCommand}" />
-                                                         <MenuItem Header="New Guid {0x00000000,0x0000,0x0000,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}}" CommandParameter="X" Command="{x:Static ssb:PropertyGrid.NewGuidCommand}" />-->
-                                                    </ContextMenu>
-                                                </TextBox.ContextMenu>
-                                            </TextBox>
-                                        </DataTemplate>
-                                    </windows:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                                <windows:PropertyGridDataTemplate IsReadOnly="True">
-                                    <windows1:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <TextBox
-                                            Background="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=ReadOnlyBackground}"
-                                            IsReadOnly="True"
-                                            Text="{Binding TextValue, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
-                                        </DataTemplate>
-                                    </windows1:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                                <windows:PropertyGridDataTemplate>
-                                    <windows:PropertyGridDataTemplate.DataTemplate>
-                                        <DataTemplate>
-                                            <TextBox Style="{StaticResource ValidationTextBox2}" Text="{Binding TextValue, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
-                                        </DataTemplate>
-                                    </windows:PropertyGridDataTemplate.DataTemplate>
-                                </windows:PropertyGridDataTemplate>
-                            </windows:PropertyGridDataTemplateSelector>
-                        </DataGridTemplateColumn.CellTemplateSelector>
+                    <DataGridTemplateColumn
+                        x:Name="ValueColumn"
+                        Width="*" 
+                                            Header="Value" 
+                                          >
                     </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn >
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button  Command="{x:Static windows:PropertyGrid.BrowseCommand}">...</Button>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
                 </DataGrid.Columns>
                 <DataGrid.GroupStyle>
                     <GroupStyle>

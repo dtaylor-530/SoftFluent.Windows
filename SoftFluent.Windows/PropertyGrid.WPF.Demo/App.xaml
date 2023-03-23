@@ -3,29 +3,34 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:PropertyGrid.WPF.Demo.Infrastructure"
-    xmlns:samples="clr-namespace:SoftFluent.Windows.Samples"
     xmlns:samples1="clr-namespace:SoftFluent.Windows.Samples;assembly=PropertyGrid.Demo.Model"
-    xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
-    xmlns:sys="clr-namespace:System;assembly=mscorlib"
-    xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF"
-    xmlns:windows1="clr-namespace:SoftFluent.Windows;assembly=UniversalConverter"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008">
+    xmlns:soft="clr-namespace:SoftFluent.Windows;assembly=Infrastructure"
+    xmlns:grid="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid"
+    xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF">
+    
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/PropertyGrid.WPF.Templates;component/DataTemplates.xaml"></ResourceDictionary>
-                <ResourceDictionary Source="/PropertyGrid.WPF.Templates;component/MoreDataTemplates.xaml"></ResourceDictionary>
-                <ResourceDictionary Source="/PropertyGrid.WPF.Extra;component/Resources.xaml"/>
+                <!--<ResourceDictionary Source="/PropertyGrid.WPF.Templates;component/DataTemplates.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="/PropertyGrid.WPF.Templates;component/MoreDataTemplates.xaml"></ResourceDictionary>-->
+                <!--<ResourceDictionary Source="/PropertyGrid.WPF.Extra;component/Resources.xaml"/>-->
+                <ResourceDictionary Source="/Infrastructure/Templates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
+            
+            
                 <DataTemplate DataType="{x:Type samples1:Customer2}">
                     <windows:PropertyGrid
+                        TemplateSelector="{StaticResource TemplateSelector}"
                         Engine="{x:Static local:Engine.Instance}"
                         Name="MyGrid"
                         SelectedObject="{Binding }" />
                 </DataTemplate>
- 
+
+
+            <DataTemplate DataType="{x:Type grid:Property}">
+                <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={x:Static local:DefaultConverter.Instance}}" Width="100" BorderBrush="ForestGreen" BorderThickness="2"></TextBox>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

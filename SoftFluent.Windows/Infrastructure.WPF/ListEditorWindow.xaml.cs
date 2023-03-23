@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using Abstractions;
+//using Abstractions;
 
 namespace SoftFluent.Windows.Samples
 {
@@ -92,24 +92,24 @@ namespace SoftFluent.Windows.Samples
         {
            if (sender is Window window)
            {
-              if (window is { DataContext: IExecute prop })
-              {
-                 prop.Executed(sender, e);
-                 if (e.Handled)
-                    return;
-              }
+              //if (window is { DataContext: IExecute prop })
+              //{
+              //   prop.Executed(sender, e);
+              //   if (e.Handled)
+              //      return;
+              //}
               window.Close();
            }
         }
 
         protected virtual void OnEditorWindowCloseCanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-           if (sender is Window { DataContext: IExecute prop} )
-            {
-                prop.CanExecute(sender, e);
-                if (e.Handled)
-                    return;
-            }
+           //if (sender is Window { DataContext: IExecute prop} )
+           // {
+           //     prop.CanExecute(sender, e);
+           //     if (e.Handled)
+           //         return;
+           // }
             e.CanExecute = true;
         }
     }

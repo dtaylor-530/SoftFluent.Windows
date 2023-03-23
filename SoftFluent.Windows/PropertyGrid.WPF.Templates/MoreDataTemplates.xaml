@@ -22,16 +22,16 @@
 
     <windows:ChangeTypeConverter x:Key="ChangeTypeConverter" />
 
-    <DataTemplate x:Key="AddressListEditor" DataType="{x:Type windows2:PropertyGridProperty}">
+    <DataTemplate x:Key="AddressListEditor" DataType="{x:Type windows2:Property}">
         <DockPanel LastChildFill="true" ToolTip="{Binding Value, Mode=OneWay}">
-            <Button
+            <!--<Button
                     Width="24"
                     HorizontalContentAlignment="Center"
                     Command="{x:Static windows3:PropertyGrid.BrowseCommand}"
                     CommandParameter="ListEditorWindow"
                     Content="..."
                     DockPanel.Dock="Right"
-                    IsEnabled="{Binding IsReadWrite}" />
+                    IsEnabled="{Binding IsReadWrite}" />-->
             <TextBox
                     Background="{Binding IsDefaultValue, Converter={StaticResource BoolToDefaultValueBackgroundConverter}}"
                     DockPanel.Dock="Left"
@@ -40,7 +40,7 @@
         </DockPanel>
     </DataTemplate>
 
-    <DataTemplate x:Key="BooleanDropDownListEditor" DataType="{x:Type windows2:PropertyGridProperty}">
+    <DataTemplate x:Key="BooleanDropDownListEditor" DataType="{x:Type windows2:Property}">
         <ComboBox
                 DisplayMemberPath="Key"
                 ItemsSource="{samples2:BooleanValueProvider IsNullable=False}"
@@ -48,7 +48,7 @@
                 SelectedValuePath="Value" />
     </DataTemplate>
 
-    <DataTemplate x:Key="NullableBooleanDropDownListEditor" DataType="{x:Type windows2:PropertyGridProperty}">
+    <DataTemplate x:Key="NullableBooleanDropDownListEditor" DataType="{x:Type windows2:Property}">
         <ComboBox
                 DisplayMemberPath="Key"
                 ItemsSource="{samples2:BooleanValueProvider IsNullable=True}"
@@ -57,7 +57,7 @@
     </DataTemplate>
 
     <samples1:ListEditorWindow
-        d:DataContext="{d:DesignInstance windows2:PropertyGridProperty}"
+        d:DataContext="{d:DesignInstance windows2:Property}"
         x:Key="ListEditorWindow" x:Shared="False" 
         ItemsSource="{Binding Value}" 
         >
@@ -68,7 +68,7 @@
             </DataTemplate>
         </ContentControl.ContentTemplate>
     </samples1:ListEditorWindow>
-    <DataTemplate x:Key="CustomEditor" DataType="{x:Type windows2:PropertyGridProperty}">
+    <DataTemplate x:Key="CustomEditor" DataType="{x:Type windows2:Property}">
         <DockPanel LastChildFill="true" ToolTip="{Binding Value, Mode=OneWay}">
 
             <Button
@@ -102,7 +102,7 @@
             Title="Text"
             Width="400"
             Height="400"
-            d:DataContext="{d:DesignInstance windows2:PropertyGridProperty}"
+            d:DataContext="{d:DesignInstance windows2:Property}"
             x:Shared="false">
         <Window.CommandBindings>
             <CommandBinding
@@ -124,7 +124,7 @@
             Title="Text"
             Width="400"
             Height="400"
-            d:DataContext="{d:DesignInstance windows2:PropertyGridProperty}"
+            d:DataContext="{d:DesignInstance windows2:Property}"
             x:Shared="false">
         <Window.CommandBindings>
             <CommandBinding
@@ -162,7 +162,7 @@
         </Grid>
     </Window>
 
-    <DataTemplate x:Key="PercentEditor"  DataType="{x:Type windows2:PropertyGridProperty}">
+    <DataTemplate x:Key="PercentEditor"  DataType="{x:Type windows2:Property}">
         <Slider
                 Background="{Binding IsDefaultValue, Converter={StaticResource BoolToDefaultValueBackgroundConverter}}"
                 Interval="1"
@@ -174,7 +174,7 @@
                 Value="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ChangeTypeConverter}, ConverterParameter={x:Type sys:Double}}" />
     </DataTemplate>
 
-    <DataTemplate x:Key="ColorEditor"  DataType="{x:Type windows2:PropertyGridProperty}">
+    <DataTemplate x:Key="ColorEditor"  DataType="{x:Type windows2:Property}">
         <DataTemplate.Resources>
             <ObjectDataProvider
                     x:Key="colorPropertiesOdp"
@@ -206,7 +206,7 @@
         </ComboBox>
     </DataTemplate>
 
-    <DataTemplate x:Key="FontEditor"  DataType="{x:Type windows2:PropertyGridProperty}">
+    <DataTemplate x:Key="FontEditor"  DataType="{x:Type windows2:Property}">
         <ComboBox ItemTemplate="{DynamicResource FontTemplate}" SelectedItem="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ComboBox.Resources>
                 <CollectionViewSource x:Key="Fonts" Source="{Binding Source={x:Static Fonts.SystemFontFamilies}}">
@@ -236,7 +236,7 @@
         </ComboBox>
     </DataTemplate>
 
-    <DataTemplate x:Key="PasswordEditor"  DataType="{x:Type windows2:PropertyGridProperty}">
+    <DataTemplate x:Key="PasswordEditor"  DataType="{x:Type windows2:Property}">
         <PasswordBox samples2:Utilities.BindPassword="True" samples2:Utilities.BindablePassword="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
     </DataTemplate>
 </ResourceDictionary>

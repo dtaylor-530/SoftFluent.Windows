@@ -4,19 +4,19 @@ using System.ComponentModel;
 
 namespace SoftFluent.Abstractions {
    public static class Helper {
-      public static IPropertyGridOptionsAttribute FromProperty(IProperty property) {
-         if (property == null)
-            throw new ArgumentNullException("property");
+      //public static IPropertyGridOptionsAttribute FromProperty(IProperty property) {
+      //   if (property == null)
+      //      throw new ArgumentNullException("property");
 
-         IPropertyGridOptionsAttribute att = property.Options;
-         if (att != null)
-            return att;
+      //   IPropertyGridOptionsAttribute att = property.Options;
+      //   if (att != null)
+      //      return att;
 
-         if (property.Descriptor != null) {
-            att = property.Descriptor.GetAttribute<PropertyGridOptionsAttribute>();
-         }
-         return att;
-      }
+      //   if (property.Descriptor != null) {
+      //      att = property.Descriptor.GetAttribute<PropertyGridOptionsAttribute>();
+      //   }
+      //   return att;
+      //}
 
       public static T GetAttribute<T>(this MemberDescriptor descriptor) where T : Attribute {
          if (descriptor == null) {

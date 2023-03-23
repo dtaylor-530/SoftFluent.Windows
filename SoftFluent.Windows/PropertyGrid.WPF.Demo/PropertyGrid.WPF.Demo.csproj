@@ -8,10 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Infrastructure\PropertyStore.cs~RF6dda7ca0.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+    <PackageReference Include="System.Reactive" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure.WPF\Infrastructure.WPF.csproj" />
     <ProjectReference Include="..\PropertyGrid.Demo.Model\PropertyGrid.Demo.Model.csproj" />
-    <ProjectReference Include="..\PropertyGrid.WPF.Extra\PropertyGrid.WPF.Extra.csproj" />
-    <ProjectReference Include="..\PropertyGrid.WPF.Templates\PropertyGrid.WPF.Templates.csproj" />
     <ProjectReference Include="..\PropertyGrid.WPF\PropertyGrid.WPF.csproj" />
+    <ProjectReference Include="..\PropertyGrid\PropertyGrid.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,6 +34,10 @@
     <Compile Update="App.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

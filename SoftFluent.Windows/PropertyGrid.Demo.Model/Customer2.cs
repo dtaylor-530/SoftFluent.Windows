@@ -1,7 +1,13 @@
-﻿namespace SoftFluent.Windows.Samples
+﻿using Abstractions;
+
+namespace SoftFluent.Windows.Samples
 {
     public class Customer2 : Customer
     {
-        public int Value { get; set; }
+        public Customer2() : base()
+        {
+        }
+
+        public int IntegerValue { get; set; }
     }
 }

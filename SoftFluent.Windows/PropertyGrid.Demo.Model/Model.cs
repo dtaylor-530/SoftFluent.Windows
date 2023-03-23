@@ -39,16 +39,16 @@ namespace SoftFluent.Windows.Samples
 
     public enum Status
     {
-        [PropertyGrid(Name = "Foreground", Value = "Black")]
-        [PropertyGrid(Name = "Background", Value = "Orange")]
+        //[PropertyGrid(Name = "Foreground", Value = "Black")]
+        //[PropertyGrid(Name = "Background", Value = "Orange")]
         Unknown,
 
-        [PropertyGrid(Name = "Foreground", Value = "White")]
-        [PropertyGrid(Name = "Background", Value = "Red")]
+        //[PropertyGrid(Name = "Foreground", Value = "White")]
+        //[PropertyGrid(Name = "Background", Value = "Red")]
         Invalid,
 
-        [PropertyGrid(Name = "Foreground", Value = "White")]
-        [PropertyGrid(Name = "Background", Value = "Green")]
+        //[PropertyGrid(Name = "Foreground", Value = "White")]
+        //[PropertyGrid(Name = "Background", Value = "Green")]
         Valid
     }
 }
