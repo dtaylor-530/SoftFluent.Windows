@@ -11,36 +11,53 @@ using System.Reactive.Threading.Tasks;
 using System.Runtime.CompilerServices;
 using SoftFluent.Windows;
 using System.Collections;
+using System.Collections.Specialized;
 
 namespace SoftFluent.Windows
 {
 
-    public class PropertySource : IPropertySource
+    public class PropertySource : IPropertySource, INotifyCollectionChanged
     {
-        private readonly IActivator _activator;
-        private readonly IPropertyGridOptions options;
+        //private readonly IActivator _activator;
+        //private readonly IPropertyGridOptions options;
         private readonly ObservableCollection<IProperty> _properties = new();
+        private object data;
+        private SynchronizationContext? context;
+        BaseActivator activator = new BaseActivator();
 
-        public PropertySource(IActivator activator, IPropertyGridOptions options)
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+        public PropertySource(object data)
         {
 
-            _activator = activator;
-            this.options = options;
+            //_activator = activator;
+            this.data = data;
+            context = SynchronizationContext.Current?? throw new Exception("er 434434");
 
-            options.Data = options.Data ?? throw new ArgumentNullException("data");
+            //options.Data = options.Data ?? throw new ArgumentNullException("data");
 
+
+            _properties.CollectionChanged += _properties_CollectionChanged;
             UpdateProperties();
 
             void UpdateProperties()
             {
-                Properties().Subscribe(prop =>
-                {
-                    _properties.Add(prop);
-                });
+                Properties()
+                   
+                    .Subscribe( prop =>
+                    {
+                        context.Post(a => { _properties.Add(prop); }, prop);
+                       
+                    });
             }
         }
 
-        public IPropertyGridOptions Options => options;
+        private void _properties_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            CollectionChanged?.Invoke(this, e);
+        }
+
+        //public IPropertyGridOptions Options => options;
 
         public IProperty GetProperty(string name)
         {
@@ -52,10 +69,10 @@ namespace SoftFluent.Windows
         //    return MyHelper.CreateProperty(this.Guid, descriptor, _activator, options.Data);
         //}
 
-        public virtual IObservable<IProperty> Properties()
+        protected virtual IObservable<IProperty> Properties()
         {
             Guid guid = Guid.NewGuid();
-            if (options.Data is IGuid iguid)
+            if (data is IGuid iguid)
             {
                 guid = iguid.Guid;
             }
@@ -65,66 +82,74 @@ namespace SoftFluent.Windows
                 return _properties.ToObservable();
             }
 
-            Type highestType = options.Data.GetType();
+            Type highestType = data.GetType();
 
             return Generate(highestType);
 
-            Subject<IProperty> Generate(Type highestType)
+            IObservable<IProperty> Generate(Type highestType)
             {
                 Subject<IProperty> subject = new();
 
-                if (options.Data is IEnumerable enumerable)
+                var descriptors = PropertyDescriptors(highestType).ToArray();
+
+                _ = Task.Run(() =>
                 {
-                    int i = 0;
-                    foreach (var item in enumerable)
+                    if (data is IEnumerable enumerable)
                     {
-                        try
+                        int i = 0;
+                        foreach (var item in enumerable)
                         {
-
-                            MyHelper.CreateProperty2(guid, i.ToString(), _activator, item)
-                                .ToObservable()
-                                .Subscribe(property =>
-                                {
-                                    RefreshProperty(property);
-                                    subject.OnNext(property);
-                                });
-
-                        }
-                        catch (Exception ex)
-                        {
-
-                        }
-                    }
-                }
-                else
-                    foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(options.Data).Cast<PropertyDescriptor>().OrderBy(d => d.Name))
-                    {
-                        try
-                        {
-                            int level = descriptor.ComponentType.InheritanceLevel(highestType);
-
-                            if (level <= options.InheritanceLevel &&
-                                descriptor.IsBrowsable
-                             )
+                            try
                             {
-                                MyHelper.CreateProperty(guid, descriptor, _activator, options.Data)
-                                    .ToObservable()
-                                    .Subscribe(property =>
-                                    {
-                                        RefreshProperty(property);
-                                    subject.OnNext(property);
-                                });
+
+                                var property = activator.CreateProperty2(guid, i.ToString(), item).Result;
+                                RefreshProperty(property);
+                                subject.OnNext(property);
+                            }
+                            catch (Exception ex)
+                            {
+
                             }
                         }
-                        catch (Exception ex)
+                    }
+                    else
+                    {
+       
+                        foreach (var descriptor in descriptors)
                         {
+                            try
+                            {
+                                var property = activator.CreateProperty(guid, descriptor, data).Result;
 
+                                RefreshProperty(property);
+                                subject.OnNext(property);
+                            }
+                            catch (Exception ex)
+                            {
+
+                            }
                         }
                     }
+                });
+
+                
                 return subject;
             }
         }
 
+        IEnumerable<PropertyDescriptor> PropertyDescriptors(Type highestType)
+        {
+            foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(data).Cast<PropertyDescriptor>().OrderBy(d => d.Name))
+            {
+
+                int level = descriptor.ComponentType.InheritanceLevel(highestType);
+
+                if (level == 0 /*<= options.InheritanceLevel*/ &&
+                    descriptor.IsBrowsable)
+                    yield return descriptor;
+
+            }
+        }
 
         //protected override T GetProperty<T>([CallerMemberName] string? name = null)
         //{
@@ -175,83 +200,11 @@ namespace SoftFluent.Windows
             //    property.IsError = true;
             //}
         }
-    }
-}
 
-static class MyHelper
-{
-    public static async Task<IProperty> CreateProperty(Guid parent, PropertyDescriptor descriptor, IActivator activator, object data)
-    {
-        if (descriptor == null)
+        public IEnumerator GetEnumerator()
         {
-            throw new ArgumentNullException("descriptor");
+            return _properties.GetEnumerator();
         }
-
-        //PropertyGridOptionsAttribute options = descriptor.GetAttribute<PropertyGridOptionsAttribute>();
-
-
-        var property = (Property)await activator.CreateInstance(parent, descriptor.Name, typeof(Property));
-        property.Descriptor = descriptor;
-
-        //property.Options = options;
-        property.Data = data;
-        //Describe(property, descriptor, gridOptions.DefaultCategoryName, gridOptions.DecamelizePropertiesDisplayNames);
-        return property;
     }
-
-    public static async Task<IProperty> CreateProperty2(Guid parent, string name, IActivator activator, object data)
-    {
- 
-
-        //PropertyGridOptionsAttribute options = descriptor.GetAttribute<PropertyGridOptionsAttribute>();
-
-
-        var property = (Property2)await activator.CreateInstance(parent, name, typeof(Property2));
-
-        property.Name = name;
-        //property.Options = options;
-        property.Data = data;
-        //Describe(property, descriptor, gridOptions.DefaultCategoryName, gridOptions.DecamelizePropertiesDisplayNames);
-        return property;
-    }
-
-
-    //public static void Describe(Property property, PropertyDescriptor descriptor, string defaultCategoryName, bool decamelizePropertiesDisplayNames)
-    //{
-    //    if (property == null)
-    //    {
-    //        throw new ArgumentNullException("property");
-    //    }
-
-    //    if (descriptor == null)
-    //    {
-    //        throw new ArgumentNullException("descriptor");
-    //    }
-
-    //    property.Descriptor = descriptor;
-
-    //    if (decamelizePropertiesDisplayNames && property.DisplayName == descriptor.Name)
-    //    {
-    //        property.DisplayName = BaseDecamelizer.Decamelize(property.DisplayName);
-    //    }
-
-
-    //    PropertyGridOptionsAttribute options = Extensions.GetAttribute<PropertyGridOptionsAttribute>((MemberDescriptor)descriptor);
-    //    if (options != null)
-    //    {
-    //        if (options.SortOrder != 0)
-    //        {
-    //            property.SortOrder = options.SortOrder;
-    //        }
-    //    }
-
-
-
-
-    //    property.Attributes.AddDynamicProperties(descriptor.Attributes.OfType<PropertyGridAttribute>().ToArray());
-    //    property.TypeAttributes.AddDynamicProperties(Extensions.GetAttributes<PropertyGridAttribute>(descriptor.PropertyType)
-    //        .ToArray());
-
-
-    //}
 }
+

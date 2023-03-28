@@ -2,23 +2,18 @@
 using Evan.Wpf;
 using PropertyGrid.Abstractions;
 using PropertyGrid.WPF;
-using SoftFluent.Windows.Utilities;
+using PropertyGrid.WPF.Infrastructure;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.DirectoryServices.ActiveDirectory;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using Utilities;
 
 namespace SoftFluent.Windows
 {
@@ -38,6 +33,7 @@ namespace SoftFluent.Windows
 
         public static readonly RoutedEvent BrowseEvent = EventManager.RegisterRoutedEvent("Browse", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(PropertyGrid));
         public static readonly RoutedEvent NavigateEvent = EventManager.RegisterRoutedEvent("Navigate", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(PropertyGrid));
+        public static readonly RoutedEvent RefreshEvent = EventManager.RegisterRoutedEvent("Refresh", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(PropertyGrid));
 
         public static readonly DependencyProperty
             IsReadOnlyProperty =
@@ -77,8 +73,7 @@ namespace SoftFluent.Windows
         }
 
         public static RoutedCommand
-            BrowseCommand = new RoutedCommand(),
-            NavigateCommand = new RoutedCommand();
+            BrowseCommand = new(), NavigateCommand = new(), RefreshCommand = new();
 
 
         private int _inheritanceLevel;
@@ -99,18 +94,19 @@ namespace SoftFluent.Windows
                 //CommandBindings.Add(new CommandBinding(IncrementGuidCommand, OnGuidCommandExecuted, OnGuidCommandCanExecute));
                 CommandBindings.Add(new CommandBinding(BrowseCommand, OnBrowseCommandExecuted));
                 CommandBindings.Add(new CommandBinding(NavigateCommand, OnNavigateCommandExecuted));
+                CommandBindings.Add(new CommandBinding(RefreshCommand, OnRefreshCommandExecuted));
             }
         }
 
 
-        public IPropertyGridOptions Options => new PropertyGridOptions
-        {
-            IsReadOnly = this.IsReadOnly,
-            InheritanceLevel = _inheritanceLevel,
-            Data = SelectedObject,
-            DecamelizePropertiesDisplayNames = this.DecamelizePropertiesDisplayNames,
-            DefaultCategoryName = this.DefaultCategoryName
-        };
+        //public IPropertyGridOptions Options => new PropertyGridOptions
+        //{
+        //    IsReadOnly = this.IsReadOnly,
+        //    InheritanceLevel = _inheritanceLevel,
+        //    Data = SelectedObject,
+        //    DecamelizePropertiesDisplayNames = this.DecamelizePropertiesDisplayNames,
+        //    DefaultCategoryName = this.DefaultCategoryName
+        //};
 
 
         public virtual double ChildEditorWindowOffset { get; set; } = 20;
@@ -160,51 +156,51 @@ namespace SoftFluent.Windows
         //    return PropertiesSource.Source as IListSource;
         //}
 
-        public virtual IProperty GetProperty(string name)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException("name");
-            }
+        //public virtual IProperty GetProperty(string name)
+        //{
+        //    if (name == null)
+        //    {
+        //        throw new ArgumentNullException("name");
+        //    }
 
-            return source.GetProperty(name);
+        //    return source.GetProperty(name);
 
-        }
+        //}
 
-        public virtual FrameworkElement GetValueCellContent(object dataItem)
-        {
-            if (dataItem == null)
-            {
-                throw new ArgumentNullException("dataItem");
-            }
+        //public virtual FrameworkElement GetValueCellContent(object dataItem)
+        //{
+        //    if (dataItem == null)
+        //    {
+        //        throw new ArgumentNullException("dataItem");
+        //    }
 
-            return GetValueColumn()?.GetCellContent(dataItem);
-        }
+        //    return GetValueColumn()?.GetCellContent(dataItem);
+        //}
 
-        public virtual DataGridColumn GetValueColumn()
-        {
-            return Helper.DataGridColumn(PropertiesGrid);
-        }
+        //public virtual DataGridColumn GetValueColumn()
+        //{
+        //    return Helper.DataGridColumn(PropertiesGrid);
+        //}
 
-        public virtual void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e?.PropertyName == null)
-            {
-                return;
-            }
+        //public virtual void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
+        //{
+        //    if (e?.PropertyName == null)
+        //    {
+        //        return;
+        //    }
 
-            if (GetProperty(e.PropertyName) is var property)
-            {
-                source.RefreshProperty(property);
-                //OnPropertyChanged(this, CreateEventArgs(property));
-            }
+        //    if (GetProperty(e.PropertyName) is var property)
+        //    {
+        //        source.RefreshProperty(property);
+        //        //OnPropertyChanged(this, CreateEventArgs(property));
+        //    }
 
-            //static bool ForceRaise(IProperty property)
-            //{
-            //    return SoftFluent.Abstractions.Helper.FromProperty(property) is var options &&
-            //            options.ForcePropertyChanged;
-            //}
-        }
+        //    //static bool ForceRaise(IProperty property)
+        //    //{
+        //    //    return SoftFluent.Abstractions.Helper.FromProperty(property) is var options &&
+        //    //            options.ForcePropertyChanged;
+        //    //}
+        //}
 
 
         public virtual void OnToggleButtonIsCheckedChanged(object sender, RoutedEventArgs e)
@@ -212,11 +208,11 @@ namespace SoftFluent.Windows
             Helper2.Update(e);
         }
 
-        public void RefreshComboBox()
-        {
-            Type[] types = SelectedObject.GetType().Inheritance().ToArray();
-            LevelComboBox.ItemsSource = types;
-        }
+        //public void RefreshComboBox()
+        //{
+        //    Type[] types = SelectedObject.GetType().Inheritance().ToArray();
+        //    LevelComboBox.ItemsSource = types;
+        //}
 
         public virtual async void RefreshSelectedObject()
         {
@@ -226,16 +222,18 @@ namespace SoftFluent.Windows
                 return;
             }
 
-            var options = Options;
+            //var options = Options;
             ValueColumn.CellTemplateSelector = TemplateSelector;
-            source =/* await Task.Run(() => */engine.Convert(options);//);
-            PropertiesSource.Source = new ListSource(source, context);
+            source =/* await Task.Run(() => */engine.Convert(SelectedObject);//);
+            PropertiesGrid.ItemsSource = source;
+            ItemsControl.ItemsSource = source;
+            //PropertiesSource.Source = new ListSource(source, context);
         }
 
-        public virtual void UpdateCellBindings(IProperty dataItem, string childName, Func<Binding, bool> where, Action<BindingExpression> action)
-        {
-            Helper.UpdateBindings(this, dataItem, childName, where, action);
-        }
+        //public virtual void UpdateCellBindings(IProperty dataItem, string childName, Func<Binding, bool> where, Action<BindingExpression> action)
+        //{
+        //    Helper.UpdateBindings(this, dataItem, childName, where, action);
+        //}
 
 
         protected virtual void OnBrowseCommandExecuted(object sender, ExecutedRoutedEventArgs e)
@@ -274,6 +272,19 @@ namespace SoftFluent.Windows
                     SelectedObject = property.Value;
                 }
             }
+        }
+
+        protected virtual void OnRefreshCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            RoutedEventArgs browse = new RoutedEventArgs(NavigateEvent, e.OriginalSource);
+            this.RaiseEvent(browse);
+            if (browse.Handled)
+            {
+                return;
+            }
+
+            ItemsControl.ItemTemplateSelector = null;
+            ItemsControl.ItemTemplateSelector = MyDataTemplateSelector.Instance;
         }
 
         public static IProperty FromEvent(RoutedEventArgs e)
@@ -360,6 +371,12 @@ namespace SoftFluent.Windows
         {
             add { AddHandler(NavigateEvent, value); }
             remove { RemoveHandler(NavigateEvent, value); }
+        }
+
+        public event RoutedEventHandler Refresh
+        {
+            add { AddHandler(RefreshEvent, value); }
+            remove { RemoveHandler(RefreshEvent, value); }
         }
 
 
@@ -465,31 +482,32 @@ namespace SoftFluent.Windows
         }
     }
 
-    public class ListSource : IListSource
-    {
-        SynchronizationContext context;
-        private readonly IPropertySource propertySource;
-        IDisposable disposable;
-        ObservableCollection<IProperty> collection = new();
+    //public class ListSource : IListSource
+    //{
+    //    SynchronizationContext context;
+    //    private readonly IPropertySource propertySource;
+    //    IDisposable disposable;
+    //    ObservableCollection<IProperty> collection = new();
 
-        public ListSource(IPropertySource propertySource, SynchronizationContext context)
-        {
-            this.propertySource = propertySource;
-            this.context = context;
-        }
+    //    public ListSource(IPropertySource propertySource, SynchronizationContext context)
+    //    {
+    //        this.propertySource = propertySource;
+    //        this.context = context;
+    //    }
 
-        public bool ContainsListCollection => false;
+    //    public bool ContainsListCollection => false;
 
-        public IList GetList()
-        {
+    //    public IList GetList()
+    //    {
 
-            if (disposable == null)
-                disposable = propertySource
-                    .Properties()
-                    .ObserveOn(context)
-                    .Subscribe(a => collection.Add(a));
+    //        if (disposable == null)
+    //            disposable =
+    //                propertySource
+    //                .Properties()
+    //                .ObserveOn(context)
+    //                .Subscribe(a => collection.Add(a));
 
-            return collection;
-        }
-    }
+    //        return collection;
+    //    }
+    //}
 }

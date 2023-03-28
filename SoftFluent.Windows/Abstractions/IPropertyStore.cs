@@ -28,19 +28,24 @@
     //    public string Description { get; }
     //}
 
-    public interface IValidation
-    {
-        public bool IsValid { get; }
+    //public interface IValidation
+    //{
+    //    public bool IsValid { get; }
 
-        public string Description { get; }
-    }
+    //    public string Description { get; }
+    //}
 
     public interface IPropertyStore
     {
         public T GetValue<T>(IKey key);
-        public Task<Guid> GetGuidByParent(Guid guid, string Name, Type type);
         public void SetValue<T>(IKey key, T value);
-        void Subscribe(IObserver observer);
+
+        public object GetValue(IKey key, Type type);
+        public void SetValue(IKey key, object value, Type type);
+
+        public Task<Guid> GetGuidByParent(Guid guid, string Name, Type type);
+
+        IDisposable Subscribe(IObserver observer);
         string Validate(string memberName);
     }
 }

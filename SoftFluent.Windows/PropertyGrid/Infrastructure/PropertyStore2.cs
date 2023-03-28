@@ -1,31 +1,22 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Abstractions;
-using Jellyfish;
 using Key = SoftFluent.Windows.Key;
 
 namespace PropertyGrid.WPF.Demo.Infrastructure
 {
     public record PropertyChange(string Name, object Value) : IPropertyChange;
-
-
-    public enum OrderType
-    {
-        Get, Set
-    }
-    public enum ControlType
-    {
-        Back, Forward, Play, Pause
-    }
     public class Order
     {
         public Key Key { get; set; }
@@ -71,18 +62,18 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
         }
     }
 
-    public class History : ViewModel, IHistory
+    public class History : IHistory
     {
         public List<IObserver<object>> observers = new();
 
         ObservableCollection<Order> past = new();
-        Order present;
+        ObservableCollection<Order> present = new();
         ObservableCollection<Order> future = new();
 
         public IEnumerable Past => past;
 
 
-        public object Present => present;
+        public IEnumerable Present => present;
 
 
         public IEnumerable Future => future;
@@ -105,28 +96,31 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
         public void Forward()
         {
             var d = future[0];
-            if (present != null)
+            if (present.Count > 0)
             {
-                past.Add(present);
+                past.Add(present[0]);
             }
-
-            present = d;
+            if (present.Count > 0)
+                present.RemoveAt(0);
+            present.Add(d);
             future.RemoveAt(0);
-            Broadcast(present);
+            Broadcast(present[0]);
 
-            this.OnPropertyChanged(nameof(Present));
+            //this.OnPropertyChanged(nameof(Present));
         }
 
         public void Back()
         {
             var d = past[^0];
             //if (past.Any())
-            future.Insert(0, present);
-            present = d;
+            future.Insert(0, present[0]);
+            if (present.Count > 0)
+                present.RemoveAt(0);
+            present.Add(d);
             past.Remove(d);
             Broadcast(present);
 
-            this.OnPropertyChanged(nameof(Present));
+            //this.OnPropertyChanged(nameof(Present));
         }
 
 
@@ -148,6 +142,8 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
         IHistory history = new History();
         IControllable controllable = new Controllable();
         SynchronizationContext context = SynchronizationContext.Current;
+        //IDisposable disposable = new Disposer();
+
         private PropertyStore2()
         {
             directory = Directory.CreateDirectory("../../../Data");
@@ -175,6 +171,25 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
             return store.ContainsKey(key) ? (T?)store[key] : default;
         }
 
+        public object GetValue(IKey key, System.Type type)
+        {
+            if (key is not Key { Guid: var guid, Name: var name } _key)
+            {
+                throw new Exception("reg 43cs ");
+            }
+
+            if (store.ContainsKey(key) == false)
+            {
+                Observable
+                    .Return(new Order { Key = _key, OrderType = OrderType.Get, Type = type })
+                    .SubscribeOn(context)
+                    .Subscribe(history.Add);
+
+                return default;
+            }
+            return store[key];
+        }
+
         public void SetValue<T>(IKey key, T value)
         {
             if (key is not Key { Guid: var guid, Name: var name } _key)
@@ -188,9 +203,25 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
         }
 
 
-        public void Subscribe(IObserver observer)
+
+        public void SetValue(IKey key, object value, System.Type type)
+        {
+            if (key is not Key { Guid: var guid, Name: var name } _key)
+            {
+                throw new Exception("reg 43cs ");
+            }
+            Observable
+                .Return(new Order { Key = _key, OrderType = OrderType.Set, Value = value, Type = type })
+                .SubscribeOn(context)
+                .Subscribe(history.Add);
+        }
+
+
+
+        public IDisposable Subscribe(IObserver observer)
         {
             dictionary[observer] = observer;
+            return Disposable.Empty;
         }
 
         public string Validate(string memberName)

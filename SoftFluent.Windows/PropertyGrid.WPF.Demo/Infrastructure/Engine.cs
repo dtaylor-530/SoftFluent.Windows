@@ -3,18 +3,18 @@ using PropertyGrid.Abstractions;
 using SoftFluent.Windows;
 using SoftFluent.Windows.Samples;
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 
 namespace PropertyGrid.WPF.Demo.Infrastructure
 {
     public class Engine : IPropertyGridEngine
     {
-        private readonly IActivator activator;
+     
 
 
-        public Engine(IActivator activator)
+        public Engine()
         {
-            this.activator = activator;
 
             Initialise();
         }
@@ -24,16 +24,16 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
          
         }
 
-        public  IPropertySource Convert(IPropertyGridOptions options)
+        public  IPropertySource Convert(object data)
         {
 
         
-            return new PropertySource(activator, options) { };
+            return new PropertySource(data) { };
                 //await PropertyStore2.Instance.GetGuid(guid.Guid, options.GetType().Name, options.Data.GetType());
             
       
         }
 
-        public static Engine Instance { get; } = new Engine(new BaseActivator());
+        public static Engine Instance { get; } = new Engine();
     }
 }

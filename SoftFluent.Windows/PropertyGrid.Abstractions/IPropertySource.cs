@@ -1,12 +1,13 @@
 using Abstractions;
+using System.Collections;
 
 namespace SoftFluent.Windows;
 
-public interface IPropertySource
+public interface IPropertySource : IEnumerable
 {
-    IProperty GetProperty(string name);
+    //IProperty GetProperty(string name);
 
-    IObservable<IProperty> Properties();
+    //IObservable<IProperty> Properties();
 
     void RefreshProperty(IProperty property);
     public int Count { get; }

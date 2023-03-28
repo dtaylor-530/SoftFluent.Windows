@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+
+
+    <DataTemplate x:Key="Blue" >
+        <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Width="100" 
+                         BorderBrush="DeepSkyBlue"
+                         BorderThickness="2"></TextBox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Green" >
+        <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Width="100" 
+                         BorderBrush="DarkSeaGreen"
+                         BorderThickness="2"></TextBox>
+    </DataTemplate>
+</ResourceDictionary>

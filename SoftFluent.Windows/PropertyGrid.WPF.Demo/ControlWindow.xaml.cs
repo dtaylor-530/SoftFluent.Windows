@@ -1,7 +1,4 @@
-﻿using PropertyGrid.WPF.Demo.Infrastructure;
-using System;
-using System.Collections;
-using System.Windows;
+﻿using System.Windows;
 
 namespace PropertyGrid.WPF.Demo
 {
@@ -41,24 +38,5 @@ namespace PropertyGrid.WPF.Demo
         {
             controllable.Forward();
         }
-    }
-
-    public interface IControllable : IObservable<ControlType>
-    {
-        void Back();
-        void Play();
-        void Pause();
-        void Forward();
-    }
-
-    public interface IHistory : IObservable<object>
-    {
-        IEnumerable Past { get; }
-        object Present { get; }
-        IEnumerable Future { get; }
-
-        void Add(object order);
-        void Back();
-        void Forward();
     }
 }

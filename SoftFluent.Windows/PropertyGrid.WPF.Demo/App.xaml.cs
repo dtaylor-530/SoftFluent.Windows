@@ -12,6 +12,8 @@ namespace SoftFluent.Windows.Samples
         protected override async void OnStartup(StartupEventArgs e)
         {
 
+            SQLitePCL.Batteries.Init();
+
             AutoObject.PropertyStore = PropertyStore2.Instance;
             var window = new Window { Content = new Customer2() };
             window.Show();

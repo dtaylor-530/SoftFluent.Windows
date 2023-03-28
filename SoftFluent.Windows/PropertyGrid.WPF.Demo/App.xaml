@@ -29,8 +29,13 @@
 
 
             <DataTemplate DataType="{x:Type grid:Property}">
-                <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus, Converter={x:Static local:DefaultConverter.Instance}}" Width="100" BorderBrush="ForestGreen" BorderThickness="2"></TextBox>
+                <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={x:Static local:DefaultConverter.Instance}}" 
+                         Width="100" 
+                         BorderBrush="ForestGreen"
+                         BorderThickness="2"></TextBox>
             </DataTemplate>
+
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

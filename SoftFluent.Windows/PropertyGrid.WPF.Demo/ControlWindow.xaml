@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PropertyGrid.WPF.Demo"
-        xmlns:infra="clr-namespace:PropertyGrid.WPF.Demo.Infrastructure"
+        xmlns:infra="clr-namespace:PropertyGrid.WPF.Demo.Infrastructure;assembly=PropertyGrid"
         xmlns:wpf="clr-namespace:UtilityWpf.Panels"
         mc:Ignorable="d"
         FontSize="20"
@@ -65,8 +65,9 @@
 
         <UniformGrid  Grid.Row="1" Rows="1"  Background="Beige">
             <TextBlock Text="{Binding ElementName=Past, Path=Items.Count}" HorizontalAlignment="Center"></TextBlock>
+            <Ellipse Height="40" Width="40"></Ellipse>     
+            <TextBlock Text="{Binding ElementName=Present, Path=Items.Count}" HorizontalAlignment="Center"></TextBlock>
             <Ellipse Height="40" Width="40"></Ellipse>
-
             <TextBlock Text="{Binding ElementName=Future, Path=Items.Count}" HorizontalAlignment="Center"></TextBlock>
         </UniformGrid>
         <wpf:UniformStackPanel Grid.Row="2" x:Name="HistoryPanel">
@@ -74,7 +75,9 @@
             <ScrollViewer>
                 <ItemsControl x:Name="Past" ItemTemplate="{StaticResource PastTemplate}" ItemsSource="{Binding Past}"/>
             </ScrollViewer>
-            <ContentControl x:Name="Present" ContentTemplate="{StaticResource PresentTemplate}" Content="{Binding Present}"></ContentControl>
+            <ScrollViewer>
+                <ItemsControl x:Name="Present" ItemTemplate="{StaticResource PresentTemplate}" ItemsSource="{Binding Present}"/>
+            </ScrollViewer>
             <ScrollViewer>
                 <ItemsControl x:Name="Future" ItemTemplate="{StaticResource FutureTemplate}" ItemsSource="{Binding Future}">
                 </ItemsControl>

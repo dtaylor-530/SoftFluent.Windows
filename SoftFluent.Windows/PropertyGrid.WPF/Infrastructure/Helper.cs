@@ -115,71 +115,73 @@ namespace SoftFluent.Windows
             }
             if (d is PropertyGrid propertyGrid)
             {
-                var engine = Helper.SelectedObjectPropertyChanged(propertyGrid, e);
-                if (engine is not null)
+                //var engine = Helper.SelectedObjectPropertyChanged(propertyGrid, e);
+                if (propertyGrid.Engine is IPropertyGridEngine engine)
                 {
-                    var options = propertyGrid.Options;
-                    var source = await Task.Run(() => engine.Convert(options));
+                    //var options = propertyGrid.Options;
+                    var source = engine.Convert(e.NewValue);
                     //var source = engine.Convert(options);
-                    propertyGrid.PropertiesSource.Source = new ListSource(source, propertyGrid.context);
+                    //propertyGrid.PropertiesSource.Source = new ListSource(source, propertyGrid.context);
+                    propertyGrid.PropertiesGrid.ItemsSource = source;
+                    propertyGrid.ItemsControl.ItemsSource = source;
                 }
             }
 
         }
 
 
-        public static IPropertyGridEngine? SelectedObjectPropertyChanged(PropertyGrid grid, DependencyPropertyChangedEventArgs e)
-        {
+        //public static IPropertyGridEngine? SelectedObjectPropertyChanged(PropertyGrid grid, DependencyPropertyChangedEventArgs e)
+        //{
 
-            if (e.OldValue is INotifyPropertyChanged pc)
-            {
-                pc.PropertyChanged -= OnDispatcherSourcePropertyChanged;
-            }
+        //    if (e.OldValue is INotifyPropertyChanged pc)
+        //    {
+        //        pc.PropertyChanged -= OnDispatcherSourcePropertyChanged;
+        //    }
 
-            if (e.NewValue == null)
-            {
-                grid.PropertiesSource.Source = null;
-                return null;
-            }
+        //    if (e.NewValue == null)
+        //    {
+        //        grid.PropertiesSource.Source = null;
+        //        return null;
+        //    }
 
-            grid.RefreshComboBox();
+        //    grid.RefreshComboBox();
 
-            if (Extensions.GetAttribute<ReadOnlyAttribute>(e.NewValue.GetType()) is ReadOnlyAttribute roa &&
-                roa.IsReadOnly)
-            {
-                grid.IsReadOnly = true;
-            }
-            else
-            {
-                grid.IsReadOnly = false;
-            }
+        //    if (Extensions.GetAttribute<ReadOnlyAttribute>(e.NewValue.GetType()) is ReadOnlyAttribute roa &&
+        //        roa.IsReadOnly)
+        //    {
+        //        grid.IsReadOnly = true;
+        //    }
+        //    else
+        //    {
+        //        grid.IsReadOnly = false;
+        //    }
 
-            if (e.NewValue is INotifyPropertyChanged npc)
-            {
-                npc.PropertyChanged += OnDispatcherSourcePropertyChanged;
-            }
-            if (grid.Engine is not IPropertyGridEngine engine)
-                return null;
+        //    if (e.NewValue is INotifyPropertyChanged npc)
+        //    {
+        //        npc.PropertyChanged += OnDispatcherSourcePropertyChanged;
+        //    }
+        //    if (grid.Engine is not IPropertyGridEngine engine)
+        //        return null;
 
-            return engine;
+        //    return engine;
 
 
 
-            void OnDispatcherSourcePropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
-            {
-                if (sender is PropertyGrid dispatcherObject)
-                {
-                    if (!dispatcherObject.Dispatcher.CheckAccess())
-                    {
-                        dispatcherObject.Dispatcher.Invoke(() => dispatcherObject.OnSourcePropertyChanged(sender, eventArgs));
-                    }
-                    else
-                    {
-                        dispatcherObject.OnSourcePropertyChanged(sender, eventArgs);
-                    }
-                }
-            }
-        }
+        //    void OnDispatcherSourcePropertyChanged(object sender, PropertyChangedEventArgs eventArgs)
+        //    {
+        //        if (sender is PropertyGrid dispatcherObject)
+        //        {
+        //            if (!dispatcherObject.Dispatcher.CheckAccess())
+        //            {
+        //                dispatcherObject.Dispatcher.Invoke(() => dispatcherObject.OnSourcePropertyChanged(sender, eventArgs));
+        //            }
+        //            else
+        //            {
+        //                dispatcherObject.OnSourcePropertyChanged(sender, eventArgs);
+        //            }
+        //        }
+        //    }
+        //}
         public static void SetGroupByCategory(PropertyGrid grid, bool value)
         {
             switch (value)
@@ -196,65 +198,65 @@ namespace SoftFluent.Windows
 
 
 
-        public static void UpdateBindings(PropertyGrid grid, object dataItem, string childName, Func<Binding, bool> where, Action<BindingExpression> action)
-        {
-            if (dataItem == null)
-            {
-                throw new ArgumentNullException("dataItem");
-            }
+        //public static void UpdateBindings(PropertyGrid grid, object dataItem, string childName, Func<Binding, bool> where, Action<BindingExpression> action)
+        //{
+        //    if (dataItem == null)
+        //    {
+        //        throw new ArgumentNullException("dataItem");
+        //    }
 
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
+        //    if (action == null)
+        //    {
+        //        throw new ArgumentNullException("action");
+        //    }
 
-            if (!(grid.GetValueCellContent(dataItem) is var fe))
-            {
-                return;
-            }
+        //    if (!(grid.GetValueCellContent(dataItem) is var fe))
+        //    {
+        //        return;
+        //    }
 
-            if (childName == null)
-            {
-                foreach (UIElement child in fe.EnumerateVisualChildren(true).OfType<UIElement>())
-                {
-                    Action(child);
-                }
-            }
-            else
-            {
-                FrameworkElement child = fe.FindVisualChild<FrameworkElement>(childName);
-                if (child != null)
-                {
-                    Action(child);
-                }
-            }
+        //    if (childName == null)
+        //    {
+        //        foreach (UIElement child in fe.EnumerateVisualChildren(true).OfType<UIElement>())
+        //        {
+        //            Action(child);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        FrameworkElement child = fe.FindVisualChild<FrameworkElement>(childName);
+        //        if (child != null)
+        //        {
+        //            Action(child);
+        //        }
+        //    }
 
-            void Action(UIElement element)
-            {
-                if (element == null)
-                {
-                    throw new ArgumentNullException("element");
-                }
+        //    void Action(UIElement element)
+        //    {
+        //        if (element == null)
+        //        {
+        //            throw new ArgumentNullException("element");
+        //        }
 
-                if (action == null)
-                {
-                    throw new ArgumentNullException("action");
-                }
+        //        if (action == null)
+        //        {
+        //            throw new ArgumentNullException("action");
+        //        }
 
-                if (@where == null)
-                {
-                    @where = b => true;
-                }
+        //        if (@where == null)
+        //        {
+        //            @where = b => true;
+        //        }
 
-                foreach (DependencyProperty prop in VisualTreeExtensions.EnumerateMarkupDependencyProperties(element))
-                {
-                    BindingExpression expr = BindingOperations.GetBindingExpression(element, prop);
-                    if (expr != null && expr.ParentBinding != null && @where(expr.ParentBinding))
-                    {
-                        action(expr);
-                    }
-                }
-            }
-        }
+        //        foreach (DependencyProperty prop in VisualTreeExtensions.EnumerateMarkupDependencyProperties(element))
+        //        {
+        //            BindingExpression expr = BindingOperations.GetBindingExpression(element, prop);
+        //            if (expr != null && expr.ParentBinding != null && @where(expr.ParentBinding))
+        //            {
+        //                action(expr);
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

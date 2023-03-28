@@ -9,7 +9,7 @@ namespace SoftFluent.Windows
     public class Property : AutoObject, IProperty
     {
         public Property(Guid guid) : base(guid)
-        {  
+        {
         }
 
         public object Data { get; set; }
@@ -47,7 +47,7 @@ namespace SoftFluent.Windows
 
         public virtual TypeConverter Converter => Descriptor.Converter;
 
-        public virtual string Description { get => GetProperty<string>(); set => SetProperty(value); }
+        //public virtual string Description { get => GetProperty<string>(); set => SetProperty(value); }
 
         public virtual PropertyDescriptor Descriptor { get; set; }
 
@@ -110,9 +110,14 @@ namespace SoftFluent.Windows
         //    }
         //}
 
+        bool flag;
         public virtual object? Value
         {
-            get => GetProperty<object>() ?? Descriptor.GetValue(Data);
+            get
+            {
+                var property = this.GetProperty(PropertyType)?? Descriptor.GetValue(Data); 
+                return property;
+            }
             set
             {
                 if (!TryChangeType(value, PropertyType, CultureInfo.CurrentCulture, out object changedValue))
@@ -125,8 +130,8 @@ namespace SoftFluent.Windows
                     try
                     {
                         Descriptor.SetValue(Data, changedValue);
-                        var finalValue = Descriptor.GetValue(Data);
-                        this.SetProperty(finalValue);
+                        //var finalValue = Descriptor.GetValue(Data);
+                        this.SetProperty(changedValue, PropertyType);
                     }
                     catch (Exception e)
                     {
@@ -142,7 +147,10 @@ namespace SoftFluent.Windows
         public string EditorTemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
 
 
-        
+        public string PanelKey { get => GetProperty<string>(); set => SetProperty(value); }
+
+
+
         //public virtual void CanExecute(object sender, EventArgs e)
         //{
         //    if (Value is IExecute handler)

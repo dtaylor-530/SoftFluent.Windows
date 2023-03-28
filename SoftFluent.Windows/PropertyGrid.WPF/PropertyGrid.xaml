@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:system="clr-namespace:System;assembly=mscorlib"
+    xmlns:infra="clr-namespace:PropertyGrid.WPF.Infrastructure"
     xmlns:windows="clr-namespace:SoftFluent.Windows"
     d:DesignHeight="300"
     d:DesignWidth="300"
@@ -276,11 +277,11 @@
                 </Grid>
             </Window>-->
 
-            <CollectionViewSource x:Key="PropertiesSource">
+            <!--<CollectionViewSource x:Key="PropertiesSource">
                 <CollectionViewSource.GroupDescriptions>
                     <PropertyGroupDescription PropertyName="Category" />
                 </CollectionViewSource.GroupDescriptions>
-            </CollectionViewSource>
+            </CollectionViewSource>-->
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -290,6 +291,7 @@
             Name="LevelComboBox"
             DockPanel.Dock="Top"
             SelectedIndex="0" />
+        <Button x:Name="RefreshButton"  Command="{x:Static windows:PropertyGrid.RefreshCommand}">refresh</Button>
         <!--<Expander Header="Properties"  DockPanel.Dock="Top">
             <ItemsControl
                 ItemsSource="{Binding Source={StaticResource PropertiesSource}}">
@@ -311,6 +313,11 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </Expander>-->
+
+        <ItemsControl x:Name="ItemsControl" 
+                      ItemTemplateSelector="{x:Static infra:MyDataTemplateSelector.Instance}">
+        </ItemsControl>
+        
         <ScrollViewer>
             <DataGrid
                 Name="PropertiesGrid"
@@ -320,7 +327,6 @@
                 FrozenColumnCount="1"
                 HeadersVisibility="None"
                 HorizontalGridLinesBrush="#D0D0D0"
-                ItemsSource="{Binding Source={StaticResource PropertiesSource}}"
                 MinRowHeight="24"
                 PreviewKeyUp="OnUIElementPreviewKeyUp"
                 SelectionMode="Single"
@@ -354,9 +360,18 @@
                     </DataGridTextColumn>
                     <DataGridTemplateColumn
                         x:Name="ValueColumn"
+                        MinWidth="200"
                         Width="*" 
-                                            Header="Value" 
-                                          >
+                        Header="Value">
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Width="100"
+                        Header="Template">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox Foreground="DarkSlateGray" Text="{Binding TemplateKey, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"></TextBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
                     <DataGridTemplateColumn >
