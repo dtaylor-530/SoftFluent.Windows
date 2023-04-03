@@ -1,75 +1,48 @@
-using System;
 using SoftFluent.Windows.Utilities;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using Abstractions;
-using Utilities;
-using PropertyGrid.Abstractions;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using SoftFluent.Windows;
 using System.Collections;
 using System.Collections.Specialized;
+using Models;
 
 namespace SoftFluent.Windows
 {
 
-    public class PropertySource : IPropertySource, INotifyCollectionChanged
+    public class PropertySource : Node, IPropertySource, INotifyCollectionChanged
     {
         //private readonly IActivator _activator;
         //private readonly IPropertyGridOptions options;
-        private readonly ObservableCollection<IProperty> _properties = new();
         private object data;
-        private SynchronizationContext? context;
+        private SynchronizationContext context;
         BaseActivator activator = new BaseActivator();
-
+        bool flag = false;
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         public PropertySource(object data)
         {
-
-            //_activator = activator;
             this.data = data;
-            context = SynchronizationContext.Current?? throw new Exception("er 434434");
+            context = SynchronizationContext.Current ?? throw new Exception("er 434434");
 
-            //options.Data = options.Data ?? throw new ArgumentNullException("data");
+            _children.CollectionChanged += (s, e) => CollectionChanged?.Invoke(this, e);
+            _properties.CollectionChanged += (s, e) => CollectionChanged?.Invoke(this, e);
 
-
-            _properties.CollectionChanged += _properties_CollectionChanged;
-            UpdateProperties();
-
-            void UpdateProperties()
-            {
-                Properties()
-                   
-                    .Subscribe( prop =>
-                    {
-                        context.Post(a => { _properties.Add(prop); }, prop);
-                       
-                    });
-            }
-        }
-
-        private void _properties_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            CollectionChanged?.Invoke(this, e);
         }
 
         //public IPropertyGridOptions Options => options;
 
-        public IProperty GetProperty(string name)
-        {
-            return _properties.FirstOrDefault(p => p.Name.EqualsIgnoreCase(name));
-        }
+        //public IProperty GetProperty(string name)
+        //{
+        //    return _children.OfType<IProperty>().FirstOrDefault(p => p.Name.EqualsIgnoreCase(name));
+        //}
 
         //protected virtual Property CreateProperty(PropertyDescriptor descriptor)
         //{
         //    return MyHelper.CreateProperty(this.Guid, descriptor, _activator, options.Data);
         //}
 
-        protected virtual IObservable<IProperty> Properties()
+        protected virtual IObservable<IProperty> GenerateProperties()
         {
             Guid guid = Guid.NewGuid();
             if (data is IGuid iguid)
@@ -77,10 +50,10 @@ namespace SoftFluent.Windows
                 guid = iguid.Guid;
             }
 
-            if (_properties.Any())
-            {
-                return _properties.ToObservable();
-            }
+            //if (_properties.Any())
+            //{
+            //    return _properties.ToObservable();
+            //}
 
             Type highestType = data.GetType();
 
@@ -92,49 +65,59 @@ namespace SoftFluent.Windows
 
                 var descriptors = PropertyDescriptors(highestType).ToArray();
 
-                _ = Task.Run(() =>
-                {
-                    if (data is IEnumerable enumerable)
-                    {
-                        int i = 0;
-                        foreach (var item in enumerable)
-                        {
-                            try
-                            {
+                var t = Task(guid, subject, descriptors);
 
-                                var property = activator.CreateProperty2(guid, i.ToString(), item).Result;
-                                RefreshProperty(property);
-                                subject.OnNext(property);
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
-                        }
-                    }
-                    else
-                    {
-       
-                        foreach (var descriptor in descriptors)
-                        {
-                            try
-                            {
-                                var property = activator.CreateProperty(guid, descriptor, data).Result;
-
-                                RefreshProperty(property);
-                                subject.OnNext(property);
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
-                        }
-                    }
-                });
-
-                
                 return subject;
             }
+        }
+
+        private Task<List<IProperty>> Task(Guid guid, Subject<IProperty> subject, PropertyDescriptor[] descriptors)
+        {
+            return System.Threading.Tasks.Task.Run(() =>
+            {
+                List<IProperty> list = new();
+                if (data is IEnumerable enumerable)
+                {
+                    int i = 0;
+                    foreach (var item in enumerable)
+                    {
+                        try
+                        {
+
+                            var property = activator.CreateProperty2(guid, i.ToString(), item).Result;
+                            RefreshProperty(property);
+                            subject.OnNext(property);
+                            list.Add(property);
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+                else
+                {
+
+                    foreach (var descriptor in descriptors)
+                    {
+                        try
+                        {
+                            var property = activator.CreateProperty(guid, descriptor, data).Result;
+
+                            RefreshProperty(property);
+                            subject.OnNext(property);
+                            list.Add(property);
+
+                        }
+                        catch (Exception ex)
+                        {
+
+                        }
+                    }
+                }
+
+                return list;
+            });
         }
 
         IEnumerable<PropertyDescriptor> PropertyDescriptors(Type highestType)
@@ -151,14 +134,18 @@ namespace SoftFluent.Windows
             }
         }
 
+        public override string ToString()
+        {
+            return data.GetType().Name;
+        }
+
+
         //protected override T GetProperty<T>([CallerMemberName] string? name = null)
         //{
         //    var baseValue = base.GetProperty<T>();
         //    if (baseValue != null)
         //        return baseValue;
-
         //    var property = GetProperty(name);
-
         //    try
         //    {
         //        object value = property.Descriptor.GetValue(Options.Data);
@@ -173,10 +160,11 @@ namespace SoftFluent.Windows
         //        property.IsError = true;
         //        return default;
         //    }
-
         //}
 
-        public int Count => _properties.Count;
+        public int Count => _children.Count;
+
+        public override object Content => data.GetType().Name;
 
 
         public void RefreshProperty(IProperty property)
@@ -203,7 +191,48 @@ namespace SoftFluent.Windows
 
         public IEnumerator GetEnumerator()
         {
-            return _properties.GetEnumerator();
+            RefreshAsync();
+            return _children.GetEnumerator();
+        }
+
+        protected override async Task<bool> RefreshAsync()
+        {
+            if (flag == true)
+                return await System.Threading.Tasks.Task.FromResult(true);
+
+            flag = true;
+            GenerateProperties()
+                   .Subscribe(prop =>
+                   {
+                       if (prop.IsValueType)
+                       {
+                           context.Post(a => { _properties.Add(prop); }, prop);
+                       }
+                       else
+                           context.Post(a => { _children.Add(prop); }, new PropertySource(prop.Value) { Parent = this });
+
+                   });
+
+            return await System.Threading.Tasks.Task.FromResult(true);
+        }
+
+
+
+        public override Task<bool> HasMoreChildren()
+        {
+            return System.Threading.Tasks.Task.FromResult(flag == false);
+        }
+
+        public override Node ToNode(object value)
+        {
+            return new PropertySource(value);
+        }
+
+        public override Task<object?> GetChildren() => throw new NotImplementedException();
+
+        public override Task<object?> GetProperties()
+        {
+            throw new NotImplementedException();
         }
     }
 }
