@@ -6,23 +6,23 @@
     xmlns:samples1="clr-namespace:SoftFluent.Windows.Samples;assembly=PropertyGrid.Demo.Model"
     xmlns:grid="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid"
     xmlns:prop="clr-namespace:PropertyGrid.WPF;assembly=PropertyGrid.WPF">
-    
+
     <Application.Resources>
         <ResourceDictionary>
-         
+            <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/Infrastructure/Templates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            
-            
-                <!--<DataTemplate DataType="{x:Type samples1:Customer2}">
+
+
+            <!--<DataTemplate DataType="{x:Type samples1:Customer2}">
                     <windows:PropertyGrid
                         TemplateSelector="{StaticResource TemplateSelector}"
                         Engine="{x:Static local:Engine.Instance}"
                         Name="MyGrid"
                         SelectedObject="{Binding }" />
                 </DataTemplate>-->
-            
+
             <DataTemplate DataType="{x:Type samples1:Customer2}">
                 <prop:PropertyTree
                         Engine="{x:Static local:Engine.Instance}"                     

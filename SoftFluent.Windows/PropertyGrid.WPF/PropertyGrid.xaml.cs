@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 namespace SoftFluent.Windows
+{ 
     public partial class PropertyGrid : UserControl
     {
 
