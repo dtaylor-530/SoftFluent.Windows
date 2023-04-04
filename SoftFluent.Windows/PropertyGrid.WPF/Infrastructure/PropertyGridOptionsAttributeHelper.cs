@@ -19,25 +19,25 @@ namespace SoftFluent.Windows
             //if (att == null)
             //    return null;
 
-            if (property.TemplateKey != null)
-            {
-                if (Application.Current != null)
-                {
-                    DataTemplate dt = (DataTemplate)Application.Current.TryFindResource(property.TemplateKey);
-                    if (dt != null)
-                        return dt;
-                }
+            //if (property.TemplateKey != null)
+            //{
+            //    if (Application.Current != null)
+            //    {
+            //        DataTemplate dt = (DataTemplate)Application.Current.TryFindResource(property.TemplateKey);
+            //        if (dt != null)
+            //            return dt;
+            //    }
 
-                var fe = container as FrameworkElement;
-                if (fe != null)
-                {
-                    var dt = (DataTemplate)fe.TryFindResource(property.TemplateKey);
-                    if (dt != null)
-                        return dt;
-                }
+            //    var fe = container as FrameworkElement;
+            //    if (fe != null)
+            //    {
+            //        var dt = (DataTemplate)fe.TryFindResource(property.TemplateKey);
+            //        if (dt != null)
+            //            return dt;
+            //    }
 
-                return null;
-            }
+            //    return null;
+            //}
 
             //if (att.EditorType != null)
             //{

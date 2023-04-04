@@ -4,9 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:PropertyGrid.WPF.Demo.Infrastructure"
     xmlns:samples1="clr-namespace:SoftFluent.Windows.Samples;assembly=PropertyGrid.Demo.Model"
-    xmlns:soft="clr-namespace:SoftFluent.Windows;assembly=Infrastructure"
     xmlns:grid="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid"
-    xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF">
+    xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF"
+    xmlns:prop="clr-namespace:PropertyGrid.WPF;assembly=PropertyGrid.WPF">
     
     <Application.Resources>
         <ResourceDictionary>
@@ -19,13 +19,21 @@
 
             
             
-                <DataTemplate DataType="{x:Type samples1:Customer2}">
+                <!--<DataTemplate DataType="{x:Type samples1:Customer2}">
                     <windows:PropertyGrid
                         TemplateSelector="{StaticResource TemplateSelector}"
                         Engine="{x:Static local:Engine.Instance}"
                         Name="MyGrid"
                         SelectedObject="{Binding }" />
-                </DataTemplate>
+                </DataTemplate>-->
+            
+            <DataTemplate DataType="{x:Type samples1:Customer2}">
+                <prop:PropertyTree
+                        Engine="{x:Static local:Engine.Instance}"                     
+                        SelectedObject="{Binding }" />
+            </DataTemplate>
+
+
 
 
             <DataTemplate DataType="{x:Type grid:Property}">

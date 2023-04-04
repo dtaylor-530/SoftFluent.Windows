@@ -17,16 +17,16 @@ using System.Windows.Media;
 
 namespace SoftFluent.Windows
 {
-    public class PropertyGridOptions : IPropertyGridOptions
-    {
-        public int InheritanceLevel { get; set; }
-        public bool IsReadOnly { get; set; }
-        public object Data { get; set; }
+    //public class PropertyGridOptions : IPropertyGridOptions
+    //{
+    //    public int InheritanceLevel { get; set; }
+    //    public bool IsReadOnly { get; set; }
+    //    public object Data { get; set; }
 
-        public string DefaultCategoryName { get; set; }
+    //    public string DefaultCategoryName { get; set; }
 
-        public bool DecamelizePropertiesDisplayNames { get; set; }
-    }
+    //    public bool DecamelizePropertiesDisplayNames { get; set; }
+    //}
 
     public partial class PropertyGrid : UserControl
     {
@@ -78,7 +78,7 @@ namespace SoftFluent.Windows
 
         private int _inheritanceLevel;
         private IPropertyGridEngine engine;
-        private IPropertySource source;
+        private IEnumerable source;
         public SynchronizationContext context;
 
         public PropertyGrid()

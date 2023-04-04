@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Projects\FileSystem\TreeBreadcrumbControl\Models\Models.csproj" />
+    <ProjectReference Include="..\..\..\Utility.Breadcrumb\Models\Models.csproj" />
     <ProjectReference Include="..\PropertyGrid.Abstractions\PropertyGrid.Abstractions.csproj" />
   </ItemGroup>
 

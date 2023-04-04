@@ -6,18 +6,17 @@ using Extensions = Utilities.Extensions;
 
 namespace SoftFluent.Windows
 {
-    public class Property : AutoObject, IProperty
+    public class Property : PropertySource, IProperty
     {
         public Property(Guid guid) : base(guid)
         {
         }
 
-        public object Data { get; set; }
+  
         public string Name => Descriptor.Name;
         public string DisplayName => Descriptor.DisplayName;
         public bool IsReadOnly => Descriptor.IsReadOnly;
         public bool IsCollection => PropertyType != null ? PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(PropertyType) : false;
-
         public bool IsFlagsEnum => Extensions.IsFlagsEnum(PropertyType);
         public bool IsValueType => PropertyType.IsValueType;
         //public bool IsVisible
@@ -110,12 +109,20 @@ namespace SoftFluent.Windows
         //    }
         //}
 
-        bool flag;
+        public override object Content =>  Name;
+        protected override async Task<bool> RefreshAsync()
+        {
+            if ((PropertyType.IsValueType || PropertyType ==typeof(string)) != true)
+                return await base.RefreshAsync();
+
+            return await Task.FromResult(true);
+        }
+
         public virtual object? Value
         {
             get
             {
-                var property = this.GetProperty(PropertyType)?? Descriptor.GetValue(Data); 
+                var property = this.GetProperty(PropertyType) ?? Descriptor.GetValue(Data);
                 return property;
             }
             set
@@ -141,13 +148,13 @@ namespace SoftFluent.Windows
             }
         }
 
-        public string TemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
+        //public string TemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
 
 
-        public string EditorTemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
+        //public string EditorTemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
 
 
-        public string PanelKey { get => GetProperty<string>(); set => SetProperty(value); }
+        //public string PanelKey { get => GetProperty<string>(); set => SetProperty(value); }
 
 
 

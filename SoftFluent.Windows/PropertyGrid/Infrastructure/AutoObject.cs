@@ -31,7 +31,6 @@ namespace SoftFluent.Windows
     {
         //private readonly Dictionary<string, object> _defaultValues = new Dictionary<string, object>();
         private readonly Guid guid;
-        public static IPropertyStore PropertyStore { get; set; }
         private IDisposable disposable;
 
         /// <summary>
@@ -40,9 +39,12 @@ namespace SoftFluent.Windows
         protected AutoObject(Guid guid)
         {
             this.guid = guid;
-
             Initialise();
         }
+
+        public static IPropertyStore PropertyStore { get; set; }
+
+        public static SynchronizationContext Context { get; set; }
 
         async void Initialise()
         {

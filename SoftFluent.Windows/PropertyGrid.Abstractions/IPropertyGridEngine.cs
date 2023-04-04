@@ -1,5 +1,6 @@
 ﻿using SoftFluent.Windows;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace PropertyGrid.Abstractions
 {
     public interface IPropertyGridEngine
     {
-        IPropertySource Convert(object options);
+        IEnumerable Convert(object options);
 
     }
 }

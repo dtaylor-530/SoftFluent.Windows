@@ -7,9 +7,9 @@ using Extensions = Utilities.Extensions;
 
 namespace SoftFluent.Windows
 {
-    public class Property2 : AutoObject, IProperty //, IComparable, IComparable<Property>
+    public class Property2 : PropertySource, IProperty //, IComparable, IComparable<Property>
     {
-        private readonly string name;
+        //private readonly string name;
     
 
         //private bool _isVisible = true;
@@ -19,12 +19,10 @@ namespace SoftFluent.Windows
          
         }
 
-        public object Data { get; set; }
-
         public string Name { get; set; }
         public string DisplayName => Name;
         public bool IsReadOnly => false;
-        public bool IsCollection => PropertyType != null ? PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(PropertyType) : false;
+        public bool IsCollection => false;// PropertyType != null ? PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(PropertyType) : false;
 
         //public bool IsVisible
         //{
@@ -149,7 +147,7 @@ namespace SoftFluent.Windows
 
         public string EditorTemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
 
-        public bool IsValueType => throw new NotImplementedException();
+        public bool IsValueType => PropertyType.IsValueType;
 
         public bool IsFlagsEnum => throw new NotImplementedException();
 

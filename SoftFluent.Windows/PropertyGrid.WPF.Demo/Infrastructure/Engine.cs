@@ -10,7 +10,7 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
 {
     public class Engine : IPropertyGridEngine
     {
-     
+
 
 
         public Engine()
@@ -21,17 +21,17 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
 
         async void Initialise()
         {
-         
+
         }
 
-        public  IPropertySource Convert(object data)
+        public IEnumerable Convert(object data)
         {
 
-        
-            return new PropertySource(data) { };
-                //await PropertyStore2.Instance.GetGuid(guid.Guid, options.GetType().Name, options.Data.GetType());
-            
-      
+
+            return new PropertySource(Guid.NewGuid()) { Data = data };
+            //await PropertyStore2.Instance.GetGuid(guid.Guid, options.GetType().Name, options.Data.GetType());
+
+
         }
 
         public static Engine Instance { get; } = new Engine();

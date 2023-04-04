@@ -25,8 +25,8 @@ namespace Abstractions
         object Value { get; set; }
         //bool IsDefaultValue => DefaultValue == Value;
 
-        public string TemplateKey { get; }
-        public string EditorTemplateKey { get; }
+        //public string TemplateKey { get; }
+        //public string EditorTemplateKey { get; }
 
         //object? DefaultValue => Extensions.GetAttribute<DefaultValueAttribute>((MemberDescriptor)Descriptor).Value;
         //bool HasDefaultValue => DefaultValue != default;

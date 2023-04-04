@@ -15,10 +15,9 @@ namespace SoftFluent.Windows.Samples
             SQLitePCL.Batteries.Init();
 
             AutoObject.PropertyStore = PropertyStore2.Instance;
+            AutoObject.Context = System.Threading.SynchronizationContext.Current;
             var window = new Window { Content = new Customer2() };
             window.Show();
-
-
             new ControlWindow(PropertyStore2.Instance.Controllable, PropertyStore2.Instance.History).Show();
 
             base.OnStartup(e);
