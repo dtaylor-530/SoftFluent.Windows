@@ -4,10 +4,11 @@ using Abstractions;
 
 namespace SoftFluent.Windows
 {
-    public class PropertyGridOptionsAttribute : Attribute, IPropertyGridOptionsAttribute {
+    public class PropertyGridOptionsAttribute : Attribute //, IPropertyGridOptionsAttribute
+    {
         public PropertyGridOptionsAttribute()
         {
-          
+
         }
 
 

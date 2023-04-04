@@ -7,43 +7,28 @@ using Extensions = Utilities.Extensions;
 
 namespace SoftFluent.Windows
 {
-    public class Property2 : PropertySource, IProperty
+    public class CollectionProperty : PropertyBase
     {
-
-        public Property2(Guid guid) : base(guid)
-        {
-         
+        public CollectionProperty(Guid guid) : base(guid)
+        {         
         }
 
-        public string Name { get; set; }
-        public string DisplayName => Name;
-        public bool IsReadOnly => false;
-        public bool IsCollection => PropertyType != null ? PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(PropertyType) : false;
+        public int Index { get; set; }
 
+        public override string Name => Index.ToString();
+        public string DisplayName => Name;
+        public override bool IsReadOnly => true;
 
         public virtual string? Category => "Collection-Item";            
 
-        public virtual int CollectionCount => Value is IEnumerable enumerable ? enumerable.Cast<object>().Count() : 0;
-
-        public virtual Type CollectionItemPropertyType => !IsCollection ? null : Extensions.GetElementType(PropertyType);
-
         public virtual string Description { get => GetProperty<string>(); set => SetProperty(value); }
 
-        public virtual bool IsCollectionItemValueType => CollectionItemPropertyType != null && CollectionItemPropertyType.IsValueType;
-
-
-        public virtual bool IsError { get => GetProperty<bool>(); set => SetProperty(value); }
-
-
-        public virtual Type PropertyType => Data.GetType();
-
-
-        public virtual object? Value
+        public override object? Value
         {
             get => Data;
             set
             {
-
+                throw new Exception("g 4sdffsd");
             }
         }
 

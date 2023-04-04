@@ -72,10 +72,10 @@ namespace SoftFluent.Windows
                 return true;
             }
 
-            if (template.Category != null && !property.Category.EqualsIgnoreCase(template.Category))
-            {
-                return true;
-            }
+            //if (template.Category != null && !property.Category.EqualsIgnoreCase(template.Category))
+            //{
+            //    return true;
+            //}
 
             if (template.Name != null && !property.Name.EqualsIgnoreCase(template.Name))
             {

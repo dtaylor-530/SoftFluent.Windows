@@ -6,28 +6,28 @@ using Extensions = Utilities.Extensions;
 
 namespace SoftFluent.Windows
 {
-
-
-
-    public class Property : PropertyBase
+    public abstract class PropertyBase : PropertyNode, IProperty
     {
-        public Property(Guid guid) : base(guid)
+        public PropertyBase(Guid guid) : base(guid)
         {
         }
-        public override string Name => Descriptor.Name;
-        public string DisplayName => Descriptor.DisplayName;
-        public override bool IsReadOnly => Descriptor.IsReadOnly;
+        public virtual string Name { get; }
+
+        public bool IsCollection => PropertyType != null ? PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(PropertyType) : false;
         public bool IsFlagsEnum => Extensions.IsFlagsEnum(PropertyType);
+        public bool IsValueType => PropertyType.IsValueType;
 
-        public virtual string? Category => string.IsNullOrWhiteSpace(Descriptor.Category) ||
-                Extensions.EqualsIgnoreCase(Descriptor.Category, CategoryAttribute.Default.Category)
-                    ? null
-                    : Descriptor.Category;
-        public virtual TypeConverter Converter => Descriptor.Converter;
+        public virtual int CollectionCount => Value is IEnumerable enumerable ? enumerable.Cast<object>().Count() : 0;
 
-        public virtual PropertyDescriptor Descriptor { get; set; }
+        public virtual Type CollectionItemPropertyType => !IsCollection ? null : Extensions.GetElementType(PropertyType);
 
-        public override Type PropertyType => Descriptor.PropertyType;
+        public virtual bool IsCollectionItemValueType => CollectionItemPropertyType != null && CollectionItemPropertyType.IsValueType;
+
+        public virtual bool IsError { get => GetProperty<bool>(); set => SetProperty(value); }
+
+        public virtual Type PropertyType => Data.GetType();
+
+        public abstract bool IsReadOnly { get; }
 
         public override object Content =>  Name;
 
@@ -39,36 +39,9 @@ namespace SoftFluent.Windows
             return await Task.FromResult(true);
         }
 
-        public override object? Value
-        {
-            get
-            {
-                var property = this.GetProperty(PropertyType) ?? Descriptor.GetValue(Data);
-                return property;
-            }
-            set
-            {
-                if (!TryChangeType(value, PropertyType, CultureInfo.CurrentCulture, out object changedValue))
-                {
-                    throw new ArgumentException("Cannot convert value {" + value + "} to type '" + PropertyType.FullName + "'.");
-                }
+        public abstract object Value { get; set; }
 
-                if (Descriptor != null)
-                {
-                    try
-                    {
-                        Descriptor.SetValue(Data, changedValue);
-                        //var finalValue = Descriptor.GetValue(Data);
-                        this.SetProperty(changedValue, PropertyType);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new ArgumentException("Cannot set value {" + value + "} to object.", e);
-                    }
-                }
-            }
-        }
-
+        public bool IsString => PropertyType == typeof(string);
 
         public override string ToString()
         {
