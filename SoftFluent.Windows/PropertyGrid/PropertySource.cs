@@ -242,7 +242,6 @@ namespace SoftFluent.Windows
         }
 
         public static PropertyHelper Instance { get; } = new PropertyHelper();
-
     }
 }
 

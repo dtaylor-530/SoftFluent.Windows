@@ -5,15 +5,11 @@
     xmlns:local="clr-namespace:PropertyGrid.WPF.Demo.Infrastructure"
     xmlns:samples1="clr-namespace:SoftFluent.Windows.Samples;assembly=PropertyGrid.Demo.Model"
     xmlns:grid="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid"
-    xmlns:windows="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid.WPF"
     xmlns:prop="clr-namespace:PropertyGrid.WPF;assembly=PropertyGrid.WPF">
     
     <Application.Resources>
         <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <!--<ResourceDictionary Source="/PropertyGrid.WPF.Templates;component/DataTemplates.xaml"></ResourceDictionary>
-                <ResourceDictionary Source="/PropertyGrid.WPF.Templates;component/MoreDataTemplates.xaml"></ResourceDictionary>-->
-                <!--<ResourceDictionary Source="/PropertyGrid.WPF.Extra;component/Resources.xaml"/>-->
+         
                 <ResourceDictionary Source="/Infrastructure/Templates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
