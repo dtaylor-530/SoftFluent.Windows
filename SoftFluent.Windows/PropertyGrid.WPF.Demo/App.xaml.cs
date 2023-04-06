@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
+using Abstractions;
+using Models;
+using PropertyGrid.Demo.Model;
 using PropertyGrid.WPF.Demo;
 using PropertyGrid.WPF.Demo.Infrastructure;
 using SoftFluent.Windows.Diagnostics;
+using Application = System.Windows.Application;
 
 namespace SoftFluent.Windows.Samples
 {
@@ -14,16 +20,28 @@ namespace SoftFluent.Windows.Samples
 
             SQLitePCL.Batteries.Init();
 
-            AutoObject.PropertyStore = PropertyStore2.Instance;
-            AutoObject.Context = System.Threading.SynchronizationContext.Current;
+            AutoObject.PropertyStore = PropertyStore.Instance;
+            Collection.Context = System.Threading.SynchronizationContext.Current;
+            BaseActivator.Interfaces = new() { { typeof(IViewModel), typeof(ViewModel) } };
             var window = new Window { Content = new Customer2() };
             window.Show();
-            new ControlWindow(PropertyStore2.Instance.Controllable, PropertyStore2.Instance.History).Show();
+            var controlWindow = new ControlWindow(PropertyStore.Instance.Controllable, PropertyStore.Instance.History);
+            SetOnSecondScreen(controlWindow);
+            controlWindow.Show();
 
             base.OnStartup(e);
 #if DEBUG
             Tracing.Enable();
 #endif
+        }
+
+
+        void SetOnSecondScreen(Window window)
+        {
+            Screen s = Screen.AllScreens[1];
+            System.Drawing.Rectangle r = s.WorkingArea;
+            window.Top = r.Top;
+            window.Left = r.Left;
         }
     }
 }

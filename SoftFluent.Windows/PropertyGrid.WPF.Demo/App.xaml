@@ -5,7 +5,7 @@
     xmlns:local="clr-namespace:PropertyGrid.WPF.Demo.Infrastructure"
     xmlns:samples1="clr-namespace:SoftFluent.Windows.Samples;assembly=PropertyGrid.Demo.Model"
     xmlns:grid="clr-namespace:SoftFluent.Windows;assembly=PropertyGrid"
-    xmlns:prop="clr-namespace:PropertyGrid.WPF;assembly=PropertyGrid.WPF">
+    xmlns:local1="clr-namespace:PropertyGrid.WPF.Demo">
 
     <Application.Resources>
         <ResourceDictionary>
@@ -13,26 +13,12 @@
                 <ResourceDictionary Source="/Infrastructure/Templates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-
-
-            <!--<DataTemplate DataType="{x:Type samples1:Customer2}">
-                    <windows:PropertyGrid
-                        TemplateSelector="{StaticResource TemplateSelector}"
-                        Engine="{x:Static local:Engine.Instance}"
-                        Name="MyGrid"
-                        SelectedObject="{Binding }" />
-                </DataTemplate>-->
-
             <DataTemplate DataType="{x:Type samples1:Customer2}">
-                <prop:PropertyTree
-                        Engine="{x:Static local:Engine.Instance}"                     
-                        SelectedObject="{Binding }" />
+                <local1:PropertyView                                           
+                        DataContext="{Binding }" />
             </DataTemplate>
 
-
-
-
-            <DataTemplate DataType="{x:Type grid:Property}">
+            <DataTemplate DataType="{x:Type grid:PropertyBase}">
                 <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={x:Static local:DefaultConverter.Instance}}" 
                          Width="100" 
                          BorderBrush="ForestGreen"
@@ -40,6 +26,27 @@
             </DataTemplate>
 
 
+            <ItemsPanelTemplate x:Key="StackPanel">
+                <StackPanel></StackPanel>
+            </ItemsPanelTemplate>
+            
+            <ItemsPanelTemplate x:Key="UniformGrid">
+                <UniformGrid></UniformGrid>
+            </ItemsPanelTemplate>
+            
+            <DataTemplate x:Key="Blue" >
+                <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Width="100" 
+                         BorderBrush="DeepSkyBlue"
+                         BorderThickness="2"></TextBox>
+            </DataTemplate>
+
+            <DataTemplate x:Key="Green" >
+                <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                         Width="100" 
+                         BorderBrush="DarkSeaGreen"
+                         BorderThickness="2"></TextBox>
+            </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
