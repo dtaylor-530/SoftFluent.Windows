@@ -1,4 +1,5 @@
 ﻿using PropertyGrid.Abstractions;
+using PropertyGrid.WPF;
 using SoftFluent.Windows.Utilities;
 using System;
 using System.Collections.Generic;
@@ -115,16 +116,12 @@ namespace SoftFluent.Windows
             }
             if (d is PropertyGrid propertyGrid)
             {
-                //var engine = Helper.SelectedObjectPropertyChanged(propertyGrid, e);
-                if (propertyGrid.Engine is IPropertyGridEngine engine)
-                {
-                    //var options = propertyGrid.Options;
-                    var source = engine.Convert(e.NewValue);
-                    //var source = engine.Convert(options);
-                    //propertyGrid.PropertiesSource.Source = new ListSource(source, propertyGrid.context);
-                    propertyGrid.PropertiesGrid.ItemsSource = source;
-                    propertyGrid.ItemsControl.ItemsSource = source;
-                }
+                propertyGrid.RefreshSelectedObject();
+            }
+                        
+            if (d is PropertyTree tree)
+            {
+                tree.RefreshSelectedObject();
             }
 
         }

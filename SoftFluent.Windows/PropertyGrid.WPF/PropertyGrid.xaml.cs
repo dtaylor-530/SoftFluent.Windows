@@ -16,7 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 namespace SoftFluent.Windows
-{ 
+{
     public partial class PropertyGrid : UserControl
     {
 
@@ -67,7 +67,7 @@ namespace SoftFluent.Windows
 
         private int _inheritanceLevel;
         private IPropertyGridEngine engine;
-        private IEnumerable source;
+        private IPropertyNode source;
         public SynchronizationContext context;
 
         public PropertyGrid()
@@ -114,12 +114,10 @@ namespace SoftFluent.Windows
                 return;
             }
 
-            //var options = Options;
             ValueColumn.CellTemplateSelector = TemplateSelector;
-            source =/* await Task.Run(() => */engine.Convert(SelectedObject);//);
-            PropertiesGrid.ItemsSource = source;
-            ItemsControl.ItemsSource = source;
-            //PropertiesSource.Source = new ListSource(source, context);
+            source = engine.Convert(SelectedObject);
+            PropertiesGrid.ItemsSource = source.Children;
+            ItemsControl.ItemsSource = source.Children;
         }
 
 

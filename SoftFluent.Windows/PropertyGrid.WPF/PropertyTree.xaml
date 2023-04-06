@@ -3,20 +3,81 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PropertyGrid.WPF"
+             xmlns:att="http://schemas.utility.com/attached"
+             xmlns:tree="http://schemas.utility.com/trees"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <FrameworkElement.Resources>
+        <ResourceDictionary Source="/Utility.WPF.Controls.Trees;component/TreeListView.xaml"/>
+    </FrameworkElement.Resources>
 
-    <TreeView x:Name="Tree">
+    <tree:TreeListView x:Name="Tree" SizeChanged="Tree_SizeChanged">
+        <TreeView.ItemContainerStyle>
+            <Style TargetType="{x:Type TreeViewItem}" BasedOn="{StaticResource TreeListViewItemStyle}">
+                <Setter Property="IsExpanded" Value="True" />
+            </Style>
+        </TreeView.ItemContainerStyle>
         <TreeView.ItemTemplate>
-            <HierarchicalDataTemplate ItemsSource="{Binding Children}" >
-                <Grid>
-                    <ContentControl Content="{Binding Content}"></ContentControl>
-                    <!--<Ellipse Fill="Red" Height="20" Width="20">
-
-                    </Ellipse>-->
-                </Grid>
-            </HierarchicalDataTemplate>
+            <HierarchicalDataTemplate ItemsSource="{Binding Children}"/>
         </TreeView.ItemTemplate>
-    </TreeView>
+        <tree:TreeListView.Columns>
+            <!--Create the first column containing the expand button and the type name.-->
+            <GridViewColumn Header="Name" Width="200">
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <!--The Expander Button (can be used in any column (typically the first one))-->
+                            <tree:TreeListViewExpander/>
+                            <!--Display the name of the DataElement-->
+                            <TextBlock Text="{Binding Content}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+            <GridViewColumn Header="Children" Width="Auto" >
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <!--Display the size of the DataElement-->
+                        <TextBox Text="{Binding Value, UpdateSourceTrigger=LostFocus}" HorizontalAlignment="Stretch" TextAlignment="Right">
+                            <TextBox.Style>
+                                <Style TargetType="TextBox">                           
+                                    <Setter Property = "att:InputBindingsManager.UpdatePropertySourceWhenEnterPressed" Value="TextBox.Text"/>                             
+                                <Setter Property="BorderThickness" Value="0"></Setter>
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type TextBox}">
+                                                <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                                    <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="false">
+                                                        <Setter Property="Opacity"  Value="0.9"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" Value="true">
+                                                        <Setter Property="BorderBrush" TargetName="border" Value="#FF7EB4EA"/>
+                                                        <Setter Property="BorderThickness" TargetName="border" Value="0.4"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsFocused" Value="true">
+                                                        <Setter Property="BorderBrush" TargetName="border" Value="Black"/>
+                                                        <Setter Property="BorderThickness" TargetName="border" Value="0.4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </TextBox.Style>
+                        </TextBox>
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+            <!--<GridViewColumn Header="Set" Width="100" >
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <Button 
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>-->
+        </tree:TreeListView.Columns>
+    </tree:TreeListView>
 </UserControl>

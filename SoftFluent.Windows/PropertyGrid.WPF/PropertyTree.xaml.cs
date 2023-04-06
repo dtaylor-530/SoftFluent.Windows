@@ -1,32 +1,16 @@
-﻿using Abstractions;
-using Evan.Wpf;
-using PropertyGrid.Abstractions;
+﻿using PropertyGrid.Abstractions;
 using SoftFluent.Windows;
 using System;
-using System.Collections;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
+using Utility.WPF.Controls.Trees;
+using static Evan.Wpf.DependencyHelper;
 
 namespace PropertyGrid.WPF
 {
-    //public class PropertyGridOptions : IPropertyGridOptions
-    //{
-    //    public int InheritanceLevel { get; set; }
-    //    public bool IsReadOnly { get; set; }
-    //    public object Data { get; set; }
-
-    //    public string DefaultCategoryName { get; set; }
-
-    //    public bool DecamelizePropertiesDisplayNames { get; set; }
-    //}
-
     public partial class PropertyTree : UserControl
     {
         public static readonly DependencyProperty
@@ -39,12 +23,10 @@ namespace PropertyGrid.WPF
 
             EngineProperty =
             DependencyProperty.Register("Engine", typeof(IPropertyGridEngine), typeof(PropertyTree),
-               new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsMeasure, EnginePropertyChanged));
-
-        public static readonly DependencyProperty TemplateSelectorProperty = DependencyHelper.Register<DataTemplateSelector>();
-
-
-
+               new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender | FrameworkPropertyMetadataOptions.AffectsMeasure, EnginePropertyChanged)),
+            TemplateSelectorProperty = Register(),
+            SelectionChangedProperty = Register(),
+            SourceProperty = Register();
 
         private static void EnginePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -58,44 +40,37 @@ namespace PropertyGrid.WPF
             BrowseCommand = new(), NavigateCommand = new(), RefreshCommand = new();
 
 
-        private int _inheritanceLevel;
         private IPropertyGridEngine engine;
-        private IEnumerable source;
         public SynchronizationContext context;
 
         public PropertyTree()
         {
             InitializeComponent();
-
+            Tree.SelectedItemChanged += Tree_SelectedItemChanged;
 
             context = SynchronizationContext.Current ?? throw new Exception("4g4e&&&&&");
 
         }
 
 
-        //public IPropertyGridOptions Options => new PropertyGridOptions
-        //{
-        //    IsReadOnly = this.IsReadOnly,
-        //    InheritanceLevel = _inheritanceLevel,
-        //    Data = SelectedObject,
-        //    DecamelizePropertiesDisplayNames = this.DecamelizePropertiesDisplayNames,
-        //    DefaultCategoryName = this.DefaultCategoryName
-        //};
+        private void Tree_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
 
-
-
-
-        //public async Task InvokeAsync(Action action)
-        //{
-        //    await this.Dispatcher.InvokeAsync(action);
-        //}
+        }
 
         public virtual string DefaultCategoryName { get; set; } = CategoryAttribute.Default.Category;
 
+        private void Tree_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
 
-
-
-
+            TreeListView _ListView = sender as TreeListView;
+            var _ActualWidth = _ListView.ActualWidth - SystemParameters.VerticalScrollBarWidth - _ListView.Columns[0].Width;
+            var separateWidth = (_ActualWidth * 1d) / (_ListView.Columns.Count-1);
+            for (int i = 1; i < _ListView.Columns.Count; i++)
+            {
+                _ListView.Columns[i].Width = separateWidth;
+            }
+        }
 
         public virtual async void RefreshSelectedObject()
         {
@@ -105,19 +80,10 @@ namespace PropertyGrid.WPF
                 return;
             }
 
-            //var options = Options;
+            Source = engine.Convert(SelectedObject);
+            Tree.ItemsSource = new[] { Source };
 
-            source =/* await Task.Run(() => */engine.Convert(SelectedObject);//);
-            Tree.ItemsSource = new[] { source };
-
-            //PropertiesSource.Source = new ListSource(source, context);
         }
-
-        //public virtual void UpdateCellBindings(IProperty dataItem, string childName, Func<Binding, bool> where, Action<BindingExpression> action)
-        //{
-        //    Helper.UpdateBindings(this, dataItem, childName, where, action);
-        //}
-
 
 
         #region DependencyProperties
@@ -128,15 +94,11 @@ namespace PropertyGrid.WPF
             set { SetValue(EngineProperty, value); }
         }
 
-
-
         public object SelectedObject
         {
             get => GetValue(SelectedObjectProperty);
             set => SetValue(SelectedObjectProperty, value);
         }
-
-
 
         public DataTemplateSelector TemplateSelector
         {
@@ -144,12 +106,22 @@ namespace PropertyGrid.WPF
             set { SetValue(TemplateSelectorProperty, value); }
         }
 
+        public ICommand SelectionChanged
+        {
+            get { return (ICommand)GetValue(SelectionChangedProperty); }
+            set { SetValue(SelectionChangedProperty, value); }
+        }
+
+        public IPropertyNode Source
+        {
+            get { return (IPropertyNode)GetValue(SourceProperty); }
+            set { SetValue(SourceProperty, value); }
+        }
+
+
 
         #endregion DependencyProperties
 
-
-
-
     }
-    
+
 }

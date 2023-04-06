@@ -1,4 +1,5 @@
 ﻿using Abstractions;
+using PropertyGrid.Demo.Model;
 using System;
 using System.IO;
 using System.Windows;
@@ -22,7 +23,7 @@ namespace PropertyGrid.WPF.Infrastructure
             //FileStream s = new FileStream(TemplateConstants.FileName, FileMode.Open);
             //var resourceDictionary = (ResourceDictionary)XamlReader.Load(s);
 
-            if (item is IProperty { TemplateKey: var key } property)
+            if (item is IProperty { ViewModel: ViewModel { Template: { DataTemplateKey: var key } viewModel } property })
             {
 
             }
