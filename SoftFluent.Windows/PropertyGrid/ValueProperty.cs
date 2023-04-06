@@ -1,17 +1,12 @@
-using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
-using Abstractions;
 using Extensions = Utilities.Extensions;
 
 namespace SoftFluent.Windows
 {
-
-
-
-    public class Property : PropertyBase
+    public class ValueProperty : PropertyBase
     {
-        public Property(Guid guid) : base(guid)
+        public ValueProperty(Guid guid) : base(guid)
         {
         }
         public override string Name => Descriptor.Name;
@@ -43,8 +38,7 @@ namespace SoftFluent.Windows
         {
             get
             {
-                var property = this.GetProperty(PropertyType) ?? Descriptor.GetValue(Data);
-                return property;
+                return this.GetProperty(PropertyType) ?? Descriptor.GetValue(Data); 
             }
             set
             {
@@ -84,18 +78,6 @@ namespace SoftFluent.Windows
 
             return ConversionHelper.TryChangeType(value, type, provider, out changedValue);
         }
-
-
-        //public string TemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
-
-
-        //public string EditorTemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
-
-
-        //public string PanelKey { get => GetProperty<string>(); set => SetProperty(value); }
-
-
-
 
 
         //int IComparable.CompareTo(object? obj)

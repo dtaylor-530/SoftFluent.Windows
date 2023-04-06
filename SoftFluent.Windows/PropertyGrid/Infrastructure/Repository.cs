@@ -88,7 +88,6 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
                     if (lastWithSameValue == 0)
                     {
                         c.Execute($"Update '{tableName}' Set Removed = '{DateTime.Now}' where Removed == null");
-                        //await connection.InsertAsync(new Property { Guid = Guid.NewGuid(), Added = DateTime.Now, Value = JsonConvert.SerializeObject(value) });
                         c.Execute($"INSERT INTO '{tableName}' (Guid,Added,Removed, Value) VALUES('{Guid.NewGuid()}','{DateTime.Now}',null,'{value}')");
                     }
                 });
@@ -111,8 +110,6 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
             if (tables.Count == 0)
             {
                 var types = await connection.QueryAsync<Type>($"Select * from 'Type' where Assembly = '{type.Assembly.FullName}' AND Namespace = '{type.Namespace}' AND Name = '{type.Name}'");
-                //throw new Exception("2241!43 ere 4323");
-                //var max = await connection.ExecuteScalarAsync<int>("SELECT MAX(Id) FROM Table");
                 await connection.RunInTransactionAsync(c =>
                 {
 

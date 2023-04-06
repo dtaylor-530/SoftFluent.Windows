@@ -15,6 +15,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\Utility.Breadcrumb\Models\Models.csproj" />
+    <ProjectReference Include="..\..\..\Utility.Enums\Utility.Enums\Utility.Enums.csproj" />
+    <ProjectReference Include="..\..\..\Utility.WPF\Utility.Commands\Utility.Commands.csproj" />
     <ProjectReference Include="..\PropertyGrid.Abstractions\PropertyGrid.Abstractions.csproj" />
   </ItemGroup>
 

@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Threading;
-using System.Threading.Tasks;
 using Abstractions;
+using Models;
+using SoftFluent.Windows;
 using Key = SoftFluent.Windows.Key;
 
 namespace PropertyGrid.WPF.Demo.Infrastructure
 {
-    public record PropertyChange(string Name, object Value) : IPropertyChange;
+    public record PropertyChange(IKey Key, object Value) : IPropertyChange;
     public class Order
     {
         public Key Key { get; set; }
@@ -66,9 +59,14 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
     {
         public List<IObserver<object>> observers = new();
 
-        ObservableCollection<Order> past = new();
-        ObservableCollection<Order> present = new();
-        ObservableCollection<Order> future = new();
+        ThreadSafeObservableCollection<Order> past = new();
+        ThreadSafeObservableCollection<Order> present = new();
+        ThreadSafeObservableCollection<Order> future = new();
+
+        public History()
+        {
+            ThreadSafeObservableCollection<Order>.Context = SynchronizationContext.Current;
+        }
 
         public IEnumerable Past => past;
 
@@ -133,90 +131,60 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
     }
 
 
-    public class PropertyStore2 : IPropertyStore, IObserver<ControlType>, IObserver<object>
+    public class PropertyStore : IPropertyStore, IObserver<ControlType>, IObserver<object>
     {
-        Dictionary<IKey, IObserver> dictionary = new(new KeyComparer());
-        Dictionary<IKey, object> store = new();
-        private readonly DirectoryInfo directory;
-        Repository repo;
-        IHistory history = new History();
-        IControllable controllable = new Controllable();
-        SynchronizationContext context = SynchronizationContext.Current;
-        //IDisposable disposable = new Disposer();
+        readonly Dictionary<IKey, IObserver> dictionary = new(new KeyComparer());
 
-        private PropertyStore2()
+        private readonly DirectoryInfo directory;
+        readonly Repository repo;
+        readonly History history = new();
+        readonly Controllable controllable = new();
+        readonly System.Timers.Timer timer = new(TimeSpan.FromSeconds(0.1));
+
+        private PropertyStore()
         {
             directory = Directory.CreateDirectory("../../../Data");
             repo = new(directory.FullName);
             controllable.Subscribe(this);
             history.Subscribe(this);
 
+            timer.Elapsed += Timer_Elapsed;
+
+        }
+
+        private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            if (history.Future.GetEnumerator().MoveNext())
+                history.Forward();
         }
 
         public IHistory History => history;
         public IControllable Controllable => controllable;
 
-        public T GetValue<T>(IKey key)
+
+        public void GetValue(IKey key)
         {
-            if (key is not Key { Guid: var guid, Name: var name } _key)
+            if (key is not Key { Guid: var guid, Name: var name, Type: var type } _key)
             {
                 throw new Exception("reg 43cs ");
             }
 
             Observable
-                .Return(new Order { Key = _key, OrderType = OrderType.Get, Type = typeof(T) })
-                .SubscribeOn(context)
-                .Subscribe(history.Add);
+                .Return(new Order { Key = _key, OrderType = OrderType.Get, Type = type })
 
-            return store.ContainsKey(key) ? (T?)store[key] : default;
-        }
-
-        public object GetValue(IKey key, System.Type type)
-        {
-            if (key is not Key { Guid: var guid, Name: var name } _key)
-            {
-                throw new Exception("reg 43cs ");
-            }
-
-            if (store.ContainsKey(key) == false)
-            {
-                Observable
-                    .Return(new Order { Key = _key, OrderType = OrderType.Get, Type = type })
-                    .SubscribeOn(context)
-                    .Subscribe(history.Add);
-
-                return default;
-            }
-            return store[key];
-        }
-
-        public void SetValue<T>(IKey key, T value)
-        {
-            if (key is not Key { Guid: var guid, Name: var name } _key)
-            {
-                throw new Exception("reg 43cs ");
-            }
-            Observable
-                .Return(new Order { Key = _key, OrderType = OrderType.Set, Value = value, Type = typeof(T) })
-                .SubscribeOn(context)
                 .Subscribe(history.Add);
         }
 
-
-
-        public void SetValue(IKey key, object value, System.Type type)
+        public void SetValue(IKey key, object value)
         {
-            if (key is not Key { Guid: var guid, Name: var name } _key)
+            if (key is not Key { Guid: var guid, Name: var name, Type: var type } _key)
             {
                 throw new Exception("reg 43cs ");
             }
             Observable
                 .Return(new Order { Key = _key, OrderType = OrderType.Set, Value = value, Type = type })
-                .SubscribeOn(context)
                 .Subscribe(history.Add);
         }
-
-
 
         public IDisposable Subscribe(IObserver observer)
         {
@@ -229,8 +197,12 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
             return string.Empty;
         }
 
-        public async Task<Guid> GetGuidByParent(Guid guid, string? name, System.Type type)
+        public async Task<Guid> GetGuidByParent(IKey key)
         {
+            if (key is not Key { Guid: var guid, Name: var name, Type: var type } _key)
+            {
+                throw new Exception("reg 43cs ");
+            }
             return await repo.FindOrCreateKeyByParent(guid, name, type);
         }
         public async Task<Guid> GetGuid(Guid guid, string? name, System.Type type)
@@ -252,6 +224,12 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
         {
             switch (value)
             {
+                case ControlType.Pause:
+                    timer.Stop();
+                    break;
+                case ControlType.Play:
+                    timer.Start();
+                    break;
                 case ControlType.Forward:
                     history.Forward();
                     break;
@@ -260,7 +238,6 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
                     break;
             }
         }
-
 
         public async void OnNext(object value)
         {
@@ -310,16 +287,10 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
 
         private void Update(object a, Order order)
         {
-            if (store.ContainsKey(order.Key) && store[order.Key].Equals(a))
-                return;
-            {
-                store[order.Key] = a;
-                dictionary[order.Key].OnNext(new PropertyChange(order.Key.Name, a));
-            }
+            dictionary[order.Key].OnNext(new PropertyChange(order.Key, a));
         }
 
-        public static PropertyStore2 Instance { get; } = new();
-
+        public static PropertyStore Instance { get; } = new();
 
         class KeyComparer : IEqualityComparer<IKey>
         {

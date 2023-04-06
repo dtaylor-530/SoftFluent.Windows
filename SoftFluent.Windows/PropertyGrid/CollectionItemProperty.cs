@@ -1,15 +1,8 @@
-using System.Collections;
-using System.ComponentModel;
-using System.Globalization;
-using System.Runtime.CompilerServices;
-using Abstractions;
-using Extensions = Utilities.Extensions;
-
 namespace SoftFluent.Windows
 {
-    public class CollectionProperty : PropertyBase
+    public class CollectionItemProperty : PropertyBase
     {
-        public CollectionProperty(Guid guid) : base(guid)
+        public CollectionItemProperty(Guid guid) : base(guid)
         {         
         }
 
@@ -21,8 +14,6 @@ namespace SoftFluent.Windows
 
         public virtual string? Category => "Collection-Item";            
 
-        public virtual string Description { get => GetProperty<string>(); set => SetProperty(value); }
-
         public override object? Value
         {
             get => Data;
@@ -31,11 +22,6 @@ namespace SoftFluent.Windows
                 throw new Exception("g 4sdffsd");
             }
         }
-
-        public string TemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
-
-
-        public string EditorTemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
 
         public bool IsValueType => PropertyType.IsValueType;
 

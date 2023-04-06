@@ -5,20 +5,25 @@ using Models;
 using System;
 using Trees;
 using Utility.Observables;
+using PropertyGrid.Abstractions;
+using System.ComponentModel;
+using SoftFluent.Windows.Utilities;
 
 namespace SoftFluent.Windows
 {
-
-    public class PropertyNode : AutoObject, INode, IEnumerable, INotifyCollectionChanged
+    public class PropertyNode : AutoObject, INode, IPropertyNode, INotifyCollectionChanged
     {
         protected Collection _children = new();
         protected Collection _branches = new();
         protected Collection _leaves = new();
         bool flag = false;
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
+        Lazy<DescriptorFilters> lazyPredicates;
+        DescriptorFilters predicates;
 
         public PropertyNode(Guid guid) : base(guid)
         {
+            lazyPredicates = new(() => new DefaultFilter(Data));
             _children.CollectionChanged += (s, e) => CollectionChanged?.Invoke(this, e);
         }
         public INode Parent { get; set; }
@@ -81,11 +86,7 @@ namespace SoftFluent.Windows
 
         public object Data { get; set; }
 
-        public IEnumerator GetEnumerator()
-        {
-            _ = RefreshAsync();
-            return _children.GetEnumerator();
-        }
+        IEnumerable IPropertyNode.Children => this.Children;
 
         protected virtual async Task<bool> RefreshAsync()
         {
@@ -94,18 +95,19 @@ namespace SoftFluent.Windows
 
             flag = true;
 
-            PropertyHelper.Instance
-                .GenerateProperties(Data)
+            PropertyFilter
+                .Instance
+                .FilterProperties(Data, Guid, Predicates)
                    .Subscribe(prop =>
                    {
                        if (prop.IsValueType || prop.IsString)
                        {
-                           Context.Post(a => { _leaves.Add(a); }, prop);
+                          _leaves.Add(prop);
                        }
                        else
-                           Context.Post(a => { _branches.Add(a); }, prop);
+                            _branches.Add( prop);
 
-                       Context.Post(a => { _children.Add(a); }, prop);
+                       _children.Add(prop);
                    });
 
             return await Task.FromResult(true);
@@ -116,12 +118,28 @@ namespace SoftFluent.Windows
             return Task.FromResult(flag == false);
         }
 
+        public DescriptorFilters Predicates { get => predicates ?? lazyPredicates.Value; set => predicates = value; }
+    }
 
-        public Task<object?> GetChildren() => throw new NotImplementedException();
 
-        public Task<object?> GetProperties()
+    public class DefaultFilter : DescriptorFilters
+    {
+        List<Predicate<PropertyDescriptor>> predicates;
+        public DefaultFilter(object data)
         {
-            throw new NotImplementedException();
+            var type = data.GetType();
+            predicates = new(){
+                new Predicate<PropertyDescriptor>(descriptor=>
+            {
+                      int level = descriptor.ComponentType.InheritanceLevel(type);
+
+                   return level == 0 /*<= options.InheritanceLevel*/ && descriptor.IsBrowsable;
+            }) };
+        }
+
+        public override IEnumerator<Predicate<PropertyDescriptor>> GetEnumerator()
+        {
+            return predicates.GetEnumerator();
         }
     }
 }

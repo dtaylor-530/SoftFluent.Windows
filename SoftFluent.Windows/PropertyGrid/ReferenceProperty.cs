@@ -1,32 +1,30 @@
-using System.Collections;
-using Abstractions;
+using System.ComponentModel;
 using Extensions = Utilities.Extensions;
 
 namespace SoftFluent.Windows
 {
-
-
-    public abstract class PropertyBase : PropertyNode, IProperty
+    public class ReferenceProperty : PropertyBase
     {
-
-
-        public PropertyBase(Guid guid) : base(guid)
+        public ReferenceProperty(Guid guid) : base(guid)
         {
         }
-
-        public virtual string Name { get; }
-        public bool IsCollection => PropertyType != null ? PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(PropertyType) : false;
+        public override string Name => Descriptor.Name;
+        public string DisplayName => Descriptor.DisplayName;
+        public override bool IsReadOnly => Descriptor.IsReadOnly;
         public bool IsFlagsEnum => Extensions.IsFlagsEnum(PropertyType);
-        public bool IsValueType => PropertyType.IsValueType;
-        public virtual int CollectionCount => Value is IEnumerable enumerable ? enumerable.Cast<object>().Count() : 0;
-        public virtual Type CollectionItemPropertyType => !IsCollection ? null : Extensions.GetElementType(PropertyType);
-        public virtual bool IsCollectionItemValueType => CollectionItemPropertyType != null && CollectionItemPropertyType.IsValueType;
-        public virtual bool IsError { get => GetProperty<bool>(); set => SetProperty(value); }
-        public virtual Type PropertyType => Data.GetType();
-        public abstract bool IsReadOnly { get; }
+
+        public virtual string? Category => string.IsNullOrWhiteSpace(Descriptor.Category) ||
+                Extensions.EqualsIgnoreCase(Descriptor.Category, CategoryAttribute.Default.Category)
+                    ? null
+                    : Descriptor.Category;
+        public virtual TypeConverter Converter => Descriptor.Converter;
+
+        public virtual PropertyDescriptor Descriptor { get; set; }
+
+        public override Type PropertyType => Descriptor.PropertyType;
+
         public override object Content =>  Name;
-        public IViewModel ViewModel { get; set; } 
-   
+
         protected override async Task<bool> RefreshAsync()
         {
             if ((PropertyType.IsValueType || PropertyType ==typeof(string)) != true)
@@ -35,9 +33,16 @@ namespace SoftFluent.Windows
             return await Task.FromResult(true);
         }
 
-        public abstract object Value { get; set; }
+        public override object? Value
+        {
+            get
+            {
+                var property =Data;
+                return property;
+            }
+            set => throw new Exception("aa 4 43321``");
+        }
 
-        public bool IsString => PropertyType == typeof(string);
 
         public override string ToString()
         {
@@ -54,11 +59,18 @@ namespace SoftFluent.Windows
             return ConversionHelper.TryChangeType(value, type, provider, out changedValue);
         }
 
+
         //public string TemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
+
 
         //public string EditorTemplateKey { get => GetProperty<string>(); set => SetProperty(value); }
 
+
         //public string PanelKey { get => GetProperty<string>(); set => SetProperty(value); }
+
+
+
+
 
         //int IComparable.CompareTo(object? obj)
         //{
@@ -89,5 +101,7 @@ namespace SoftFluent.Windows
 
         //    return string.Compare(DisplayName, other.DisplayName, StringComparison.OrdinalIgnoreCase);
         //}
+
+
     }
 }
