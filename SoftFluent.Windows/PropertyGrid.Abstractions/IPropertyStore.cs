@@ -14,7 +14,7 @@
     public interface IPropertyChange
     {
         //public IEnumerable<IPropertyResult> Results { get; set; }
-        public string Name { get; }
+        public IKey Key { get; }
         public object Value { get; }
     }
 
@@ -37,13 +37,10 @@
 
     public interface IPropertyStore
     {
-        public T GetValue<T>(IKey key);
-        public void SetValue<T>(IKey key, T value);
+        public void GetValue(IKey key);
+        public void SetValue(IKey key, object value);
 
-        public object GetValue(IKey key, Type type);
-        public void SetValue(IKey key, object value, Type type);
-
-        public Task<Guid> GetGuidByParent(Guid guid, string Name, Type type);
+        public Task<Guid> GetGuidByParent(IKey key);
 
         IDisposable Subscribe(IObserver observer);
         string Validate(string memberName);
