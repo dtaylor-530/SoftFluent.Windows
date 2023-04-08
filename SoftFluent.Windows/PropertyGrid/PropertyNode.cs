@@ -8,6 +8,7 @@ using Utility.Observables;
 using PropertyGrid.Abstractions;
 using System.ComponentModel;
 using SoftFluent.Windows.Utilities;
+using PropertyGrid.Infrastructure;
 
 namespace SoftFluent.Windows
 {

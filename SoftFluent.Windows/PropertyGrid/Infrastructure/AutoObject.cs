@@ -1,20 +1,18 @@
 ﻿using Abstractions;
+using SoftFluent.Windows;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Windows.Input;
 using System.Xml.Serialization;
-using Utility.Commands;
-using Utility.Enums;
 
-namespace SoftFluent.Windows
+namespace PropertyGrid.Infrastructure
 {
 
     public record Key(Guid Guid, string Name, Type Type) : IKey
     {
         public bool Equals(IKey? other)
         {
-            return this.Equals(other as Key);
+            return Equals(other as Key);
         }
 
         public override int GetHashCode()
@@ -51,7 +49,7 @@ namespace SoftFluent.Windows
 
             //setCommand.Subscribe(a =>
             //{
-            
+
             //});
         }
 
@@ -189,15 +187,15 @@ namespace SoftFluent.Windows
         protected virtual object GetProperty(Type type, [CallerMemberName] string? name = null)
         {
             disposable ??= PropertyStore.Subscribe(this);
-            var key = new Key(this.guid, name, type);
-        
-            if(store.ContainsKey(key))
+            var key = new Key(guid, name, type);
+
+            if (store.ContainsKey(key))
             {
                 return store[key];
             }
             PropertyStore.GetValue(key);
 
-            return  default;
+            return default;
         }
 
 
@@ -238,7 +236,7 @@ namespace SoftFluent.Windows
         public bool SetProperty(object value, Type type, [CallerMemberName] string name = null)
         {
             disposable ??= PropertyStore.Subscribe(this);
-            var key = new Key(this.guid, name, type);
+            var key = new Key(guid, name, type);
             store[key] = value;
             PropertyStore.SetValue(key, value);
             return true;
@@ -257,20 +255,20 @@ namespace SoftFluent.Windows
 
         public bool Equals(IKey? other)
         {
-            return this.Guid == ((other as AutoObject)?.Guid ?? (other as Key)?.Guid);
+            return Guid == ((other as AutoObject)?.Guid ?? (other as Key)?.Guid);
         }
 
 
         public override int GetHashCode()
         {
-            return this.Guid.GetHashCode();
+            return Guid.GetHashCode();
         }
 
 
         public void OnNext(IPropertyChange propertyResult)
         {
             store[propertyResult.Key] = propertyResult.Value;
-            if (propertyResult.Key is Key {Name:var name })
+            if (propertyResult.Key is Key { Name: var name })
             {
                 OnPropertyChanged(name);
                 return;

@@ -6,8 +6,8 @@ using System.Windows.Input;
 using Abstractions;
 using Models;
 using PropertyGrid.Demo.Model;
+using PropertyGrid.Infrastructure;
 using PropertyGrid.WPF.Demo;
-using PropertyGrid.WPF.Demo.Infrastructure;
 using SoftFluent.Windows.Diagnostics;
 using Application = System.Windows.Application;
 

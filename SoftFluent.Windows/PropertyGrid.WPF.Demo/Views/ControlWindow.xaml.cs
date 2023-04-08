@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using Utility.Commands;
+using Utility.Enums;
 
 namespace PropertyGrid.WPF.Demo
 {
@@ -7,36 +9,38 @@ namespace PropertyGrid.WPF.Demo
     /// </summary>
     public partial class ControlWindow : Window
     {
-        private readonly IControllable controllable;
-        private readonly IHistory history;
-
         public ControlWindow(IControllable controllable, IHistory history)
         {
             InitializeComponent();
-            this.controllable = controllable;
-            this.history = history;
 
-            HistoryPanel.DataContext = history; 
-        }
+            HistoryPanel.DataContext = history;
 
-        private void Back_Click(object sender, RoutedEventArgs e)
-        {
-            controllable.Back();
-        }
+            StepButtons.Enabled = Step.Walk| Step.Backward| Step.Forward ;
 
-        private void Play_Click(object sender, RoutedEventArgs e)
-        {
-            controllable.Play();
-        }
-
-        private void Pause_Click(object sender, RoutedEventArgs e)
-        {
-            controllable.Pause();
-        }
-
-        private void Forward_Click(object sender, RoutedEventArgs e)
-        {
-            controllable.Forward();
+            StepButtons.Command = new Command<Step>(step =>
+            {
+                switch (step)
+                {
+                    case Step.None:
+                        break;
+                    case Step.Backward:
+                        controllable.Back();
+                        break;
+                    case Step.Forward:
+                        controllable.Forward();             
+                        break;
+                    case Step.Walk:
+                        controllable.Play();
+                        StepButtons.Enabled = Step.Wait;
+                        break;
+                    case Step.Wait:
+                        controllable.Pause();
+                        StepButtons.Enabled = Step.Walk | Step.Backward | Step.Forward;
+                        break;
+                    case Step.All:
+                        break;
+                }
+            });
         }
     }
 }

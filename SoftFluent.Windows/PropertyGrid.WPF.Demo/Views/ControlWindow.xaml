@@ -4,84 +4,92 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PropertyGrid.WPF.Demo"
-        xmlns:infra="clr-namespace:PropertyGrid.WPF.Demo.Infrastructure;assembly=PropertyGrid"
+        xmlns:infra="clr-namespace:PropertyGrid.Infrastructure;assembly=PropertyGrid"
+        xmlns:conv="http://schemas.utility.com/converters"
         xmlns:wpf="clr-namespace:UtilityWpf.Panels"
+        xmlns:btn="http://schemas.utility.com/buttons" xmlns:st="http://schemas.spicytaco.io/"
         mc:Ignorable="d"
         FontSize="20"
         Title="ControlWindow" Height="300" Width="400">
     <FrameworkElement.Resources>
-        <DataTemplate x:Key="PastTemplate" DataType="{x:Type infra:Order}">
-            <Viewbox Height="60">
-                <UniformGrid Height="30" Rows="1">
 
-                    <TextBlock Text="{Binding Key}"></TextBlock>
-                    <Ellipse Fill="Orange" Height="16" Width="16"/>
-                    <TextBlock Text="{Binding OrderType}"></TextBlock>
-                    <TextBlock Text="{Binding Type}"></TextBlock>
-                    <TextBlock Text="{Binding Value}"></TextBlock>
-                </UniformGrid>
+        <DataTemplate DataType="{x:Type infra:Key}">
+            <UniformGrid Height="30" Rows="1" >
+                <Viewbox >
+                    <Border  Background="White" AutomationProperties.IsRowHeader="False">
+                        <ContentControl 
+                            ToolTip="{Binding Guid}"
+                            Content="{Binding Guid, Converter={x:Static conv:GravatarConverter.Instance}}"></ContentControl>
+                    </Border>
+                </Viewbox>
+                <TextBlock Text="{Binding Name}"></TextBlock>
+                <TextBlock Text="{Binding Type.Name}"></TextBlock>
+            </UniformGrid>
+
+        </DataTemplate>
+
+
+        <DataTemplate DataType="{x:Type infra:Order}">
+            <Viewbox>
+                <st:AutoGrid Columns="400,50,*" Background="Transparent" >
+                    <Border BorderThickness="1" BorderBrush="Transparent" Background="White">
+                        <ContentControl Content="{Binding Key}"></ContentControl>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Transparent" Background="White">
+                        <TextBlock Text="{Binding OrderType}" HorizontalAlignment="Center"></TextBlock>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Transparent" Background="White" MinWidth="30">
+                        <TextBlock Text="{Binding Value}"></TextBlock>
+                    </Border>
+                </st:AutoGrid>
             </Viewbox>
         </DataTemplate>
 
-        <DataTemplate x:Key="PresentTemplate">
-            <Viewbox Height="30">
-                <UniformGrid Height="30" Rows="1">
-
-                    <TextBlock Text="{Binding Key}"></TextBlock>
-                    <Ellipse Fill="Green" Height="16" Width="16"/>
-                    <TextBlock Text="{Binding OrderType}"></TextBlock>
-                    <TextBlock Text="{Binding Type}"></TextBlock>
-                    <TextBlock Text="{Binding Value}"></TextBlock>
-                </UniformGrid>
-            </Viewbox>
-        </DataTemplate>
-
-        <DataTemplate x:Key="FutureTemplate">
-            <Viewbox Height="30">
-
-                <UniformGrid  Rows="1">
-
-                    <TextBlock Text="{Binding Key}"></TextBlock>
-                    <Ellipse Fill="Blue" Height="16" Width="16"/>
-                    <TextBlock Text="{Binding OrderType}"></TextBlock>
-                    <TextBlock Text="{Binding Type}"></TextBlock>
-                    <TextBlock Text="{Binding Value}"></TextBlock>
-                </UniformGrid>
-            </Viewbox>
-        </DataTemplate>
     </FrameworkElement.Resources>
-    <Grid >
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"></RowDefinition>
-            <RowDefinition Height="30"></RowDefinition>
-            <RowDefinition ></RowDefinition>
-        </Grid.RowDefinitions>
-        <UniformGrid Rows="1" Grid.Row="0" >
-            <Button Content="&lt;" Click="Back_Click"/>
-            <Button Click="Play_Click">|></Button>
-            <Button Click="Pause_Click">||</Button>
-            <Button Content=">" Click="Forward_Click"></Button>
-        </UniformGrid>
+
+
+    <st:AutoGrid Rows="50,30,*" Columns="*" x:Name="Top" >
+
+        <btn:StepButtons x:Name="StepButtons"></btn:StepButtons>
 
         <UniformGrid  Grid.Row="1" Rows="1"  Background="Beige">
             <TextBlock Text="{Binding ElementName=Past, Path=Items.Count}" HorizontalAlignment="Center"></TextBlock>
-            <Ellipse Height="40" Width="40"></Ellipse>     
+            <Ellipse Height="40" Width="40"></Ellipse>
             <TextBlock Text="{Binding ElementName=Present, Path=Items.Count}" HorizontalAlignment="Center"></TextBlock>
             <Ellipse Height="40" Width="40"></Ellipse>
             <TextBlock Text="{Binding ElementName=Future, Path=Items.Count}" HorizontalAlignment="Center"></TextBlock>
         </UniformGrid>
-        <wpf:UniformStackPanel Grid.Row="2" x:Name="HistoryPanel">
 
+
+        <wpf:UniformStackPanel x:Name="HistoryPanel" Grid.Row="3">
             <ScrollViewer>
-                <ItemsControl x:Name="Past" ItemTemplate="{StaticResource PastTemplate}" ItemsSource="{Binding Past}"/>
+                <ItemsControl x:Name="Past"  ItemsSource="{Binding Past}" Background="LightGreen"/>
             </ScrollViewer>
             <ScrollViewer>
-                <ItemsControl x:Name="Present" ItemTemplate="{StaticResource PresentTemplate}" ItemsSource="{Binding Present}"/>
+                <ItemsControl x:Name="Present"  ItemsSource="{Binding Present}" Background="LightYellow"/>
             </ScrollViewer>
             <ScrollViewer>
-                <ItemsControl x:Name="Future" ItemTemplate="{StaticResource FutureTemplate}" ItemsSource="{Binding Future}">
+                <ItemsControl x:Name="Future" ItemsSource="{Binding Future}" Background="LightBlue">
                 </ItemsControl>
+                <!--<ListView  Name="Future"  ItemsSource="{Binding Future}">
+                    <ListView.View>
+                        <GridView  >
+                            <GridViewColumn Header="Key" Width="200" DisplayMemberBinding="{Binding Key}" CellTemplate="{StaticResource Key}">
+                                -->
+                <!--<GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ContentControl Background="LightBlue"  Content="{Binding Key}"></ContentControl>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>-->
+                <!--
+                            </GridViewColumn>
+                            <GridViewColumn Header="Type" Width="50" DisplayMemberBinding="{Binding OrderType}" />
+                            <GridViewColumn Header="Value" Width="Auto" DisplayMemberBinding="{Binding Value}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>-->
             </ScrollViewer>
         </wpf:UniformStackPanel>
-    </Grid>
+    </st:AutoGrid>
+
 </Window>

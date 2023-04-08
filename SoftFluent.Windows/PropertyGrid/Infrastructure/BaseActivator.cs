@@ -1,10 +1,6 @@
-﻿using SoftFluent.Windows.Utilities;
-using System;
-//using PropertyGrid.Infrastructure;
-using PropertyGrid.WPF.Demo.Infrastructure;
-using System.Threading.Tasks;
-using Abstractions;
+﻿using Abstractions;
 using System.ComponentModel;
+using PropertyGrid.Infrastructure;
 
 namespace SoftFluent.Windows
 {
