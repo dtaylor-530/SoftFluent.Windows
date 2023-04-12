@@ -1,6 +1,8 @@
 ﻿namespace Abstractions
 {
 
+    public record KeyValue(IKey Key, object Value);
+
     public interface IKey : IEquatable<IKey>
     {
 

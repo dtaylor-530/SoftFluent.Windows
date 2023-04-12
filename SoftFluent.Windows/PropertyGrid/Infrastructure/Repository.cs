@@ -1,4 +1,7 @@
 ﻿
+using Abstractions;
+using PropertyGrid.Abstractions;
+using PropertyGrid.Infrastructure;
 using SoftFluent.Windows;
 using SQLite;
 using System.Globalization;
@@ -44,7 +47,7 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
 
 
 
-    public class Repository
+    public class Repository : IRepository
     {
         protected readonly SQLiteAsyncConnection connection;
         private Task initialisationTask;
@@ -66,11 +69,16 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
         }
 
 
-        public async Task Update(Guid key, object value)
+        public async Task UpdateValue(IKey key, object value)
         {
+            if (key is not Key { Guid: var guid, Name: var name, Type: var type } _key)
+            {
+                throw new Exception("reg 43cs ");
+            }
+
             await initialisationTask;
 
-            var tables = await connection.Table<Table>().Where(v => v.Guid.Equals(key)).ToListAsync();
+            var tables = await connection.Table<Table>().Where(v => v.Guid.Equals(guid)).ToListAsync();
 
             if (tables.Count == 1)
             {
@@ -103,49 +111,53 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
         }
 
 
-        public async Task<Guid> FindOrCreateKey(Guid guid, string name, System.Type type)
+        //public async Task<Guid> FindOrCreateKey(Guid guid, string name, System.Type type)
+        //{
+        //    await initialisationTask;
+        //    var tables = await connection.QueryAsync<Table>($"Select * from 'Table' where Guid = '{guid}' AND Name = '{name}'");
+        //    if (tables.Count == 0)
+        //    {
+        //        var types = await connection.QueryAsync<Type>($"Select * from 'Type' where Assembly = '{type.Assembly.FullName}' AND Namespace = '{type.Namespace}' AND Name = '{type.Name}'");
+        //        await connection.RunInTransactionAsync(c =>
+        //        {
+
+        //            int typeId;
+        //            if (types.Count == 0)
+        //            {
+        //                c.Insert(new Type { Assembly = type.Assembly.FullName, Namespace = type.Namespace, Name = type.Name });
+        //                typeId = c.ExecuteScalar<int>("Select Max(Id) from 'Type'");
+        //            }
+        //            else if (types.Count == 1)
+        //            {
+        //                typeId = types.Single().Id;
+        //            }
+        //            else
+        //                throw new Exception("56f 34 4");
+
+        //            var i = c.Insert(new Table { Guid = guid, Name = name, Parent = null, Type = typeId });
+
+        //        });
+        //        return guid;
+        //    }
+        //    else if (tables.Count == 1)
+        //    {
+        //        return tables.Single().Guid;
+        //    }
+        //    else
+        //    {
+        //        throw new Exception("e99re 4323");
+        //    }
+        //}
+
+
+        public async Task<IKey> FindKeyByParent(IKey key)
         {
+            if (key is not Key { Guid: var parent, Name: var name, Type: var type } _key)
+            {
+                throw new Exception("reg 43cs ");
+            }
+
             await initialisationTask;
-            var tables = await connection.QueryAsync<Table>($"Select * from 'Table' where Guid = '{guid}' AND Name = '{name}'");
-            if (tables.Count == 0)
-            {
-                var types = await connection.QueryAsync<Type>($"Select * from 'Type' where Assembly = '{type.Assembly.FullName}' AND Namespace = '{type.Namespace}' AND Name = '{type.Name}'");
-                await connection.RunInTransactionAsync(c =>
-                {
-
-                    int typeId;
-                    if (types.Count == 0)
-                    {
-                        c.Insert(new Type { Assembly = type.Assembly.FullName, Namespace = type.Namespace, Name = type.Name });
-                        typeId = c.ExecuteScalar<int>("Select Max(Id) from 'Type'");
-                    }
-                    else if (types.Count == 1)
-                    {
-                        typeId = types.Single().Id;
-                    }
-                    else
-                        throw new Exception("56f 34 4");
-
-                    var i = c.Insert(new Table { Guid = guid, Name = name, Parent = null, Type = typeId });
-
-                });
-                return guid;
-            }
-            else if (tables.Count == 1)
-            {
-                return tables.Single().Guid;
-            }
-            else
-            {
-                throw new Exception("e99re 4323");
-            }
-        }
-
-
-        public async Task<Guid> FindOrCreateKeyByParent(Guid parent, string name, System.Type type)
-        {
-            await initialisationTask;
-
 
             var tables = await connection.QueryAsync<Table>($"Select * from 'Table' where Parent = '{parent}' AND Name = '{name}'");
             if (tables.Count == 0)
@@ -176,11 +188,12 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
 
                     var i = c.Insert(new Table { Guid = guid, Name = name, Parent = parent, Type = typeId });
                 });
-                return guid;
+                return new Key(guid, name, type);
             }
             if (tables.Count == 1)
             {
-                return tables.Single().Guid;
+                var table = tables.Single();
+                return new Key(table.Guid, name, type);
             }
             else
             {
@@ -189,10 +202,15 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
         }
 
 
-        public async Task<List<object>> Find(Guid key)
+        public async Task<object> FindValue(IKey key)
         {
+            if (key is not Key { Guid: var guid } _key)
+            {
+                throw new Exception("reg 43cs ");
+            }
+
             await initialisationTask;
-            var tables = await connection.Table<Table>().Where(v => v.Guid.Equals(key)).ToListAsync();
+            var tables = await connection.Table<Table>().Where(v => v.Guid.Equals(guid)).ToListAsync();
 
             if (tables.Count == 0)
             {
@@ -224,7 +242,7 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
                             throw new Exception("332 b64ere 4323");
 
                     }
-                    return list;
+                    return list.LastOrDefault();
                 }
             }
             else

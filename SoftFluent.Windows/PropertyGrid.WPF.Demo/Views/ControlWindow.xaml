@@ -52,7 +52,11 @@
 
         <btn:StepButtons x:Name="StepButtons"></btn:StepButtons>
 
-        <UniformGrid  Grid.Row="1" Rows="1"  Background="Beige">
+        <UniformGrid  Grid.Row="1" Rows="1"  >
+            <UniformGrid.Background>
+                <SolidColorBrush Opacity="0.5" Color="#FF7B7B4E"></SolidColorBrush>
+            </UniformGrid.Background>
+     
             <TextBlock Text="{Binding ElementName=Past, Path=Items.Count}" HorizontalAlignment="Center"></TextBlock>
             <Ellipse Height="40" Width="40"></Ellipse>
             <TextBlock Text="{Binding ElementName=Present, Path=Items.Count}" HorizontalAlignment="Center"></TextBlock>
@@ -63,13 +67,30 @@
 
         <wpf:UniformStackPanel x:Name="HistoryPanel" Grid.Row="3">
             <ScrollViewer>
-                <ItemsControl x:Name="Past"  ItemsSource="{Binding Past}" Background="LightGreen"/>
+                <ItemsControl x:Name="Past"  ItemsSource="{Binding Past}">
+                    <ItemsControl.Background>
+                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0" Opacity="0.5">
+                            <GradientStop Color="#FF7B7B4E" Offset="0.25"/>
+                            <GradientStop Color="White" Offset="0.75"/>
+                        </LinearGradientBrush>
+                    </ItemsControl.Background>
+                </ItemsControl>
             </ScrollViewer>
             <ScrollViewer>
-                <ItemsControl x:Name="Present"  ItemsSource="{Binding Present}" Background="LightYellow"/>
+                <ItemsControl x:Name="Present"  ItemsSource="{Binding Present}">
+                    <ItemsControl.Background>
+                        <SolidColorBrush Color="White"  Opacity="1"/>
+                    </ItemsControl.Background>
+                </ItemsControl>
             </ScrollViewer>
             <ScrollViewer>
-                <ItemsControl x:Name="Future" ItemsSource="{Binding Future}" Background="LightBlue">
+                <ItemsControl x:Name="Future" ItemsSource="{Binding Future}" >
+                    <ItemsControl.Background>
+                        <LinearGradientBrush EndPoint="0,1" StartPoint="0,0" Opacity="0.5">
+                            <GradientStop Color="White" Offset="0.25"/>
+                            <GradientStop Color="#FF5C7982" Offset="0.75"/>
+                        </LinearGradientBrush>
+                    </ItemsControl.Background>
                 </ItemsControl>
                 <!--<ListView  Name="Future"  ItemsSource="{Binding Future}">
                     <ListView.View>

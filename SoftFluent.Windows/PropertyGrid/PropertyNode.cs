@@ -1,14 +1,14 @@
 using System.Reactive.Linq;
 using System.Collections;
 using System.Collections.Specialized;
-using Models;
 using System;
-using Trees;
 using Utility.Observables;
 using PropertyGrid.Abstractions;
 using System.ComponentModel;
 using SoftFluent.Windows.Utilities;
 using PropertyGrid.Infrastructure;
+using Utility.Collections;
+using Utility.Nodes.Abstractions;
 
 namespace SoftFluent.Windows
 {

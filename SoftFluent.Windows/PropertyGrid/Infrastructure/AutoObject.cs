@@ -1,4 +1,5 @@
 ﻿using Abstractions;
+using PropertyGrid.Abstractions;
 using SoftFluent.Windows;
 using System.ComponentModel;
 using System.Reflection;
@@ -8,18 +9,7 @@ using System.Xml.Serialization;
 namespace PropertyGrid.Infrastructure
 {
 
-    public record Key(Guid Guid, string Name, Type Type) : IKey
-    {
-        public bool Equals(IKey? other)
-        {
-            return Equals(other as Key);
-        }
 
-        public override int GetHashCode()
-        {
-            return Guid.GetHashCode();
-        }
-    }
 
     /// <summary>
     /// Defines a utility class to implement objects with typed properties without private fields.

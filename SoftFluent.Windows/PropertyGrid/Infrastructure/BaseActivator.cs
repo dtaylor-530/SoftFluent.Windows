@@ -1,12 +1,15 @@
 ﻿using Abstractions;
 using System.ComponentModel;
 using PropertyGrid.Infrastructure;
+using PropertyGrid.Abstractions;
 
 namespace SoftFluent.Windows
 {
     public class BaseActivator
     {
         public static Dictionary<System.Type, System.Type> Interfaces { get; set; }
+
+        public static PropertyStore PropertyStore { get; set; }
 
         public virtual async Task<object?> CreateInstance(Guid parent, string name, System.Type propertyType, System.Type type)
         {
@@ -15,7 +18,7 @@ namespace SoftFluent.Windows
                 throw new ArgumentNullException("type");
             }
 
-            var cx = await PropertyStore.Instance.GetGuidByParent(new Key(parent, name, propertyType));
+            var cx = await PropertyStore.GetGuidByParent(new Key(parent, name, propertyType));
 
             var args = new object[]
             {

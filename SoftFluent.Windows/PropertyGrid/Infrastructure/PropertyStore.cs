@@ -2,13 +2,14 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Abstractions;
+using PropertyGrid.Abstractions;
 using PropertyGrid.WPF.Demo;
 using PropertyGrid.WPF.Demo.Infrastructure;
-using Key = PropertyGrid.Infrastructure.Key;
 
 namespace PropertyGrid.Infrastructure
 {
     public record PropertyChange(IKey Key, object Value) : IPropertyChange;
+
     public class Order
     {
         public Key Key { get; set; }
@@ -21,21 +22,28 @@ namespace PropertyGrid.Infrastructure
     {
         readonly Dictionary<IKey, IObserver> dictionary = new(new KeyComparer());
 
-        private readonly DirectoryInfo directory;
         readonly Repository repo;
         readonly History history = new();
         readonly Controllable controllable = new();
         readonly System.Timers.Timer timer = new(TimeSpan.FromSeconds(0.1));
-
-        private PropertyStore()
+        Lazy<IRepository> repository = new(() =>
         {
-            directory = Directory.CreateDirectory("../../../Data");
-            repo = new(directory.FullName);
+            var directory = Directory.CreateDirectory("../../../Data");
+            return new Repository(directory.FullName);
+        });
+        public PropertyStore()
+        {
+  
             controllable.Subscribe(this);
             history.Subscribe(this);
 
             timer.Elapsed += Timer_Elapsed;
 
+        }
+
+        protected virtual IRepository Repository
+        {
+            get => repository.Value;
         }
 
         private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
@@ -82,19 +90,12 @@ namespace PropertyGrid.Infrastructure
             return string.Empty;
         }
 
+        // Move this into history
         public async Task<Guid> GetGuidByParent(IKey key)
         {
-            if (key is not Key { Guid: var guid, Name: var name, Type: var type } _key)
-            {
-                throw new Exception("reg 43cs ");
-            }
-            return await repo.FindOrCreateKeyByParent(guid, name, type);
+            var childKey= await repo.FindKeyByParent(key);
+            return (childKey as Key)?.Guid ?? throw new Exception("dfb 43 4df");
         }
-
-        //public async Task<Guid> GetGuid(Guid guid, string? name, System.Type type)
-        //{
-        //    return await repo.FindOrCreateKey(guid, name, type);
-        //}
 
         public void OnCompleted()
         {
@@ -138,11 +139,11 @@ namespace PropertyGrid.Infrastructure
                     {
                         try
                         {
-                            var guid = await GetGuidByParent(order.Key);
-                            var find = await repo.Find(guid);
-                            if (find.Any())
+                            var guid = await repo.FindKeyByParent(order.Key);
+                            var find = await repo.FindValue(guid);
+                            if (find != null)
                             {
-                                Update(find.Last(), order);
+                                Update(find, order);
                             }
                         }
                         catch (Exception ex)
@@ -156,8 +157,8 @@ namespace PropertyGrid.Infrastructure
                     {
                         try
                         {
-                            var guid = await GetGuidByParent(order.Key);
-                            await repo.Update(guid, order.Value);
+                            var guid = await repo.FindKeyByParent(order.Key);
+                            await repo.UpdateValue(guid, order.Value);
                             Update(order.Value, order);
                         }
                         catch (Exception ex)
@@ -176,7 +177,7 @@ namespace PropertyGrid.Infrastructure
             dictionary[order.Key].OnNext(new PropertyChange(order.Key, a));
         }
 
-        public static PropertyStore Instance { get; } = new();
+        //public static PropertyStore Instance { get; } = new();
 
         class KeyComparer : IEqualityComparer<IKey>
         {

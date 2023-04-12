@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Reactive.Linq;
-using Models;
 using PropertyGrid.Infrastructure;
+using Utility.Collections;
 
 namespace PropertyGrid.WPF.Demo.Infrastructure
 {
