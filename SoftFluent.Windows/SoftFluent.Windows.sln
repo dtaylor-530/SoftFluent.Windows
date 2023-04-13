@@ -32,6 +32,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyGrid.Abstractions", "PropertyGrid.Abstractions\PropertyGrid.Abstractions.csproj", "{7347D94F-ED58-4D56-8A04-DEA12030B936}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utility.WPF.Packages", "..\..\Utility.WPF\Utility.WPF.Packages\Utility.WPF.Packages.csproj", "{88B053D6-AC11-4DB1-8817-16AEF16E56D7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PropertyTree.API", "Tree.API\PropertyTree.API.csproj", "{6AB6A98E-1297-42FB-ACC5-C0702EEAFAAD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Utility.WPF.Controls.Trees", "..\..\Utility.WPF\Utility.WPF.Controls.Trees\Utility.WPF.Controls.Trees.csproj", "{7235D105-9860-45BC-951C-B4BD3A0E3AD1}"
 EndProject

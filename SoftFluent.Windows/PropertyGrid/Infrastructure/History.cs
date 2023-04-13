@@ -28,7 +28,7 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
 
         public void Add(object order)
         {
-            if(isDirty)
+            if (isDirty)
             {
                 future.Clear();
             }
@@ -43,6 +43,8 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
             }
 
             future.Add(o);
+            if (present.Any())
+                Broadcast(present[0]);
         }
 
         public void Forward()
@@ -64,14 +66,14 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
         public void Back()
         {
             isDirty = true;
-            var d = past[^0];
+            var d = past[^1];
             //if (past.Any())
             future.Insert(0, present[0]);
             if (present.Count > 0)
                 present.RemoveAt(0);
             present.Add(d);
             past.Remove(d);
-            Broadcast(present);
+            Broadcast(present[0]);
         }
 
 

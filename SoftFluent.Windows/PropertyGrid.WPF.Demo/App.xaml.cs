@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Windows;
-using System.Windows.Forms;
+//using System.Windows.Forms;
 using System.Windows.Input;
 using Abstractions;
 using PropertyGrid.Demo.Model;
@@ -20,11 +20,11 @@ namespace SoftFluent.Windows.Samples
         {
 
             SQLitePCL.Batteries.Init();
-            var propertyStore = new PropertyStore();
+            var propertyStore = new WebStore();
             AutoObject.PropertyStore = BaseActivator.PropertyStore = propertyStore;
-            Collection.Context = System.Threading.SynchronizationContext.Current;
+            Collection.Context = DispatcherTimer.Context = System.Threading.SynchronizationContext.Current;
             BaseActivator.Interfaces = new() { { typeof(IViewModel), typeof(ViewModel) } };
-            var window = new Window { Content = new Customer2() };
+            var window = new Window { Content = new PropertyView { DataContext = new Model() } };
             window.Show();
             var controlWindow = new ControlWindow(propertyStore.Controllable, propertyStore.History);
             SetOnSecondScreen(controlWindow);
@@ -48,9 +48,9 @@ namespace SoftFluent.Windows.Samples
 
         public class WebStore : PropertyStore
         {
-            private 
-            
-            protected override IRepository Repository => base.Repository;
+            private HttpRepository store = new();
+
+            protected override IRepository Repository => store;
         }
     }
 }

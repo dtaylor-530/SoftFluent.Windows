@@ -1,54 +1,72 @@
-﻿using System;
-using System.ComponentModel;
-
-namespace SoftFluent.Windows.Samples
+﻿namespace PropertyGrid.Demo.Model
 {
-    [TypeConverter(typeof(PointConverter))]
-    public struct Point
-    {
-        public Point(int x, int y)
-            : this()
-        {
-            X = x;
-            Y = y;
-        }
 
-        public int X { get; private set; }
-        public int Y { get; private set; }
+
+
+    public class Model
+    {
+        //public Guid Guid => Guid.Parse("1edf3c6d-1424-4771-8672-0b77d7c44342");
+
+        public Game CurrentGame { get; set; }
+        public Game PreviousGame { get; set; }
+
+        public Animation Animation { get; set; }
+        public Game StartGame { get; set; }
+        public Game EndGame { get; set; }
+
+        public PrizeWheelUpdate PrizeWheelUpdate { get; set; }
+
+        public ScreenSaver ScreenSaver { get; set; }
     }
 
-    [Flags]
-    public enum DaysOfWeek
+
+    public class Game
     {
-        NoDay = 0,
-        Monday = 1,
-        Tuesday = 2,
-        Wednesday = 4,
-        Thursday = 8,
-        Friday = 16,
-        Saturday = 32,
-        Sunday = 64,
-        WeekDays = Monday | Tuesday | Wednesday | Thursday | Friday
+        public string Name { get; set; }
+
+        public List<Hole> Holes { get; set; }
     }
 
-    public enum Gender
+    public class Hole
     {
-        Male,
-        Female
+        public string Course { get; set; }
+        public string HoleNumber { get; set; }
+        public string HoleName { get; set; }
+        public int Points { get; set; }
+        public bool Supertube { get; set; }
+        public bool Hazard { get; set; }
+        public bool HoleInOne { get; set; }
+
+
     }
 
-    public enum Status
+    public class Animation
     {
-        //[PropertyGrid(Name = "Foreground", Value = "Black")]
-        //[PropertyGrid(Name = "Background", Value = "Orange")]
-        Unknown,
+        public bool SuperTube { get; set; }
+        public bool HoleInOne { get; set; }
+        public bool Hazard { get; set; }
+        public PointCalculator PointCalculator { get; set; }
+        public bool ShotTaken { get; set; }
+    }
 
-        //[PropertyGrid(Name = "Foreground", Value = "White")]
-        //[PropertyGrid(Name = "Background", Value = "Red")]
-        Invalid,
+    public class PointCalculator
+    {
+        public int Points { get; set; }
+        public int Sequence { get; set; }
+    }
 
-        //[PropertyGrid(Name = "Foreground", Value = "White")]
-        //[PropertyGrid(Name = "Background", Value = "Green")]
-        Valid
+    public class PrizeWheelUpdate
+    {
+        public int SegmentSequence { get; set; }
+        public string Name { get; set; }
+        public int ColourScheme { get; set; }
+        public bool PrintTicket { get; set; }
+        public int Size { get; set; }
+        public bool AllowWin { get; set; }
+    }
+
+    public class ScreenSaver
+    {
+        public string FileName { get; set; }
     }
 }

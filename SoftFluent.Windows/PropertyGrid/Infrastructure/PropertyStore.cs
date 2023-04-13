@@ -1,55 +1,102 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Abstractions;
 using PropertyGrid.Abstractions;
 using PropertyGrid.WPF.Demo;
 using PropertyGrid.WPF.Demo.Infrastructure;
+using Utility.Trees;
+using Utility.Trees.Abstractions;
 
 namespace PropertyGrid.Infrastructure
 {
-    public record PropertyChange(IKey Key, object Value) : IPropertyChange;
-
-    public class Order
+    public enum HistoryState
     {
-        public Key Key { get; set; }
-        public OrderType OrderType { get; set; }
-        public object Value { get; set; }
+        None,
+        Past,
+        Present,
+        Future
     }
 
+    public record PropertyChange(IKey Key, object Value) : IPropertyChange;
+
+    public class Order : ViewModel
+    {
+        private Exception exception;
+        private int progress;
+
+        public Key Key { get; set; }
+        public HistoryState State { get; set; }
+        public OrderType OrderType { get; set; }
+        public object Value { get; set; }
+        public int Progress { get => progress; set { progress = value; OnPropertyChanged(); } }
+        public Exception Exception
+        {
+            get => exception; set { exception = value; OnPropertyChanged(); }
+        }
+    }
+
+    public class DispatcherTimer : IObservable<DateTime>
+    {
+        Subject<DateTime> subject = new();
+        public static SynchronizationContext Context { get; set; }
+
+        public System.Timers.Timer Timer { get; set; } = new(TimeSpan.FromSeconds(0.1));
+
+        public DispatcherTimer()
+        {
+
+            Timer.Elapsed += Timer_Elapsed;
+        }
+
+        public void Start()
+        {
+            Timer.Start();
+        }
+        public void Stop()
+        {
+            Timer.Stop();
+        }
+
+        private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            Context.Post(a => subject.OnNext(e.SignalTime), null);
+        }
+
+        public IDisposable Subscribe(IObserver<DateTime> observer)
+        {
+            return subject.Subscribe(observer);
+        }
+    }
 
     public class PropertyStore : IPropertyStore, IObserver<ControlType>, IObserver<object>
     {
         readonly Dictionary<IKey, IObserver> dictionary = new(new KeyComparer());
-
-        readonly Repository repo;
+        //readonly Repository repo;
         readonly History history = new();
         readonly Controllable controllable = new();
-        readonly System.Timers.Timer timer = new(TimeSpan.FromSeconds(0.1));
+        DispatcherTimer timer = new();
         Lazy<IRepository> repository = new(() =>
         {
             var directory = Directory.CreateDirectory("../../../Data");
-            return new Repository(directory.FullName);
+            return new SqliteRepository(directory.FullName);
         });
         public PropertyStore()
         {
-  
+
             controllable.Subscribe(this);
             history.Subscribe(this);
-
-            timer.Elapsed += Timer_Elapsed;
-
+            timer.Subscribe(a =>
+            {
+                if (history.Future.GetEnumerator().MoveNext())
+                    history.Forward();
+            });
         }
 
         protected virtual IRepository Repository
         {
             get => repository.Value;
-        }
-
-        private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
-        {
-            if (history.Future.GetEnumerator().MoveNext())
-                history.Forward();
         }
 
         public IHistory History => history;
@@ -93,7 +140,7 @@ namespace PropertyGrid.Infrastructure
         // Move this into history
         public async Task<Guid> GetGuidByParent(IKey key)
         {
-            var childKey= await repo.FindKeyByParent(key);
+            var childKey = await Repository.FindKeyByParent(key);
             return (childKey as Key)?.Guid ?? throw new Exception("dfb 43 4df");
         }
 
@@ -118,9 +165,11 @@ namespace PropertyGrid.Infrastructure
                     timer.Start();
                     break;
                 case ControlType.Forward:
+                    timer.Stop();
                     history.Forward();
                     break;
                 case ControlType.Back:
+                    timer.Stop();
                     history.Back();
                     break;
             }
@@ -133,14 +182,18 @@ namespace PropertyGrid.Infrastructure
                 throw new Exception("g 3434 3");
             }
 
+            order.Progress = 0;
             switch (order.OrderType)
             {
                 case OrderType.Get:
                     {
                         try
                         {
-                            var guid = await repo.FindKeyByParent(order.Key);
-                            var find = await repo.FindValue(guid);
+                            var guid = await Repository.FindKeyByParent(order.Key);
+                            order.Progress = 50;
+                            var find = await Repository.FindValue(guid);
+                            order.Progress = 100;
+
                             if (find != null)
                             {
                                 Update(find, order);
@@ -148,7 +201,7 @@ namespace PropertyGrid.Infrastructure
                         }
                         catch (Exception ex)
                         {
-
+                            order.Exception = ex;
                         }
 
                         break;
@@ -157,13 +210,15 @@ namespace PropertyGrid.Infrastructure
                     {
                         try
                         {
-                            var guid = await repo.FindKeyByParent(order.Key);
-                            await repo.UpdateValue(guid, order.Value);
+                            var guid = await Repository.FindKeyByParent(order.Key);
+                            order.Progress = 50;
+                            await Repository.UpdateValue(guid, order.Value);
+                            order.Progress = 100;
                             Update(order.Value, order);
                         }
                         catch (Exception ex)
                         {
-
+                            order.Exception = ex;
                         }
 
                         break;

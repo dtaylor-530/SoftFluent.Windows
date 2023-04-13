@@ -13,10 +13,10 @@
                 <ResourceDictionary Source="/Infrastructure/Templates.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <DataTemplate DataType="{x:Type samples1:Customer2}">
+            <!--<DataTemplate DataType="{x:Type samples1:Customer2}">
                 <local1:PropertyView                                           
                         DataContext="{Binding }" />
-            </DataTemplate>
+            </DataTemplate>-->
 
             <DataTemplate DataType="{x:Type grid:PropertyBase}">
                 <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={x:Static local:DefaultConverter.Instance}}" 

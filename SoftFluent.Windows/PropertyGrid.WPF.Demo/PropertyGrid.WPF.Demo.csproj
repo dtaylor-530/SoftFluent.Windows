@@ -16,9 +16,9 @@
     <PackageReference Include="System.Reactive" Version="5.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Utility.WPF\Utility.WPF.Controls.Buttons\Utility.WPF.Controls.Buttons.csproj" />
-    <ProjectReference Include="..\..\..\Utility.WPF\Utility.WPF.Converters\Utility.WPF.Converters.csproj" />
+<ItemGroup>
+    <!--  <ProjectReference Include="..\..\..\Utility.WPF\Utility.WPF.Controls.Buttons\Utility.WPF.Controls.Buttons.csproj" />
+    <ProjectReference Include="..\..\..\Utility.WPF\Utility.WPF.Converters\Utility.WPF.Converters.csproj" />-->
     <ProjectReference Include="..\Infrastructure.WPF\Infrastructure.WPF.csproj" />
     <ProjectReference Include="..\PropertyGrid.Demo.Model\PropertyGrid.Demo.Model.csproj" />
     <ProjectReference Include="..\PropertyGrid.WPF\PropertyGrid.WPF.csproj" />
@@ -40,6 +40,48 @@
 
   <ItemGroup>
     <Folder Include="Data\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="MaterialDesignColors">
+      <HintPath>..\dlls\MaterialDesignColors.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignExtensions">
+      <HintPath>..\dlls\MaterialDesignExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="MaterialDesignThemes.Wpf">
+      <HintPath>..\dlls\MaterialDesignThemes.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="SpicyTaco.AutoGrid">
+      <HintPath>..\dlls\SpicyTaco.AutoGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility.Collections">
+      <HintPath>..\dlls\Utility.Collections.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility.Commands">
+      <HintPath>..\dlls\Utility.Commands.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility.Enums">
+      <HintPath>..\dlls\Utility.Enums.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility.Nodes.Abstractions">
+      <HintPath>..\dlls\Utility.Nodes.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility.Observables">
+      <HintPath>..\dlls\Utility.Observables.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility.WPF.Attached">
+      <HintPath>..\dlls\Utility.WPF.Attached.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility.WPF.Controls.Buttons">
+      <HintPath>..\dlls\Utility.WPF.Controls.Buttons.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility.WPF.Converters">
+      <HintPath>..\dlls\Utility.WPF.Converters.dll</HintPath>
+    </Reference>
+    <Reference Include="Utility.WPF.ResourceDictionarys">
+      <HintPath>..\dlls\Utility.WPF.ResourceDictionarys.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

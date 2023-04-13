@@ -47,12 +47,12 @@ namespace PropertyGrid.WPF.Demo.Infrastructure
 
 
 
-    public class Repository : IRepository
+    public class SqliteRepository : IRepository
     {
         protected readonly SQLiteAsyncConnection connection;
         private Task initialisationTask;
 
-        public Repository(string? dbDirectory)
+        public SqliteRepository(string? dbDirectory)
         {
             connection = new SQLiteAsyncConnection(Path.Combine(dbDirectory, "data" + "." + "sqlite"));
             Initialise();

@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PropertyGrid.WPF.Demo"
+        xmlns:abs="clr-namespace:PropertyGrid.Abstractions;assembly=PropertyGrid.Abstractions"
         xmlns:infra="clr-namespace:PropertyGrid.Infrastructure;assembly=PropertyGrid"
         xmlns:conv="http://schemas.utility.com/converters"
         xmlns:wpf="clr-namespace:UtilityWpf.Panels"
@@ -13,7 +14,7 @@
         Title="ControlWindow" Height="300" Width="400">
     <FrameworkElement.Resources>
 
-        <DataTemplate DataType="{x:Type infra:Key}">
+        <DataTemplate DataType="{x:Type abs:Key}">
             <UniformGrid Height="30" Rows="1" >
                 <Viewbox >
                     <Border  Background="White" AutomationProperties.IsRowHeader="False">
@@ -31,7 +32,7 @@
 
         <DataTemplate DataType="{x:Type infra:Order}">
             <Viewbox>
-                <st:AutoGrid Columns="400,50,*" Background="Transparent" >
+                <st:AutoGrid Columns="400,50,*,*,*" Background="Transparent" >
                     <Border BorderThickness="1" BorderBrush="Transparent" Background="White">
                         <ContentControl Content="{Binding Key}"></ContentControl>
                     </Border>
@@ -39,7 +40,17 @@
                         <TextBlock Text="{Binding OrderType}" HorizontalAlignment="Center"></TextBlock>
                     </Border>
                     <Border BorderThickness="1" BorderBrush="Transparent" Background="White" MinWidth="30">
+                        <Grid>
+                            <ProgressBar  Maximum="100" Value="{Binding Progress}"></ProgressBar>
+                            <TextBlock Text="{Binding Progress}"></TextBlock>
+
+                        </Grid>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Transparent" Background="White" MinWidth="30">
                         <TextBlock Text="{Binding Value}"></TextBlock>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Transparent" Background="White" MinWidth="10">
+                        <TextBlock Text="{Binding Exception.Message}"></TextBlock>
                     </Border>
                 </st:AutoGrid>
             </Viewbox>
@@ -65,7 +76,12 @@
         </UniformGrid>
 
 
-        <wpf:UniformStackPanel x:Name="HistoryPanel" Grid.Row="3">
+        <Grid x:Name="HistoryPanel" Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="3*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="3*"></RowDefinition>
+            </Grid.RowDefinitions>
             <ScrollViewer>
                 <ItemsControl x:Name="Past"  ItemsSource="{Binding Past}">
                     <ItemsControl.Background>
@@ -76,15 +92,16 @@
                     </ItemsControl.Background>
                 </ItemsControl>
             </ScrollViewer>
-            <ScrollViewer>
-                <ItemsControl x:Name="Present"  ItemsSource="{Binding Present}">
+            <Border Margin="2"  Grid.Row="1" BorderBrush="Gray" BorderThickness="8">
+                <ItemsControl x:Name="Present" ItemsSource="{Binding Present}">
                     <ItemsControl.Background>
                         <SolidColorBrush Color="White"  Opacity="1"/>
                     </ItemsControl.Background>
                 </ItemsControl>
-            </ScrollViewer>
-            <ScrollViewer>
-                <ItemsControl x:Name="Future" ItemsSource="{Binding Future}" >
+            </Border>
+     
+            <ScrollViewer Grid.Row="2">
+                <ItemsControl x:Name="Future"  ItemsSource="{Binding Future}" >
                     <ItemsControl.Background>
                         <LinearGradientBrush EndPoint="0,1" StartPoint="0,0" Opacity="0.5">
                             <GradientStop Color="White" Offset="0.25"/>
@@ -110,7 +127,7 @@
                     </ListView.View>
                 </ListView>-->
             </ScrollViewer>
-        </wpf:UniformStackPanel>
+        </Grid>
     </st:AutoGrid>
 
 </Window>

@@ -1,4 +1,8 @@
-﻿using System.Windows;
+﻿using PropertyGrid.WPF.Demo.Infrastructure;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 using Utility.Commands;
 using Utility.Enums;
 
@@ -15,7 +19,7 @@ namespace PropertyGrid.WPF.Demo
 
             HistoryPanel.DataContext = history;
 
-            StepButtons.Enabled = Step.Walk| Step.Backward| Step.Forward ;
+            StepButtons.Enabled = Step.Walk | Step.Backward | Step.Forward;
 
             StepButtons.Command = new Command<Step>(step =>
             {
@@ -27,7 +31,7 @@ namespace PropertyGrid.WPF.Demo
                         controllable.Back();
                         break;
                     case Step.Forward:
-                        controllable.Forward();             
+                        controllable.Forward();
                         break;
                     case Step.Walk:
                         controllable.Play();
@@ -35,12 +39,35 @@ namespace PropertyGrid.WPF.Demo
                         break;
                     case Step.Wait:
                         controllable.Pause();
-                        StepButtons.Enabled = Step.Walk | Step.Backward | Step.Forward;
+                        Update();
                         break;
                     case Step.All:
                         break;
                 }
             });
+
+            history.Subscribe(a =>
+            {
+                Update();
+            });
+
+            void Update()
+            {
+
+                StepButtons.Enabled = Steps().Aggregate((x, y) => x |= y);
+
+                IEnumerable<Step> Steps()
+                {
+
+                    if (history.Future.GetEnumerator().MoveNext())
+                    {
+                        yield return Step.Walk;
+                        yield return Step.Forward;
+                    }
+                    if (history.Past.GetEnumerator().MoveNext())
+                        yield return Step.Backward;
+                }
+            }
         }
     }
 }

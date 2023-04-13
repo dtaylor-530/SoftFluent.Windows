@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using Utility.WPF.Helper;
 
 namespace PropertyGrid.WPF.Demo
 {
